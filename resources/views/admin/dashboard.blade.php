@@ -2,12 +2,12 @@
 
 @section('content')
 <style>
-  /* Warna utama */
+  /* --- Style utama --- */
   :root {
-    --color-primary: #fff;          /* putih */
-    --color-secondary: #fff;     /* abu abu */
-    --color-accent: #5a1a1a;        /* abu gelap / merah gelap */
-    --color-text: #000;             /* hitam */
+    --color-primary: #fff;
+    --color-secondary: #fff;
+    --color-accent: #5a1a1a;
+    --color-text: #000;
   }
 
   body {
@@ -18,16 +18,14 @@
     color: var(--color-text);
   }
 
-  /* Wrapper dashboard dan sidebar */
   .dashboard-wrapper {
-    max-width: 1200px; /* Lebar container */
+    max-width: 1200px;
     margin: auto;
     margin-top: 20px;
     display: flex;
     gap: 30px;
   }
 
-  /* Dashboard utama */
   .dashboard {
     flex: 3;
     background: var(--color-secondary);
@@ -120,7 +118,6 @@
     color: #5a1a1a;
   }
 
-  /* Icon simple */
   .icon {
     font-size: 20px;
     background: var(--color-secondary);
@@ -129,7 +126,6 @@
     color: var(--color-text);
   }
 
-  /* Recent Movement + controls */
   .recent-movement {
     background: var(--color-primary);
     padding: 20px;
@@ -165,7 +161,6 @@
     width: 140px;
   }
 
-  /* Top Products Section */
   .top-products {
     background: var(--color-primary);
     margin-top: 30px;
@@ -224,7 +219,6 @@
     color: var(--color-text);
   }
 
-  /* animasi clik gambar */
   .clickable {
     cursor: pointer;
     transition: transform 0.2s ease;
@@ -252,10 +246,10 @@
     display: block;
     max-width: 80vw;
     max-height: 80vh;
-    object-fit: contain;   /* ⬅ Ini penting */
+    object-fit: contain;
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(255,255,255,0.3);
-    background-color: #fff; /* Tambahan untuk kontras */
+    background-color: #fff;
   }
 
   .close {
@@ -273,7 +267,6 @@
     color: var(--color-secondary);
   }
 
-  /* Sidebar stok barang */
   .sidebar {
     flex: 1;
     background: var(--color-secondary);
@@ -331,7 +324,9 @@
     color: var(--color-text);
   }
 
-  /* Responsive */
+  /* --- Responsiveness --- */
+
+  /* Tablet */
   @media (max-width: 1024px) {
     .dashboard-wrapper {
       flex-direction: column;
@@ -340,6 +335,100 @@
     .sidebar {
       max-height: none;
       margin-top: 30px;
+    }
+  }
+
+  /* Tablet kecil dan HP */
+  @media (max-width: 768px) {
+    .dashboard-wrapper {
+      flex-direction: column;
+      padding: 20px;
+    }
+    .dashboard, .sidebar {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 0 30px 0;
+    }
+
+    .metrics {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card .value {
+      font-size: 24px;
+    }
+
+    .card .title {
+      font-size: 12px;
+    }
+
+    .recent-movement-header select,
+    .recent-movement-header input {
+      width: 100px;
+      font-size: 12px;
+    }
+
+    .recent-movement-header {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .recent-movement-header div:last-child {
+      display: flex;
+      gap: 10px;
+    }
+
+    .top-products h3 {
+      font-size: 16px;
+    }
+
+    .product-list li {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .product-name, .product-sales {
+      font-size: 16px;
+    }
+
+    .product-img {
+      width: 80px;
+    }
+
+    .stock-list li {
+      font-size: 14px;
+    }
+  }
+
+  /* HP kecil */
+  @media (max-width: 480px) {
+    .metrics {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      padding: 15px;
+    }
+
+    .card .value {
+      font-size: 20px;
+    }
+
+    .dashboard-wrapper {
+      padding: 10px;
+    }
+
+    .product-name, .product-sales {
+      font-size: 14px;
+    }
+
+    .product-img {
+      width: 60px;
+    }
+
+    .stock-list li {
+      font-size: 12px;
     }
   }
 </style>
@@ -492,12 +581,12 @@
         label: 'Movement',
         data: [2100, 1800, 2000, 2200, 1900, 2500, 2700, 3100, 3400, 3200, 3500, 3300],
         fill: true,
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',      // hitam transparan ringan
-        borderColor: 'rgba(0, 0, 0, 1)',              // hitam solid
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        borderColor: 'rgba(0, 0, 0, 1)',
         borderWidth: 2,
         tension: 0.3,
         pointRadius: 4,
-        pointBackgroundColor: 'rgba(0, 0, 0, 1)'     // hitam solid
+        pointBackgroundColor: 'rgba(0, 0, 0, 1)'
       }]
     },
     options: {
@@ -510,18 +599,18 @@
           max: 4000,
           ticks: {
             stepSize: 500,
-            color: '#000000'   // hitam
+            color: '#000000'
           },
           grid: {
-            color: 'rgba(0, 0, 0, 0.1)'   // hitam sangat transparan
+            color: 'rgba(0, 0, 0, 0.1)'
           }
         },
         x: {
           ticks: {
-            color: '#000000'   // hitam
+            color: '#000000'
           },
           grid: {
-            color: 'rgba(0, 0, 0, 0.05)'  // hitam sangat transparan tipis
+            color: 'rgba(0, 0, 0, 0.05)'
           }
         }
       },
@@ -532,7 +621,6 @@
     }
   });
 </script>
-
 
 <!-- Modal for zoom image -->
 <div id="imgModal" class="modal" onclick="closeImageModal()">
