@@ -45,3 +45,6 @@ class AuthController extends Controller
         return view('auth.auth');
     }
 }
+
+
+// halo jevon seksi
