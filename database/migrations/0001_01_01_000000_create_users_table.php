@@ -12,14 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->id('user_id');
+            $table->string('user_name');
+            $table->string('user_email')->unique();
+            $table->string('user_password');
+            $table->string('user_phone')->nullable();
+            $table->string('user_role')->default('customer'); // bisa "admin", "customer", dll
+
+            // Optional Laravel needs
             $table->rememberToken();
             $table->timestamps();
         });
+
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

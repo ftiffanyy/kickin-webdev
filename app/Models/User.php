@@ -2,47 +2,48 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    // ✅ Pakai primary key baru
+    protected $primaryKey = 'user_id';
+
+    // ✅ Jika kamu rename password menjadi user_password, sesuaikan di bawah
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'user_name',
+        'user_email',
+        'user_password',
+        'user_phone',
+        'user_role',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
+        'user_password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    // ✅ Perlu override password default untuk login
+    public function getAuthPassword()
+    {
+        return $this->user_password;
+    }
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
         ];
     }
+
+    // ✅ Jika primary key bukan "id"
+    public $incrementing = true;
+    public $timestamps = true;
+
+    // ✅ Jika primary key bukan integer (tidak perlu ubah ini jika tetap integer)
+    // protected $keyType = 'int';
 }
