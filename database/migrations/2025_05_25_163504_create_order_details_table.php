@@ -12,14 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order_details', function (Blueprint $table) {
-            $table->id('detail_id');
+            $table->id();
+            $table->decimal('price_at_purchase', 10, 2);
+            $table->integer('qty');
             $table->unsignedBigInteger('variant_id');
+            $table->foreign('variant_id')->references('id')->on('variants')->onDelete('cascade');
             $table->unsignedBigInteger('order_id');
-            $table->decimal('detail_price_at_purchase', 10, 2);
-            $table->integer('detail_qty');
-            $table->tinyInteger('detail_status_del')->default(0);
-            $table->foreign('variant_id')->references('variant_id')->on('variants')->onDelete('cascade');
-            $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade');
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->timestamps();
         });
     }

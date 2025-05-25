@@ -12,14 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reviews', function (Blueprint $table) {
-            $table->id('review_id');
+            $table->id();
+            $table->integer('rating')->check('review_rating >= 1 AND review_rating <= 5');
+            $table->timestamp('date')->useCurrent();
             $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('product_id');
-            $table->integer('review_rating')->check('review_rating >= 1 AND review_rating <= 5');
-            $table->timestamp('review_date')->useCurrent();
-            $table->tinyInteger('review_status_del')->default(0);
-            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
-            $table->foreign('product_id')->references('product_id')->on('products')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->timestamps();
         });
     }

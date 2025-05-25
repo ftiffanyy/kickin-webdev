@@ -12,19 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id('product_id');
-            $table->string('product_name');
-            $table->decimal('product_cogs', 10, 2);
-            $table->decimal('product_price', 10, 2);
-            $table->decimal('product_discount', 5, 2)->default(0);
-            $table->string('product_brand');
-            $table->enum('product_gender', ['male', 'female', 'unisex'])->default('unisex');
-            $table->text('product_description')->nullable();
-            $table->decimal('product_rating_avg', 3, 2)->default(0);
-            $table->integer('product_total_reviews')->default(0);
-            $table->integer('product_sold')->default(0);
-            $table->boolean('product_hide_status')->default(false);
-            $table->tinyInteger('product_status_del')->default(0);
+            $table->id();
+            $table->string('name');
+            $table->decimal('cogs', 10, 2);
+            $table->decimal('price', 10, 2);
+            $table->decimal('discount', 5, 2)->default(0);
+            $table->string('brand');
+            $table->enum('gender', ['male', 'female', 'unisex'])->default('unisex');
+            $table->text('description')->nullable();
+            $table->decimal('rating_avg', 3, 2)->default(0);
+            $table->integer('total_reviews')->default(0);
+            $table->integer('sold')->default(0);
+            $table->boolean('hide_status')->default(false);
             $table->timestamps();
         });
     }

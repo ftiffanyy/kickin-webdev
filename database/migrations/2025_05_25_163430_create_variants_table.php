@@ -12,12 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('variants', function (Blueprint $table) {
-            $table->id('variant_id');
+            $table->id();
+            $table->string('size');
+            $table->integer('stock')->default(0);
             $table->unsignedBigInteger('product_id');
-            $table->string('variant_size');
-            $table->integer('variant_stock')->default(0);
-            $table->tinyInteger('variant_status_del')->default(0);
-            $table->foreign('product_id')->references('product_id')->on('products')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->timestamps();
         });
     }
