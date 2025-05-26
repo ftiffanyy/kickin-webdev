@@ -21,3 +21,6 @@ class AdminController extends Controller
     }
 }
 
+
+
+// halo ini valen tes ke 2
