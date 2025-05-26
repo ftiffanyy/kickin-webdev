@@ -6,7 +6,7 @@
     $isShipping = strtolower($order->status) === 'shipping';
     $statusOptions = $isShipping
         ? ['Pending', 'Dispatched', 'In Transit', 'Delivered']
-        : ['Pending', 'already-pick-up'];
+        : ['Pending', 'Already Pick Up'];
     $currentStatus = strtolower($order->shipping_status);
 @endphp
 
@@ -85,15 +85,15 @@
             <div class="status-notes-container">
                 <h3>Update Order Status</h3>
                 <div class="status-section">
-                    <div id="status-display" class="status-{{ $currentStatus }}">
-                        <span>{{ ucfirst(str_replace('-', ' ', $order->shipping_status)) }}</span>
+                    <div id="status-display" class="status-{{ str_replace(' ', '-', strtolower($order->shipping_status)) }}">
+                        <span>{{ ucfirst($order->shipping_status) }}</span>
                     </div>
 
                     <label for="status-select"><strong>Update Status:</strong></label>
                     <select id="status-select" class="form-select">
                         @foreach ($statusOptions as $status)
-                            <option value="{{ $status }}" {{ $currentStatus === $status ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('-', ' ', $status)) }}
+                            <option value="{{ strtolower($status) }}" {{ $currentStatus === strtolower($status) ? 'selected' : '' }}>
+                                {{ $status }}
                             </option>
                         @endforeach
                     </select>
@@ -169,17 +169,6 @@
         color: #666;
     }
 
-    .delivery-box .edit-link {
-        color: #007bff;
-        font-size: 14px;
-        font-weight: 600;
-        text-decoration: none;
-    }
-
-    .delivery-box .edit-link:hover {
-        text-decoration: underline;
-    }
-
     .delivery-box-content p {
         margin: 4px 0;
         font-size: 15px;
@@ -215,11 +204,6 @@
         background-color: #f9f9f9;
         border-bottom: 1px solid #ddd;
         font-size: 15px;
-    }
-
-    .product-table-row:last-child {
-        border-radius: 0 0 8px 8px;
-        border-bottom: none;
     }
 
     .product-info {
@@ -318,50 +302,10 @@
         color: black;
     }
 
+    .status-delivered,
     .status-already-pick-up {
         background-color: #28a745;
     }
-
-    /* Responsive styles */
-    @media (max-width: 1024px) {
-        .order-detail-container {
-            flex-wrap: wrap;
-            margin: 0 15px 30px;
-        }
-        .order-left-container, .order-right-container {
-            flex: 1 1 100%;
-            margin-bottom: 20px;
-        }
-        .order-left-container {
-            padding: 20px;
-        }
-        .order-right-container {
-            padding: 20px;
-        }
-    }
-
-    @media (max-width: 600px) {
-        .page-title {
-            font-size: 28px;
-            margin: 20px 15px;
-        }
-        .product-table-header, .product-table-row {
-            grid-template-columns: 1.5fr 1fr 1fr 1fr;
-            font-size: 14px;
-            padding: 10px 12px;
-        }
-        .order-horizontal-info {
-            font-size: 14px;
-        }
-        .form-select, .message-box-section textarea {
-            font-size: 14px;
-        }
-        .btn {
-            font-size: 14px;
-            padding: 10px;
-        }
-    }
-    
 </style>
 
 <script>
@@ -369,25 +313,15 @@
         const selected = document.getElementById("status-select").value;
         const display = document.getElementById("status-display");
 
-        // Bersihkan semua class status sebelumnya
-        display.classList.remove(
-            'status-pending',
-            'status-dispatched',
-            'status-in-transit',
-            'status-delivered',
-            'status-already-pick-up'
-        );
-
-        // Tambahkan class status baru
-        display.classList.add('status-' + selected);
-
-        // Update teks di dalam span
+        display.className = '';
+        display.classList.add('status-' + selected.replace(/\s+/g, '-').toLowerCase());
         display.innerHTML = `<span>${selected.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>`;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        updateStatus(); // Set awal
+        updateStatus();
         document.getElementById("status-select").addEventListener("change", updateStatus);
     });
 </script>
+
 @endsection

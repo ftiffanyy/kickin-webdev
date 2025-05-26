@@ -9,7 +9,7 @@ class AdminController extends Controller
 {
     public function orderadmin()
     {
-        $orders = Order::get();  // pastikan relasi 'user' sudah dibuat
+        $orders = Order::get(); 
         return view('admin.orderpage', compact('orders'));
     }
 

@@ -142,6 +142,10 @@
         border: 2px solid green;
     }
 
+    .status.already-pick-up {
+        border: 2px solid green;
+    }
+
     .btn {
         background-color: #fff;
         color: #181B1E;
