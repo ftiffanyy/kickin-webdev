@@ -14,11 +14,10 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->decimal('cogs', 10, 2);
             $table->decimal('price', 10, 2);
             $table->decimal('discount', 5, 2)->default(0);
             $table->string('brand');
-            $table->enum('gender', ['male', 'female', 'unisex'])->default('unisex');
+            $table->enum('gender', ['Male', 'Female', 'Unisex'])->default('Unisex');
             $table->text('description')->nullable();
             $table->decimal('rating_avg', 3, 2)->default(0);
             $table->integer('total_reviews')->default(0);
