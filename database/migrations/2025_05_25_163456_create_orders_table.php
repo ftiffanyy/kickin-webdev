@@ -16,13 +16,21 @@ return new class extends Migration
             $table->timestamp('date')->useCurrent();
             $table->decimal('total_price', 10, 2);
             $table->integer('total_qty');
-            $table->enum('status', ['pickup', 'shipping'])->default('shipping');
-            $table->text('shipping_address');
-            $table->enum('shipping_status', ['pending', 'shipped', 'delivered'])->default('pending');
+            $table->enum('status', ['Pick Up', 'Shipping'])->default('shipping');
+            $table->text('shipping_address')->nullable();
+            $table->enum('shipping_status', ['Pending', 'Dispatched', 'In Transit', 'Delivered'])->default('pending');
+            
+            // Tambahan
+            $table->string('invoice_number')->unique(); 
+            $table->text('payment_url')->nullable();    
+
+            // Foreign key ke users
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
             $table->timestamps();
         });
+
     }
 
     /**
