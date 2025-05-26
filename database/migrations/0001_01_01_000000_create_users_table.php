@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('phone')->nullable();
-            $table->enum('role', ['admin', 'customer'])->default('customer');
+            $table->enum('role', ['Admin', 'Customer'])->default('Customer');
 
             // Optional Laravel needs
             $table->rememberToken();
