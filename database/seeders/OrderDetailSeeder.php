@@ -2,14 +2,16 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class OrderDetailsTableSeeder extends Seeder
+class OrderDetailSeeder extends Seeder
 {
-    public function run()
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
     {
         DB::table('order_details')->insert([
             [
@@ -135,4 +137,3 @@ class OrderDetailsTableSeeder extends Seeder
         ]);
     }
 }
-
