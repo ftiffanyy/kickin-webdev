@@ -16,7 +16,6 @@ class ProductSeeder extends Seeder
         DB::table('products')->insert([
         [
             'name' => "air force 1 '07 men's basketball shoes - white",
-            'cogs' => 0,
             'price' => 1549000,
             'discount' => 30,
             'brand' => 'NIKE',
@@ -31,7 +30,6 @@ class ProductSeeder extends Seeder
         ],
         [
             'name' => "air force 1 '07 men's basketball shoes - black",
-            'cogs' => 0,
             'price' => 1549000,
             'discount' => 10,
             'brand' => 'NIKE',
@@ -46,7 +44,6 @@ class ProductSeeder extends Seeder
         ],
         [
             'name' => "speedcat og unisex lifestyle shoes - black",
-            'cogs' => 0,
             'price' => 1899000,
             'discount' => 0,
             'brand' => 'PUMA',
@@ -61,7 +58,6 @@ class ProductSeeder extends Seeder
         ],
         [
             'name' => "speedcat og unisex lifestyle shoes - red",
-            'cogs' => 0,
             'price' => 1899000,
             'discount' => 0,
             'brand' => 'PUMA',
@@ -76,7 +72,6 @@ class ProductSeeder extends Seeder
         ],
         [
             'name' => "palermo moda vintage women's lifestyle shoes - blue",
-            'cogs' => 0,
             'price' => 1599000,
             'discount' => 10,
             'brand' => 'PUMA',
@@ -91,7 +86,6 @@ class ProductSeeder extends Seeder
         ],
         [
             'name' => "530 unisex sneakers shoes - silver",
-            'cogs' => 0,
             'price' => 1599000,
             'discount' => 30,
             'brand' => 'NEW BALANCE',
@@ -106,7 +100,6 @@ class ProductSeeder extends Seeder
         ],
         [
             'name' => "mr530 men's running shoes - white with natural indigo",
-            'cogs' => 0,
             'price' => 1599000,
             'discount' => 0,
             'brand' => 'NEW BALANCE',
@@ -121,7 +114,6 @@ class ProductSeeder extends Seeder
         ],
         [
             'name' => "550 men's sneakers- black",
-            'cogs' => 0,
             'price' => 2099000,
             'discount' => 50,
             'brand' => 'NEW BALANCE',
@@ -136,7 +128,6 @@ class ProductSeeder extends Seeder
         ],
         [
             'name' => "old skool unisex sneakers shoes - black",
-            'cogs' => 0,
             'price' => 999000,
             'discount' => 0,
             'brand' => 'VANS',
@@ -151,7 +142,6 @@ class ProductSeeder extends Seeder
         ],
         [
             'name' => "sambae women's sneakers - ftwr white",
-            'cogs' => 0,
             'price' => 2200000,
             'discount' => 50,
             'brand' => 'ADIDAS',
