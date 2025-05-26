@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; 
 
 class AuthController extends Controller
 {
@@ -22,6 +23,23 @@ class AuthController extends Controller
         }
     }
 
+    // public function login(Request $request)
+    // {
+    //     $credentials = $request->validate([
+    //         'email' => 'required|email:dns',
+    //         'password' => 'required',
+    //     ]);
+
+    //     if (Auth::attempt($credentials)) {
+    //         $request->session()->regenerate();
+    //         return redirect()->intended('/home');
+    //     }
+
+    //     return back()->with([
+    //         'error' => 'The provided credentials do not match our records.',
+    //     ]);
+    // }
+
 
     public function showForgotForm()
     {
@@ -39,6 +57,23 @@ class AuthController extends Controller
         // bisa simpan data sementara di session / flash message
         return redirect()->route('dashboard');/*->with('status', 'Registered successfully. Please login.');*/
     }
+
+    // public function register(Request $request)
+    // {
+    //     // Register user logic (ensure you handle password hashing)
+    //     // For simplicity, we will assign a default role for now
+    //     $user = User::create([
+    //         'email' => $request->input('email'),
+    //         'password' => bcrypt($request->input('password')),
+    //         'role' => 'User', // Default to User role
+    //     ]);
+
+    //     // Log the user in after registration
+    //     Auth::login($user);
+        
+    //     return redirect()->route('dashboard'); // Or wherever you want
+    // }
+
 
      public function showAuth()
     {

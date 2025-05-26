@@ -98,3 +98,25 @@ Route::post('/product/update', [ProductController::class, 'update_product'])->na
 Route::get('/orderadmin', [AdminController::class, 'orderadmin'])->name('orderadmin');
 //order details admin
 Route::get('/orderdadmin/{orderid}', [AdminController::class, 'orderdadmin'])->name('order_details_admin');
+
+
+// Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth');
+// Route::post('/login', [AuthController::class, 'login'])->name('login'); // dummy handler
+
+// Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+// Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+
+// Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.password');
+// Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('forgot.send');
+
+// Route::middleware(['auth'])->group(function(){
+
+//     Route::middleware(['role:Customer'])->group(function(){
+//         Route::get('/', [HomeController::class, 'show'])->name('dashboard');
+//     });
+
+//     Route::middleware(['role:Admin'])->group(function(){
+//         Route::get('/admin', [HomeController::class, 'admin'])->name('dashboard_admin');
+//     });
+
+// });
