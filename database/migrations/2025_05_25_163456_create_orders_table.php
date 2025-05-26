@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('total_qty');
             $table->enum('status', ['Pick Up', 'Shipping'])->default('shipping');
             $table->text('shipping_address')->nullable();
-            $table->enum('shipping_status', ['Pending', 'Dispatched', 'In Transit', 'Delivered'])->default('pending');
+            $table->enum('shipping_status', ['Pending', 'Dispatched', 'In Transit', 'Delivered', 'Already Pick Up'])->default('Pending');
             
             // Tambahan
             $table->string('invoice_number')->unique(); 

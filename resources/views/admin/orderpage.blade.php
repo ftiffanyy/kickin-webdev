@@ -21,96 +21,29 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>#1232</td>
-                    <td>Brooklyn Zoe</td>
-                    <td>Pick up at Pakuwon Mall Surabaya</td>
-                    <td>31 Jul 2020</td>
-                    <td>Rp 2.300.000</td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 1]) }}" class="btn detail">Detail</a></td>
-                </tr>
-                <tr>
-                    <td>#1233</td>
-                    <td>John McCormick</td>
-                    <td>Jalan Merdeka No. 45, Bandung, Indonesia</td>
-                    <td>01 Aug 2020</td>
-                    <td>Rp 3.800.000</td>
-                    <td><span class="status dispatched">Dispatched</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 2]) }}" class="btn detail">Detail</a></td>
-                </tr>
-                <tr>
-                    <td>#1234</td>
-                    <td>James Witwicky</td>
-                    <td>Jalan Pahlawan No. 12, Surabaya, Indonesia</td>
-                    <td>26 March 2020, 12:42 AM</td>
-                    <td>Rp 2.500.000</td>
-                    <td><span class="status dispatched">Dispatched</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 2]) }}" class="btn detail">Detail</a></td>
-                </tr>
-                <tr>
-                    <td>#1235</td>
-                    <td>David Horison</td>
-                    <td>Jalan Tugu No. 99, Yogyakarta, Indonesia</td>
-                    <td>26 March 2020, 02:42 PM</td>
-                    <td>Rp 350.000</td>
-                    <td><span class="status delivered">Delivered</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 2]) }}" class="btn detail">Detail</a></td>
-                </tr>
-                <tr>
-                    <td>#1236</td>
-                    <td>Emilia Johansson</td>
-                    <td>Jalan Sunter No. 50, Jakarta Utara, Indonesia</td>
-                    <td>26 March 2020, 02:12 AM</td>
-                    <td>Rp 4.000.000</td>
-                    <td><span class="status dispatched">Dispatched</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 2]) }}" class="btn detail">Detail</a></td>
-                </tr>
-                <tr>
-                    <td>#1237</td>
-                    <td>Rendy Greenlee</td>
-                    <td>Jalan Soekarno Hatta No. 80, Makassar, Indonesia</td>
-                    <td>26 March 2020, 12:42 AM</td>
-                    <td>Rp 700.000</td>
-                    <td><span class="status dispatched">Dispatched</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 2]) }}" class="btn detail">Detail</a></td>
-                </tr>
-                <tr>
-                    <td>#1238</td>
-                    <td>Jessica Wong</td>
-                    <td>Pick up at Pakuwon Mall Surabaya</td>
-                    <td>26 March 2020, 12:42 AM</td>
-                    <td>Rp 3.600.000</td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 1]) }}" class="btn detail">Detail</a></td>
-                </tr>
-                <tr>
-                    <td>#1239</td>
-                    <td>Veronica</td>
-                    <td>Jalan Gajah Mada No. 100, Surabaya, Indonesia</td>
-                    <td>26 March 2020, 12:42 AM</td>
-                    <td>Rp 1.100.000</td>
-                    <td><span class="status dispatched">Dispatched</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 2]) }}" class="btn detail">Detail</a></td>
-                </tr>
-                <tr>
-                    <td>#1240</td>
-                    <td>Samantha Bake</td>
-                    <td>Jalan Jendral Sudirman No. 88, Semarang, Indonesia</td>
-                    <td>26 March 2020, 12:42 AM</td>
-                    <td>Rp 350.000</td>
-                    <td><span class="status dispatched">Dispatched</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 2]) }}" class="btn detail">Detail</a></td>
-                </tr>
-                <tr>
-                    <td>#1241</td>
-                    <td>Olivia Shine</td>
-                    <td>Pick up at Pakuwon Mall Surabaya</td>
-                    <td>26 March 2020, 12:42 AM</td>
-                    <td>Rp 1.200.000</td>
-                    <td><span class="status pending">Pending</span></td>
-                    <td><a href="{{ route('order_details_admin', ['orderid' => 1]) }}" class="btn detail">Detail</a></td>
-                </tr>
+                @foreach ($orders as $order)
+                    <tr>
+                        <td>#{{ str_pad($order->invoice_number, 4, '0', STR_PAD_LEFT) }}</td>
+                        <td>{{ $order->user->name ?? 'Unknown' }}</td>
+                        <td>
+                            @if($order->status === 'Pick Up')
+                                Pick up at {{ $order->shipping_address }}
+                            @else
+                                {{ $order->shipping_address }}
+                            @endif
+                        </td>
+                        <td>{{ \Carbon\Carbon::parse($order->date)->format('d M Y, h:i A') }}</td>
+                        <td>Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                        <td>
+                            <span class="status {{ strtolower(str_replace(' ', '-', $order->shipping_status)) }}">
+                                {{ $order->shipping_status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ route('order_details_admin', ['orderid' => $order->id]) }}" class="btn detail">Detail</a>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>

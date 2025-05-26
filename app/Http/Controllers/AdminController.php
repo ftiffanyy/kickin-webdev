@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
     public function orderadmin()
     {
-        return view('admin.orderpage');
+        $orders = Order::get();  // pastikan relasi 'user' sudah dibuat
+        return view('admin.orderpage', compact('orders'));
     }
 
     public function orderdadmin($orderid)
     {
-        if ($orderid == 1) {
-            return view('admin.detailspage2'); 
-        } elseif ($orderid == 2) {
-            return view('admin.detailspage'); 
-        }
+        $order = Order::with(['user', 'orderDetails.variant.product'])->findOrFail($orderid);
+        return view('admin.detailspage', compact('order'));
     }
 }
 
