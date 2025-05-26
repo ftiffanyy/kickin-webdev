@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrderDetail extends Model
+class CartItem extends Model
 {
-    // Order dan OrderDetail (1 to many)
-    public function order(): BelongsTo
+    // User dan CartItem (1 to many)
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Order::class, 'order_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Variant dan OrderDetail (1 to many)
+    // Variant dan CartItem (1 to many)
     public function variant(): BelongsTo
     {
         return $this->belongsTo(Variant::class, 'variant_id');

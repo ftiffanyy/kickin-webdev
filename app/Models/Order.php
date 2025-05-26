@@ -2,24 +2,23 @@
 
 namespace App\Models;
 
-class Order
-{
-    public $invoice_number;
-    public $user_id;
-    public $customer_name;
-    public $total_price;
-    public $status;
-    public $payment_url;
-    public $items = [];
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-    public function __construct(array $data)
+class Order extends Model
+{
+    // User dan Order (1 to many)
+    public function user(): BelongsTo
     {
-        $this->invoice_number = $data['invoice_number'] ?? null;
-        $this->user_id = $data['user_id'] ?? null;
-        $this->customer_name = $data['customer_name'] ?? null;
-        $this->total_price = $data['total_price'] ?? 0;
-        $this->status = $data['status'] ?? 'pending';
-        $this->payment_url = $data['payment_url'] ?? null;
-        $this->items = $data['items'] ?? [];
+        return $this->belongsTo(User::class, 'user_id');
     }
+
+    // Order dan OrderDetail (1 to many)
+    public function orderDetails(): HasMany
+    {
+        return $this->hasMany(OrderDetail::class, 'order_id');
+    }
+
+
 }
