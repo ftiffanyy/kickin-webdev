@@ -9,17 +9,34 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckUserRole
 {
+    // /**
+    //  * Handle an incoming request.
+    //  *
+    //  * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+    //  */
+    // public function handle(Request $request, Closure $next): Response
+    // {
+    //     //check if any of the provided roles exist in the UserRoles array
+    //     if(array_intersect($roles, Auth:: user()->roles->pluck('role')->toArray())){
+    //         return $next($request);
+    //     }
+    //     abort(403); //forbidden
+    // }
+
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string  $role
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, $role): Response
     {
-        //check if any of the provided roles exist in the UserRoles array
-        if(array_intersect($roles, Auth:: user()->roles->pluck('role')->toArray())){
+        if (Auth::check() && Auth::user()->role === $role) {
             return $next($request);
         }
-        abort(403); //forbidden
+        
+        abort(403); // Forbidden
     }
 }

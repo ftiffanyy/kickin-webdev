@@ -3,18 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
     public function show()
     {
-        $role = session('user_role', 'Guest');
+        //$role = session('user_role', 'Guest');
 
-        if ($role === 'Admin') {
+        if (Auth()->user()->role === 'Admin') {
             return view('admin.dashboard');
-        } elseif ($role === 'User') {
+        } elseif (Auth()->user()->role === 'Customer') {
             return view('cust.dashboard');
         } 
+
+        //dd(Auth()->user());
     }
 
     public function admin()
