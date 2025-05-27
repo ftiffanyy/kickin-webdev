@@ -7,13 +7,14 @@
                 <div class="col-md-6" style="background-color: #FFFFFF; padding: 20px;">
                     <!-- Carousel for Product Images -->
                     <div id="product-images" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            @foreach ($imageUrls as $index => $imageUrl)
-                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                    <img src="{{ $imageUrl }}" class="d-block w-100" alt="{{ $product['product_name'] }}">
-                                </div>
-                            @endforeach
-                        </div>
+                    <div class="carousel-inner">
+                        @foreach ($images as $index => $image)
+                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                <img src="{{ asset('images/' . $image->url) }}" class="d-block w-100" alt="{{ $products->name }}">
+                            </div>
+                        @endforeach
+                    </div>
+
                         <!-- Left arrow button -->
                         <button class="carousel-control-prev" type="button" data-bs-target="#product-images" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -32,35 +33,38 @@
                     <div class="mt-3">
                         <p class="text-muted" style="font-family: 'Fredoka', sans-serif; font-size: 16px;">
                             <strong style="font-family: 'Bebas Neue', sans-serif; font-size: 22px;">
-                                {{ $product['brand'] }} - {{ $product['gender'] }}
+                                {{ $products->brand }} - {{ $products->gender }}
                             </strong>
                         </p>
                         <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: #181B1E;">
-                            <strong>{{ $product['product_name'] }}</strong>
+                            <strong>{{ $products->name }}</strong>
                         </h3>
+                        <p style="font-family: 'Fredoka', sans-serif; font-size: 14px; color: #5F6266; text-align: justify;">
+                            {{ $products->description }}
+                        </p>
                         <p style="font-family: 'Fredoka', sans-serif; font-size: 18px; color: #5F6266;">
-                            @if ($product['discount'] > 0)
-                                <span style="text-decoration: line-through; color: #A5A9AE;">Rp {{ number_format($product['price'], 0, ',', '.') }}</span> 
-                                <span style="color: red;">Rp {{ number_format($product['price'] * (1 - $product['discount'] / 100), 0, ',', '.') }}</span>
+                            @if ($products->discount > 0)
+                                <span style="text-decoration: line-through; color: #A5A9AE;">Rp {{ number_format($products->price, 0, ',', '.') }}</span> 
+                                <span style="color: red;">Rp {{ number_format($products->price * (1 - $products->discount / 100), 0, ',', '.') }}</span>
                             @else
-                                Rp {{ number_format($product['price'], 0, ',', '.') }}
+                                Rp {{ number_format($products->price, 0, ',', '.') }}
                             @endif
                         </p>
 
                         <p style="font-family: 'Fredoka', sans-serif; font-size: 16px; color: #5F6266;">
-                            {{ number_format($product['sold'], 0, ',', '.') }} sold
+                            {{ number_format($products->sold, 0, ',', '.') }} sold
                         </p>
                         <p style="font-family: 'Fredoka', sans-serif; font-size: 16px; color: #5F6266;">
                             @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <= floor($product['rating_avg'])) 
+                                @if ($i <= floor($products->rating_avg)) 
                                     <i class="fas fa-star text-warning"></i> <!-- Full Star -->
-                                @elseif ($i - 0.5 <= $product['rating_avg'] && $product['rating_avg'] - floor($product['rating_avg']) >= 0.25) 
+                                @elseif ($i - 0.5 <= $products->rating_avg && $products->rating_avg - floor($products->rating_avg) >= 0.25) 
                                     <i class="fas fa-star-half-alt text-warning"></i> <!-- Half Star -->
                                 @else
                                     <i class="fas fa-star text-muted"></i> <!-- Empty Star -->
                                 @endif
                             @endfor
-                            ({{ $product['total_reviews'] }} reviews)
+                            ({{ $products->total_reviews }} reviews)
                         </p>
                     </div>
 
@@ -83,7 +87,8 @@
                     </div>
 
 
-                    <form action="{{ route('add_to_cart', $product['product_id']) }}" method="POST">
+
+                    {{-- <form action="{{ route('add_to_cart', $product->product_id) }}" method="POST"> --}}
                         @csrf
                         <!-- Hidden input to pass quantity -->
                         <input type="hidden" name="quantity" id="quantity-input">

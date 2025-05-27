@@ -317,49 +317,54 @@
                         <div class="product-card">
                             <!-- Wishlist Icon -->
                             <div class="wishlist-icon">
-                                <input type="checkbox" id="wishlist-{{ $product['product_id'] }}" class="wishlist-checkbox">
-                                <label for="wishlist-{{ $product['product_id'] }}" class="wishlist-btn">
+                                <input type="checkbox" id="wishlist-{{ $product->id }}" class="wishlist-checkbox">
+                                <label for="wishlist-{{ $product->id }}" class="wishlist-btn">
                                     <i class="fas fa-heart"></i>
                                 </label>
                             </div>
 
                             <div class="card-body">
-                                <a href="{{ route('product.details', ['id' => $product['product_id']]) }}">
-                                    @if ($product['image'])
-                                        <img src="{{ $product['image'] }}" class="card-img-top product-image" alt="{{ $product['product_name'] }}">
+                                <a href="{{ route('product.details', ['id' => $product->id]) }}">
+                                    @if ($product->images->isNotEmpty()) <!-- Check if there are images -->
+                                        <img src="{{ asset('images/' . $product->images->first()->url) }}" class="card-img-top product-image" alt="{{ $product->name }}">
                                     @else
                                         <p>No image available</p>
                                     @endif
                                 </a>
 
-                                <h5 class="card-title">{{ $product['product_name'] }}</h5>
-                                <p class="card-text"><i>{{ $product['brand'] }} - {{ $product['gender'] }}</i></p>
+
+                                <h5 class="card-title">{{ strtoupper($product->name) }}</h5>
+                                <p class="card-text"><i>{{ $product->brand }} - {{ $product->gender }}</i></p>
 
                                 <p class="card-price">
-                                    @if ($product['discount'] > 0)
-                                        <span style="text-decoration: line-through; color: gray;">Rp {{ number_format($product['price'], 0, ',', '.') }}</span> 
-                                        <span class="card-discount-price">Rp {{ number_format($product['price'] * (1 - $product['discount'] / 100), 0, ',', '.') }}</span>
+                                    @if ($product->discount > 0)
+                                        <span style="text-decoration: line-through; color: gray;">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                                        <span class="card-discount-price">Rp {{ number_format($product->price * (1 - $product->discount / 100), 0, ',', '.') }}</span>
                                     @else
-                                        Rp {{ number_format($product['price'], 0, ',', '.') }}
+                                        Rp {{ number_format($product->price, 0, ',', '.') }}
                                     @endif
                                 </p>
                                 <p class="card-text">
                                     @for ($i = 1; $i <= 5; $i++)
-                                        @if ($i <= floor($product['rating_avg'])) 
+                                        @if ($i <= floor($product->rating_avg))
                                             <i class="fas fa-star text-warning"></i> <!-- Full Star -->
-                                        @elseif ($i - 0.5 <= $product['rating_avg'] && $product['rating_avg'] - floor($product['rating_avg']) >= 0.25) 
+                                        @elseif ($i - 0.5 <= $product->rating_avg && $product->rating_avg - floor($product->rating_avg) >= 0.25)
                                             <i class="fas fa-star-half-alt text-warning"></i> <!-- Half Star -->
                                         @else
                                             <i class="fas fa-star text-muted"></i> <!-- Empty Star -->
                                         @endif
                                     @endfor
-                                    ({{ $product['total_reviews'] }} reviews)
+                                    ({{ $product->total_reviews }} reviews)
                                 </p>
                             </div>
                         </div>
                     @endforeach
                 </div>
             </div>
+            
+
+
+
         </div>
     </div>
 
