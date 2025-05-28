@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         DB::table('users')->insert([
-        [
+            [
                 'name' => 'Jevon',
                 'email' => 'jevon@gmail.com',
                 'password' => Hash::make('jevon123'),
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
                 'email' => 'feli@gmail.com',
                 'password' => Hash::make('feli123'),
                 'phone' => '6282266100102',
-                'role' => 'Admin',
+                'role' => 'Customer',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -47,7 +47,7 @@ class UserSeeder extends Seeder
                 'email' => 'kevin@gmail.com',
                 'password' => Hash::make('kevin123'),
                 'phone' => '6285103177002',
-                'role' => 'Admin',
+                'role' => 'Customer',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -57,6 +57,24 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('keenan123'),
                 'phone' => '6281231293688',
                 'role' => 'Customer',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Satria',
+                'email' => 'satria@gmail.com',
+                'password' => Hash::make('satria123'),
+                'phone' => '6281251343668',
+                'role' => 'Admin',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Andreas',
+                'email' => 'andreas@gmail.com',
+                'password' => Hash::make('andreas123'),
+                'phone' => '6281261544321',
+                'role' => 'Admin',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

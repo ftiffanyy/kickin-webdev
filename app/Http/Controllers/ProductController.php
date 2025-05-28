@@ -620,10 +620,11 @@ class ProductController extends Controller
         if ($request->has('size')) {
             $sizes = $request->input('size');
             $query->whereHas('variants', function ($variantQuery) use ($sizes) {
-                $variantQuery->whereIn('size', $sizes);
+                // Filter by size and stock greater than 0
+                $variantQuery->whereIn('size', $sizes)
+                            ->where('stock', '>', 0); // Ensure stock is greater than 0
             });
         }
-
         // 4. Filter by brand (case-insensitive)
         if ($request->has('brand')) {
             $brands = $request->input('brand');

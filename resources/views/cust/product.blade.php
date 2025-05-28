@@ -242,7 +242,7 @@
                             </div>
                         </div>
 
-                        {{-- <!-- Size Filter -->
+                        <!-- Size Filter -->
                         <div class="filter-section">
                             <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#size-filter" aria-expanded="false" aria-controls="size-filter">
                                 Ukuran
@@ -255,7 +255,7 @@
                                     </div>
                                 @endforeach
                             </div>
-                        </div> --}}
+                        </div>
 
                         <!-- Brand Filter -->
                         <div class="filter-section">
