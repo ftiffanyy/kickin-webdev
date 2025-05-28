@@ -10,15 +10,22 @@ use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
+
     public function show()
     {
-        // Fetch products from the database
-        $products = Product::all(); // Or you can filter with where conditions if needed
+        // Fetch all products from the database
+        $products = Product::all(); // You can filter with where conditions if needed
 
-        // Pass the products to the view
-        return view('cust.product', compact('products'));
-        
+        // Fetch unique brands from the products table
+        $brands = Product::distinct()->pluck('brand'); // Fetch distinct brands
+
+        // Fetch unique sizes from the variants table
+        $sizes = Variant::distinct()->pluck('size'); // Fetch distinct sizes
+
+        // Pass the products, brands, and sizes to the view
+        return view('cust.product', compact('products', 'brands', 'sizes'));
     }
+
 
     // Helper method to get the first image from a product folder
     private function getFirstImage($productId)
@@ -643,7 +650,10 @@ class ProductController extends Controller
         // Fetch all distinct sizes from the variants table
         $sizes = Variant::distinct()->pluck('size');
 
-        return view('cust.product', compact('products', 'sizes'));
+        // Fetch unique brands from the products table
+        $brands = Product::distinct()->pluck('brand'); // Fetch distinct brands
+
+        return view('cust.product', compact('products', 'sizes', 'brands'));
     }
 
 

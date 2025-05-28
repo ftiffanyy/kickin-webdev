@@ -242,7 +242,7 @@
                             </div>
                         </div>
 
-                        <!-- Size Filter -->
+                        {{-- <!-- Size Filter -->
                         <div class="filter-section">
                             <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#size-filter" aria-expanded="false" aria-controls="size-filter">
                                 Ukuran
@@ -255,7 +255,7 @@
                                     </div>
                                 @endforeach
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- Brand Filter -->
                         <div class="filter-section">
@@ -264,20 +264,14 @@
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div id="brand-filter" class="collapse">
-                                <div class="filter-option">
-                                    <input type="checkbox" name="brand[]" value="nike" @if(in_array('nike', request('brand', []))) checked @endif> <label>Nike</label>
-                                </div>
-                                <div class="filter-option">
-                                    <input type="checkbox" name="brand[]" value="adidas" @if(in_array('adidas', request('brand', []))) checked @endif> <label>Adidas</label>
-                                </div>
-                                <div class="filter-option">
-                                    <input type="checkbox" name="brand[]" value="new balance" @if(in_array('new balance', request('brand', []))) checked @endif> <label>New Balance</label>
-                                </div>
-                                <div class="filter-option">
-                                    <input type="checkbox" name="brand[]" value="puma" @if(in_array('puma', request('brand', []))) checked @endif> <label>Puma</label>
-                                </div>
+                                @foreach ($brands as $brand)
+                                    <div class="filter-option">
+                                        <input type="checkbox" name="brand[]" value="{{ $brand }}" @if(in_array($brand, request('brand', []))) checked @endif> <label>{{ ucfirst($brand) }}</label>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
+
 
                         <!-- Sort By Price -->
                         <div class="filter-section">
