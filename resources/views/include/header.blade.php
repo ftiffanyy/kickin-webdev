@@ -202,7 +202,10 @@
     <img src="{{ asset('images/Kickin.jpg') }}" alt="Logo" />
   </div>
 
-  @php $role = session('user_role', 'Guest'); @endphp
+  @php 
+    $role = session('role', 'Guest');
+    $username = session('username', 'Guest'); // Fetch username from session or database 
+  @endphp
 
   <div class="nav-links">
     <a href="{{ route('dashboard') }}">DASHBOARD</a>
@@ -235,7 +238,7 @@
         <i class="fas fa-user"></i>
       </div>
       <div class="dropdown-menu" id="dropdownMenu">
-        <p>{{ $role }}</p>
+        <p>Welcome, {{ $username }}</p>
         <form action="{{ route('logout') }}" method="POST">
           @csrf
           <button type="submit">Log Out</button>

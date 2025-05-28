@@ -128,15 +128,55 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 
     Route::middleware(['role:Customer'])->group(function(){
-        Route::get('/', [HomeController::class, 'show'])->name('dashboard');
+        //dashboard
+        Route::get('/', [HomeController::class, 'show'])
+        ->name('dashboard');
+        //products
+        // liat produk semua (HEADER)
         Route::get('/product', [ProductController::class, 'show'])->name('product.show');
-        Route::get('/orders', [OrderCustController::class, 'show'])->name('order_customer');
+        // liat detail produk pas diklik
+        Route::get('/product/view/{id}', [ProductController::class, 'showDetail'])->name('product.details');
+        // fungsi add to cart
+        Route::post('/add-to-cart/{productId}', [ProductController::class, 'addToCart'])->name('add_to_cart');
+        // liat cart (HEADER)
         Route::get('/cart', [ProductController::class, 'cart'])->name('view_cart');
+        // fungsi update cart (quantity & remove)
+        Route::post('/cart/update', [ProductController::class, 'updateCart'])->name('update_cart');
+        // filter product
+        Route::get('/products/filter', [ProductController::class, 'filter'])->name('products.filter');
+        //page checkout
+        Route::post('/copage', [ProductController::class, 'copage'])->name('copage');
+        //fungsi checkout
+        Route::post('/checkout', [ProductController::class, 'checkout'])->name('checkout');
+        //wishlist
         Route::get('/wishlist', [WishlistController::class, 'showWishlist'])->name('wishlist');
+
+        //orders
+        Route::get('/orders', [OrderCustController::class, 'show'])->name('order_customer');
+        //order details
+        Route::get('/order-details/{id}', [OrderCustController::class, 'orderdetails'])->name('order_details');
     });
 
     Route::middleware(['role:Admin'])->group(function(){
+        //ADMIN
         Route::get('/admin', [HomeController::class, 'admin'])->name('dashboard_admin');
+        // liat produk semua versi admin (HEADER)
+        Route::get('/productadmin', [ProductController::class, 'showadmin'])->name('productadmin.show');
+        // liat form create
+        Route::get('/product/create-form', [ProductController::class, 'create_product_form'])->name('create_product_form');
+        // proses create
+        Route::post('/product/create', [ProductController::class, 'create_product'])->name('create_product');
+
+        // harusnya ada parameter id (tp nanti aja setelah ada database)
+        // liat form edit
+        Route::get('/product/edit-form', [ProductController::class, 'edit_product_form'])->name('edit_product_form');
+        // proses edit (hrsnya put dan ada parameter id)
+        Route::post('/product/update', [ProductController::class, 'update_product'])->name('update_product');
+
+        //order admin
+        Route::get('/orderadmin', [AdminController::class, 'orderadmin'])->name('orderadmin');
+        //order details admin
+        Route::get('/orderdadmin/{orderid}', [AdminController::class, 'orderdadmin'])->name('order_details_admin');
     });
 });
 Route::get('/debug', function () {

@@ -36,6 +36,10 @@ class AuthController extends Controller
 
             // Redirect based on role
             $user = Auth::user();
+
+            // Store the role and username (or name) in the session
+            session(['user_role' => $user->role, 'username' => $user->name, 'user_id' => $user->id]);  // or $user->email if preferred
+
             if ($user->role === 'Admin') {
                 return redirect()->route('dashboard_admin');  // Redirect Admin to the admin dashboard
             } else {
@@ -78,6 +82,9 @@ class AuthController extends Controller
 
         // Log the user in after registration
         Auth::login($user);
+
+        // Store role and username in session after registration
+        session(['user_role' => $user->role, 'username' => $user->name]);
         
         return redirect()->route('dashboard'); // Or wherever you want
     }
