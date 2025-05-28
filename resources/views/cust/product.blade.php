@@ -193,8 +193,7 @@
         }
     </style>
 
-    <div class="container">
-        <h2 class="mb-4">Products</h2>
+    <div class="container" style="padding-top: 25px; padding-bottom: 50px;">
 
         <div class="row">
             <!-- Filter Section -->
@@ -210,13 +209,13 @@
                             </div>
                             <div id="gender-filter" class="collapse">
                                 <div class="filter-option">
-                                    <input type="checkbox" name="gender[]" value="men" @if(in_array('men', request('gender', []))) checked @endif> <label>Men</label>
+                                    <input type="checkbox" name="gender[]" value="Male" @if(in_array('Male', request('gender', []))) checked @endif> <label>Male</label>
                                 </div>
                                 <div class="filter-option">
-                                    <input type="checkbox" name="gender[]" value="women" @if(in_array('women', request('gender', []))) checked @endif> <label>Women</label>
+                                    <input type="checkbox" name="gender[]" value="Female" @if(in_array('Female', request('gender', []))) checked @endif> <label>Female</label>
                                 </div>
                                 <div class="filter-option">
-                                    <input type="checkbox" name="gender[]" value="unisex" @if(in_array('unisex', request('gender', []))) checked @endif> <label>Unisex</label>
+                                    <input type="checkbox" name="gender[]" value="Unisex" @if(in_array('Unisex', request('gender', []))) checked @endif> <label>Unisex</label>
                                 </div>
                             </div>
                         </div>
@@ -250,18 +249,11 @@
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div id="size-filter" class="collapse">
-                                <div class="filter-option">
-                                    <input type="checkbox" name="size[]" value="35" @if(in_array('35', request('size', []))) checked @endif> <label>35</label>
-                                </div>
-                                <div class="filter-option">
-                                    <input type="checkbox" name="size[]" value="36" @if(in_array('36', request('size', []))) checked @endif> <label>36</label>
-                                </div>
-                                <div class="filter-option">
-                                    <input type="checkbox" name="size[]" value="37" @if(in_array('37', request('size', []))) checked @endif> <label>37</label>
-                                </div>
-                                <div class="filter-option">
-                                    <input type="checkbox" name="size[]" value="38" @if(in_array('38', request('size', []))) checked @endif> <label>38</label>
-                                </div>
+                                @foreach ($sizes as $size)
+                                    <div class="filter-option">
+                                        <input type="checkbox" name="size[]" value="{{ $size }}" @if(in_array($size, request('size', []))) checked @endif> <label>{{ $size }}</label>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
 
@@ -279,7 +271,7 @@
                                     <input type="checkbox" name="brand[]" value="adidas" @if(in_array('adidas', request('brand', []))) checked @endif> <label>Adidas</label>
                                 </div>
                                 <div class="filter-option">
-                                    <input type="checkbox" name="brand[]" value="new_balance" @if(in_array('new_balance', request('brand', []))) checked @endif> <label>New Balance</label>
+                                    <input type="checkbox" name="brand[]" value="new balance" @if(in_array('new balance', request('brand', []))) checked @endif> <label>New Balance</label>
                                 </div>
                                 <div class="filter-option">
                                     <input type="checkbox" name="brand[]" value="puma" @if(in_array('puma', request('brand', []))) checked @endif> <label>Puma</label>
@@ -287,7 +279,7 @@
                             </div>
                         </div>
 
-                        <!-- Sorting Options -->
+                        <!-- Sort By Price -->
                         <div class="filter-section">
                             <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#sort-filter" aria-expanded="false" aria-controls="sort-filter">
                                 Sort By
@@ -302,6 +294,7 @@
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="filter-btn-container">
                             <button type="submit" class="filter-btn">Apply Filters</button>

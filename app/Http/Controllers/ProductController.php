@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Variant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
@@ -15,14 +17,6 @@ class ProductController extends Controller
 
         // Pass the products to the view
         return view('cust.product', compact('products'));
-
-        // $role = session('user_role', 'Guest');
-
-        // if ($role === 'Admin') {
-        //     return view('admin.productadmin', compact('products'));
-        // } elseif ($role === 'User') {
-        //     return view('cust.product', compact('products'));
-        // }
         
     }
 
@@ -444,7 +438,7 @@ class ProductController extends Controller
     }
 
 
-        public function showadmin()
+    public function showadmin()
     {
         // Hardcoded product data
         $products = [
@@ -593,57 +587,66 @@ class ProductController extends Controller
         return redirect()->route('order_customer')->with('success', 'Checkout Complete!');
     }
 
-    public function filter(Request $request)
+    public function filterProducts(Request $request)
     {
-        // Ambil semua produk (collection)
-        $products = Product::all(); // harus return collection
+        // Start a query on the Product model
+        $query = Product::query();
 
-        // Filter by gender
-        if ($request->filled('gender')) {
-            $products = $products->filter(function ($product) use ($request) {
-                return strtolower($product['gender']) === strtolower($request->gender);
-            });
+        // 1. Filter by gender if selected (case-insensitive)
+        if ($request->has('gender')) {
+            // Convert the selected gender values to lowercase
+            $genders = array_map('strtolower', $request->input('gender'));
+
+            // Apply case-insensitive filtering using the LOWER() function
+            $query->whereIn(DB::raw('LOWER(gender)'), $genders);
         }
 
-        // Filter by color
-        if ($request->filled('color')) {
-            $products = $products->filter(function ($product) use ($request) {
-                return isset($product['color']) && strtolower($product['color']) === strtolower($request->color);
-            });
-        }
-
-        // Filter by size
-        if ($request->filled('size')) {
-            $products = $products->filter(function ($product) use ($request) {
-                return isset($product['size']) && strtolower($product['size']) === strtolower($request->size);
-            });
-        }
-
-        // Filter by brand
-        if ($request->filled('brand')) {
-            $products = $products->filter(function ($product) use ($request) {
-                return strtolower($product['brand']) === strtolower($request->brand);
-            });
-        }
-
-        // Sorting
-        if ($request->filled('sort')) {
-            if ($request->sort === 'low_high') {
-                $products = $products->sortBy('price');
-            } elseif ($request->sort === 'high_low') {
-                $products = $products->sortByDesc('price');
-            } elseif ($request->sort === 'relevance') {
-                // contoh sort by rating_avg descending
-                $products = $products->sortByDesc('rating_avg');
+        // 2. Filter by color (case-insensitive, based on product name)
+        if ($request->has('color')) {
+            $colors = $request->input('color');
+            foreach ($colors as $color) {
+                $query->orWhere('name', 'like', '%' . $color . '%');  // Case-insensitive check
             }
         }
 
-        // Kalau mau pagination manual, bisa slice collection di sini (optional)
-        // Misal: $products = $products->slice(0, 20);
+        // 3. Filter by size (related to variants table)
+        if ($request->has('size')) {
+            $sizes = $request->input('size');
+            $query->whereHas('variants', function ($variantQuery) use ($sizes) {
+                $variantQuery->whereIn('size', $sizes);
+            });
+        }
 
-        // Kembalikan view dengan products (jangan lupa reset index collection)
-        return view('product.index', ['products' => $products->values()]);
+        // 4. Filter by brand (case-insensitive)
+        if ($request->has('brand')) {
+            $brands = $request->input('brand');
+            $query->whereIn('brand', $brands);
+        }
+
+        // 5. Sort by price if selected
+        if ($request->has('sort')) {
+            if ($request->input('sort') == 'low_high') {
+                // Sorting by price after discount: price - discount (assuming discount is a percentage)
+                $query->orderByRaw('(price * (1 - discount / 100)) asc');
+            } elseif ($request->input('sort') == 'high_low') {
+                // Sorting by price after discount: price - discount (assuming discount is a percentage)
+                $query->orderByRaw('(price * (1 - discount / 100)) desc');
+            }
+        }
+
+        // 6. Apply hide status filter (if needed, like products that are active)
+        $query->where('hide_status', false);
+
+        // Get the filtered products
+        $products = $query->get();
+
+        // Fetch all distinct sizes from the variants table
+        $sizes = Variant::distinct()->pluck('size');
+
+        return view('cust.product', compact('products', 'sizes'));
     }
+
+
 
 }
 

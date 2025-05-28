@@ -143,7 +143,7 @@ Route::middleware(['auth'])->group(function(){
         // fungsi update cart (quantity & remove)
         Route::post('/cart/update', [ProductController::class, 'updateCart'])->name('update_cart');
         // filter product
-        Route::get('/products/filter', [ProductController::class, 'filter'])->name('products.filter');
+        Route::get('/products/filter', [ProductController::class, 'filterProducts'])->name('products.filter');
         //page checkout
         Route::post('/copage', [ProductController::class, 'copage'])->name('copage');
         //fungsi checkout
