@@ -1,6 +1,11 @@
 @extends('base.base')
 
 @section('content')
+
+@php
+    $isShipping = strtolower($order->status) === 'shipping';
+@endphp
+
 <style>
   /* Fonts dan base styling */
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Roboto&display=swap');
@@ -150,9 +155,27 @@
     letter-spacing: 0.02em;
   }
 
+  /* Map container styling */
+  .map-container {
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    border-radius: 14px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .map-container iframe {
+    height: 100%;
+    width: 100%;
+    border: 0;
+  }
+
   /* Right Section */
   .right-section {
     flex: 1;
+    max-width: 450px; /* supaya ga terlalu melebar */
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -161,7 +184,7 @@
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     font-family: 'Roboto', sans-serif;
-    max-height: fit-content;
+    /* Hapus max-height agar tinggi container sesuai isi */
   }
 
   .right-section h2 {
@@ -326,84 +349,96 @@
       <svg class="back-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
       </svg>
-      <span>Order Details #862682274</span>
+      <span>Order Details #{{ $order->id }}</span>
     </div>
 
-    <!-- Loading bar -->
-    <div class="loading-bar-container">
-      <div class="loading-bar-progress"></div>
-    </div>
-    <div class="loading-labels">
-      <span>Ordered</span>
-      <span>Dispatched</span>
-      <span>In Transit</span>
-      <span>Delivered</span>
-    </div>
+    @if($isShipping)
+      <!-- Shipping content -->
+      <div class="loading-bar-container">
+        <div class="loading-bar-progress"></div>
+      </div>
+      <div class="loading-labels">
+        <span>Ordered</span>
+        <span>Dispatched</span>
+        <span>In Transit</span>
+        <span>Delivered</span>
+      </div>
 
-    <div class="delivery-info">
-      <p><strong>Estimated delivery date</strong></p>
-      <p>From Jun 25 to Jun 28, 2021</p>
-      <p style="margin-top: 20px;"><strong>Delivery location</strong></p>
-      <p>Cornell Apartment, Surabaya</p>
-    </div>
+      <div class="delivery-info">
+        <p><strong>Estimated delivery date</strong></p>
+        <p>From {{ \Carbon\Carbon::parse($order->date)->format('M d, Y') }} to {{ \Carbon\Carbon::parse($order->date)->addDays(3)->format('M d, Y') }}</p>
+        <p style="margin-top: 20px;"><strong>Delivery location</strong></p>
+        <p>{{ $order->shipping_address }}</p>
+      </div>
 
-    <!-- Shipment progress as loading -->
-    <div class="shipment-progress">
-      <div class="shipment-status">
-        <div class="shipment-step">
-          <div class="datetime">Jun 5, 2021 02:10 AM</div>
-          <div class="status">Shipment dispatched to carrier</div>
-        </div>
-        <div class="shipment-step">
-          <div class="datetime">May 31, 2021 05:12 AM</div>
-          <div class="status">Order placed</div>
+      <div class="shipment-progress">
+        <div class="shipment-status">
+          @foreach($order->shippings->sortByDesc('date') as $shipping)
+            <div class="shipment-step">
+              <div class="datetime">{{ \Carbon\Carbon::parse($shipping->date)->format('M d, Y  h:i A') }}</div>
+              <div class="status">{{ $shipping->comment }}</div>
+            </div>
+          @endforeach
         </div>
       </div>
-    </div>
+
+    @else
+      <!-- Pick up content -->
+      <div class="map-container">
+        <iframe 
+          style="height:100%; width:100%; border:0;" 
+          frameborder="0" 
+          src="https://www.google.com/maps/embed/v1/place?q={{ urlencode($order->pickup_location) }}&key=YOUR_GOOGLE_MAPS_API_KEY" 
+          allowfullscreen 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+
+      <div class="delivery-info">
+        <p><strong>Pick-up Location</strong></p>
+        <p>{{ $order->shipping_address }}</p>
+        <p><strong>Pick-up Time</strong></p>
+        <p>From {{ \Carbon\Carbon::parse($order->pickup_start_date)->format('M d, Y') }} to {{ \Carbon\Carbon::parse($order->pickup_end_date)->format('M d, Y') }}</p>
+        <p style="margin-top: 20px;"><strong>Pick-up Instructions</strong></p>
+        <p>Please bring a valid ID and your order confirmation for pick-up.</p>
+      </div>
+    @endif
 
   </div>
 
   <div class="right-section">
     <h2>Products</h2>
 
-    <a href="{{ route('product.details', ['id' => 1]) }}" class="product" tabindex="0">
-      <img src="{{ asset('images/products/1/NIKE air force 1 _07 men_s basketball shoes - white,1.webp') }}" alt="Product Image">
+    @foreach($order->orderDetails as $detail)
+    <a href="{{ route('product.details', ['id' => $detail->variant->product->id]) }}" class="product" tabindex="0">
+      <img src="{{ asset('images/' . $detail->variant->product->images->firstWhere('main', 1)->url) }}" alt="Product Image">
       <div class="product-info">
-        <p>NIKE Air Force 1 '07 Men's Basketball Shoes - White</p>
-        <p class="qty-size">QTY: 1</p>
-        <p class="qty-size">Size: 36</p>
+        <p>{{ $detail->variant->product->name }}</p>
+        <p class="qty-size">QTY: {{ $detail->qty }}</p>
+        <p class="qty-size">Size: {{ $detail->variant->size }}</p>
       </div>
       <div class="product-price">
-        Rp 1.084.300
+        Rp {{ number_format($detail->qty * $detail->price_at_purchase, 0, ',', '.') }}
       </div>
     </a>
-
-    <a href="{{ route('product.details', ['id' => 4]) }}" class="product" tabindex="0">
-      <img src="{{ asset('images/products/4/PUMA speedcat og unisex lifestyle shoes - red,1.webp') }}" alt="Product Image">
-      <div class="product-info">
-        <p>PUMA speedcat og unisex lifestyle shoes - red</p>
-        <p class="qty-size">QTY: 1</p>
-        <p class="qty-size">Size: 37</p>
-      </div>
-      <div class="product-price">
-        Rp 1.899.000
-      </div>
-    </a>
+    @endforeach
 
     <div class="summary">
       <div class="summary-item">
         <span>Subtotal</span>
-        <span>Rp 2.983.300</span>
+        <span>Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
       </div>
       <div class="summary-item">
         <span>Shipping</span>
-        <span>Rp 20.000</span>
+        <span>Rp {{ $isShipping ? '20.000' : '0' }}</span>
       </div>
       <div class="summary-item total">
         <span>Total</span>
-        <span>Rp 3.003.300</span>
+        <span>Rp {{ number_format($order->total_price + ($isShipping ? 20000 : 0), 0, ',', '.') }}</span>
       </div>
     </div>
   </div>
 </div>
+
 @endsection
