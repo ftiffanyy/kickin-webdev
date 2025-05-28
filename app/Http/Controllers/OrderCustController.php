@@ -8,13 +8,8 @@ class OrderCustController extends Controller
 {
     public function show()
     {
-       $role = session('user_role', 'Guest');
+        return view('cust.orders');
 
-        if ($role === 'Admin') {
-            return view('admin.orderpage');
-        } elseif ($role === 'User') {
-            return view('cust.orders');
-        } 
     }
 
     public function orderdetails($id)

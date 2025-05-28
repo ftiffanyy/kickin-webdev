@@ -211,10 +211,11 @@
     <a href="{{ route('dashboard') }}">DASHBOARD</a>
     @if ($role !== 'Admin')
         <a href="{{ route('product.show') }}">SHOP HERE</a>
+        <a href="{{ route('order_customer') }}">ORDERS</a>
     @else
         <a href="{{ route('productadmin.show') }}">PRODUCT</a>
+        <a href="{{ route('orderadmin') }}">ORDERS</a>
     @endif
-    <a href="{{ route('order_customer') }}">ORDERS</a>
     @if ($role !== 'Admin')
       <a href="{{ route('about') }}">ABOUT US</a>
     @endif

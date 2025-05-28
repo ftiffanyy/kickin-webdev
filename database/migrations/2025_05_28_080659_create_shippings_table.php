@@ -13,8 +13,16 @@ return new class extends Migration
     {
         Schema::create('shippings', function (Blueprint $table) {
             $table->id();
+            $table->string('status');
+            $table->date('date');
+            $table->text('comment')->nullable();
+            $table->unsignedBigInteger('order_id');
             $table->timestamps();
+
+            // Jika ingin menambahkan foreign key constraint ke tabel orders
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
         });
+
     }
 
     /**

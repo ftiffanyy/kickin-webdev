@@ -1,5 +1,12 @@
 @extends('base.base')
 
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px;">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 @section('content')
 
 @php
@@ -52,7 +59,15 @@
                     <div class="product-table-row">
                         <div class="col-item">
                             <div class="product-info">
-                                <img src="{{ asset('images/products/' . $detail->variant->product->id . '/' . $detail->variant->product->name . ',1.webp') }}" alt="Product">
+                                @php
+                                    $mainImage = $detail->variant->product->images->firstWhere('main', 1);
+                                @endphp
+
+                                @if ($mainImage)
+                                    <img src="{{ asset('images/' . $mainImage->url) }}" alt="{{ $detail->variant->product->name }}"/>
+                                @else
+                                    <p>Product</p>
+                                @endif
                                 <span>{{ $detail->variant->product->name }}</span>
                             </div>
                         </div>
@@ -84,33 +99,55 @@
         <div class="order-right-container">
             <div class="status-notes-container">
                 <h3>Update Order Status</h3>
-                <div class="status-section">
-                    <div id="status-display" class="status-{{ str_replace(' ', '-', strtolower($order->shipping_status)) }}">
-                        <span>{{ ucfirst($order->shipping_status) }}</span>
+                <form action="{{ route('order.updateStatus', $order->id) }}" method="POST">
+                    @csrf
+                    <div class="status-section">
+                        <div id="status-display" class="status-{{ str_replace(' ', '-', strtolower($order->shipping_status)) }}">
+                            <span>{{ ucfirst($order->shipping_status) }}</span>
+                        </div>
+
+                        <label for="status-select"><strong>Update Status:</strong></label>
+                        <select id="status-select" name="shipping_status" class="form-select">
+                            @foreach ($statusOptions as $status)
+                                <option value="{{ strtolower($status) }}" {{ $currentStatus === strtolower($status) ? 'selected' : '' }}>
+                                    {{ $status }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <div class="message-box-section" style="margin-top: 15px;">
+                            <label for="message-box"><strong>Admin Notes:</strong></label>
+                            <textarea id="message-box" name="comment" rows="5" placeholder="Enter notes here..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn" style="margin-top: 20px;">Update Status</button>
                     </div>
-
-                    <label for="status-select"><strong>Update Status:</strong></label>
-                    <select id="status-select" class="form-select">
-                        @foreach ($statusOptions as $status)
-                            <option value="{{ strtolower($status) }}" {{ $currentStatus === strtolower($status) ? 'selected' : '' }}>
-                                {{ $status }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <div class="message-box-section" style="margin-top: 15px;">
-                        <label for="message-box"><strong>Admin Notes:</strong></label>
-                        <textarea id="message-box" rows="5" placeholder="Enter notes here..."></textarea>
-                    </div>
-
-                    <button onclick="updateStatus()" class="btn" style="margin-top: 20px;">Update Status</button>
-                </div>
+                </form>
             </div>
+
+            @if ($order->shippings->isNotEmpty())
+            <div class="status-notes-container" style="margin-top: 30px;">
+                <h4>Shipping History</h4>
+                <ul style="list-style-type:none; padding-left: 0; margin: 0; max-height: 300px; overflow-y: auto;">
+                    @foreach ($order->shippings->sortByDesc('date') as $shipping)
+                    <li style="margin-bottom: 20px; border-left: 4px solid #000; padding-left: 10px;">
+                        <p style="margin: 0; font-weight: 600; font-size: 14px; color: #000;">
+                            {{ \Carbon\Carbon::parse($shipping->date)->format('M j, Y  h:i A') }}
+                        </p>
+                        <p style="margin: 0; font-size: 16px; font-weight: 500; color: #000;">
+                            {{ $shipping->comment }}
+                        </p>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
         </div>
     </div>
 </div>
 
 <style>
+    /* Style sama seperti sebelumnya */
     .page-title {
         font-family: 'Bebas Neue', sans-serif;
         font-size: 36px;
@@ -204,6 +241,11 @@
         background-color: #f9f9f9;
         border-bottom: 1px solid #ddd;
         font-size: 15px;
+    }
+
+    .product-table-row:last-child {
+        border-radius: 0 0 8px 8px;
+        border-bottom: none;
     }
 
     .product-info {

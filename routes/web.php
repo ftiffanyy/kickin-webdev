@@ -177,8 +177,7 @@ Route::middleware(['auth'])->group(function(){
         Route::get('/orderadmin', [AdminController::class, 'orderadmin'])->name('orderadmin');
         //order details admin
         Route::get('/orderdadmin/{orderid}', [AdminController::class, 'orderdadmin'])->name('order_details_admin');
+        //update status shipping
+        Route::post('/order/{id}/update-status', [AdminController::class, 'updateStatus'])->name('order.updateStatus');
     });
-});
-Route::get('/debug', function () {
-    dd(Auth::check(), Auth::user()->role);
 });

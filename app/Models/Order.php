@@ -20,5 +20,10 @@ class Order extends Model
         return $this->hasMany(OrderDetail::class, 'order_id');
     }
 
+    // Order dan Shipping (1 to many)
+    public function shippings(): HasMany
+    {
+        return $this->hasMany(Shipping::class, 'order_id');
+    }
 
 }
