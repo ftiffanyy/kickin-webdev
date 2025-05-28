@@ -203,7 +203,7 @@
   </div>
 
   @php 
-    $role = session('role', 'Guest');
+    $role = session('user_role', 'Guest');
     $username = session('username', 'Guest'); // Fetch username from session or database 
   @endphp
 
@@ -212,7 +212,7 @@
     @if ($role !== 'Admin')
         <a href="{{ route('product.show') }}">SHOP HERE</a>
     @else
-        <a href="{{ route('product.show') }}">PRODUCT</a>
+        <a href="{{ route('productadmin.show') }}">PRODUCT</a>
     @endif
     <a href="{{ route('order_customer') }}">ORDERS</a>
     @if ($role !== 'Admin')
