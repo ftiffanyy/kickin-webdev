@@ -174,8 +174,7 @@
 
   /* Right Section */
   .right-section {
-    flex: 1;
-    max-width: 450px; /* supaya ga terlalu melebar */
+    max-width: 450px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -184,8 +183,9 @@
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     font-family: 'Roboto', sans-serif;
-    /* Hapus max-height agar tinggi container sesuai isi */
+    align-self: flex-start; /* Supaya tinggi kanan menyesuaikan isi */
   }
+
 
   .right-section h2 {
     font-family: 'Poppins', sans-serif;
@@ -384,16 +384,23 @@
 
     @else
       <!-- Pick up content -->
+      @php
+          $encodedAlamat = urlencode($order->shipping_address); // Ambil alamat dari database (misalnya: "Pakuwon Mall")
+          $apiKey = 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8'; // API key kamu
+          $gmapSrc = "https://www.google.com/maps/embed/v1/place?q={$encodedAlamat}&key={$apiKey}";
+      @endphp
+
       <div class="map-container">
         <iframe 
           style="height:100%; width:100%; border:0;" 
           frameborder="0" 
-          src="https://www.google.com/maps/embed/v1/place?q={{ urlencode($order->pickup_location) }}&key=YOUR_GOOGLE_MAPS_API_KEY" 
+          src="{{ $gmapSrc }}"
           allowfullscreen 
           loading="lazy" 
           referrerpolicy="no-referrer-when-downgrade">
         </iframe>
       </div>
+
 
       <div class="delivery-info">
         <p><strong>Pick-up Location</strong></p>
@@ -438,7 +445,21 @@
         <span>Rp {{ number_format($order->total_price + ($isShipping ? 20000 : 0), 0, ',', '.') }}</span>
       </div>
     </div>
+
+   @if(!$isShipping)
+    <div style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-family: 'Roboto', sans-serif;">
+      <h3 style="text-align: center; font-size: 16px; font-weight: 700; color: #202020; margin-bottom: 12px;">Pick-up QR Code</h3>
+      <div style="text-align: center;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ urlencode($order->shipping_address . ' | Order No: #' . $order->id) }}&size=200x200" 
+             alt="QR Code for Pickup" 
+             style="border: 1px solid #ccc; border-radius: 8px; padding: 5px;">
+        <p style="font-size: 13px; color: #555; margin-top: 10px;">Scan this at the pick-up location</p>
+      </div>
+    </div>
+    @endif
   </div>
 </div>
+
+
 
 @endsection
