@@ -11,7 +11,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    // ✅ Jika kamu rename password menjadi user_password, sesuaikan di bawah
+    // Jika kamu rename password menjadi user_password, sesuaikan di bawah
     protected $fillable = [
         'name',
         'email',
@@ -25,7 +25,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // ✅ Perlu override password default untuk login
+    // Perlu override password default untuk login
     public function getAuthPassword()
     {
         return $this->password;
