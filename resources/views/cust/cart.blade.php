@@ -7,7 +7,7 @@
 
 
 @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px; background-color: #A5A9AE; color: #fff;">
+    <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px;">
         {{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -31,39 +31,60 @@
                 </thead>
                 <tbody>
                     @php $total = 0; @endphp
-                    @foreach ($cart as $id => $item)
+                    @foreach ($cart as $item)
                         @php 
-                            $total += $item['price'] * $item['quantity']; 
-                            $productImage = $item['image'] ?? 'default-image.jpg'; // Retrieve the image from the cart data
+                            $total += $item->price * $item->qty; 
+                            $productImage = $item->variant->image ?? 'default-image.jpg';
+                            
+                            // Hitung harga diskon
+                            $discount = $item->variant->product->product_discount ?? $item->variant->product->discount ?? 0;
+                            $originalPrice = $item->variant->product->price;
+                            $discountedPrice = $originalPrice * (1 - $discount / 100);
                         @endphp
-                        <tr style="background-color: #FFF; border-bottom: 1px solid #CFD1D4;">
+                        <tr style="background-color: #FFF; border-bottom: 1px solid #CFD1D4;" 
+                            data-item-id="{{ $item->id }}" 
+                            data-original-price="{{ $originalPrice }}" 
+                            data-discounted-price="{{ $discountedPrice }}"
+                            data-discount="{{ $discount }}">
+                            
+                            <!-- checkbox column -->
                             <td style="vertical-align: middle;">
-                                <input type="checkbox" name="selected_items[]" value="{{ $id }}" class="item-checkbox" style="cursor: pointer; width: 20px; height: 20px; border: 2px solid #CFD1D4; background-color: #FFF; accent-color: #181B1E; border-radius: 5px; transition: all 0.3s ease;">
+                                <input type="checkbox" name="selected_items[]" value="{{ $item->id }}" class="item-checkbox" style="cursor: pointer; width: 20px; height: 20px; border: 2px solid #CFD1D4; background-color: #FFF; accent-color: #181B1E; border-radius: 5px; transition: all 0.3s ease;">
                             </td>
+                            
+                            <!-- image column -->
                             <td style="vertical-align: middle;">
-                                <img src="{{ $productImage }}" alt="{{ $item['name'] }}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 5px;">
+                                <img src="{{ asset('images/' . ($item->variant->product->images->first()->url ?? 'default-image.jpg')) }}" alt="{{ $item->variant->product->name }}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 5px;">
                             </td>
+                            
+                            <!-- name column -->
                             <td style="font-family: 'Fredoka', sans-serif; font-size: 1rem; color: #5F6266; vertical-align: middle;">
-                                {{ $item['name'] }}
+                                {{ strtoupper($item->variant->product->name) }}
                             </td>
+                            
+                            <!-- size column -->
                             <td style="font-family: 'Fredoka', sans-serif; font-size: 1rem; color: #5F6266; vertical-align: middle;">
-                                {{ $item['size'] ?? '36' }}
+                                {{ $item->variant->size }}
                             </td>
+                            
+                            <!-- price column (harga per unit setelah diskon) -->
                             <td style="font-family: 'Fredoka', sans-serif; font-size: 1rem; color: #5F6266; vertical-align: middle;">
-                                Rp{{ number_format($item['price'], 0, ',', '.') }}
+                                Rp{{ number_format($discountedPrice, 0, ',', '.') }}
                             </td>
 
+                            <!-- quantity column -->
                             <td style="vertical-align: middle;">
                                 <div style="display: flex; align-items: center;">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="changeQuantity({{ $id }}, -1)" style="margin-right: 5px; padding: 5px 10px;">-</button>
-                                    <input type="number" name="quantity[{{ $id }}]" value="{{ $item['quantity'] }}" class="quantity-input" id="quantity-{{ $id }}" style="width: 50px; text-align: center; font-family: 'Fredoka', sans-serif; font-size: 1rem; border: 1px solid #CFD1D4; border-radius: 5px; padding: 5px; -moz-appearance: textfield; -webkit-appearance: none;">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="changeQuantity({{ $id }}, 1)" style="margin-left: 5px; padding: 5px 10px;">+</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="changeQuantity({{ $item->id }}, -1)" style="margin-right: 5px; padding: 5px 10px;">-</button>
+                                    <input type="number" name="quantity[{{ $item->id }}]" value="{{ $item->qty }}" class="quantity-input" id="quantity-{{ $item->id }}" style="width: 50px; text-align: center; font-family: 'Fredoka', sans-serif; font-size: 1rem; border: 1px solid #CFD1D4; border-radius: 5px; padding: 5px; -moz-appearance: textfield; -webkit-appearance: none;">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="changeQuantity({{ $item->id }}, 1)" style="margin-left: 5px; padding: 5px 10px;">+</button>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-link" id="confirm-{{ $id }}" onclick="confirmQuantity({{ $id }})" style="display:none; text-decoration: underline; font-family: 'Fredoka', sans-serif; color: #5F6266;">Confirm</button>
+                                <button type="button" class="btn btn-sm btn-link" id="confirm-{{ $item->id }}" onclick="confirmQuantity({{ $item->id }})" style="display:none; text-decoration: underline; font-family: 'Fredoka', sans-serif; color: #5F6266;">Confirm</button>
                             </td>
 
-                            <td style="font-family: 'Fredoka', sans-serif; font-size: 1rem; color: #5F6266; vertical-align: middle;">
-                                Rp{{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
+                            <!-- subtotal column -->
+                            <td style="font-family: 'Fredoka', sans-serif; font-size: 1rem; color: #5F6266; vertical-align: middle;" id="subtotal-{{ $item->id }}">
+                                Rp{{ number_format($discountedPrice * $item->qty, 0, ',', '.') }}
                             </td>
                         </tr>
                     @endforeach
@@ -71,7 +92,19 @@
 
             </table>
         </div>
-            <h5 style="font-family: 'Bebas Neue', sans-serif; color: #181B1E;">Total: Rp<span id="total-price">{{ number_format($total, 0, ',', '.') }}</span></h5>
+        
+        <h5 style="font-family: 'Bebas Neue', sans-serif; color: #181B1E;">Total: Rp
+            <span id="total-price">
+                @php
+                    $grandTotal = $cart->sum(function ($item) {
+                        $discount = $item->variant->product->product_discount ?? $item->variant->product->discount ?? 0;
+                        $discountedPrice = $item->variant->product->price * (1 - $discount / 100);
+                        return $discountedPrice * $item->qty;
+                    });
+                @endphp
+                {{ number_format($grandTotal, 0, ',', '.') }}
+            </span>
+        </h5>
 
         <button type="submit" class="btn" style="font-family: 'Fredoka', sans-serif; background-color: #5F6266; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-transform: uppercase;">Remove</button>
         </form>
@@ -196,17 +229,103 @@
         }
 
         quantityInput.value = newQuantity;
-
+        
+        // Update subtotal secara real-time menggunakan harga diskon
+        updateSubtotalDisplay(id, newQuantity);
+        
         document.getElementById('confirm-' + id).style.display = 'inline-block';
     }
-
+    
+    // Fungsi untuk update subtotal display tanpa AJAX
+    function updateSubtotalDisplay(id, quantity) {
+        var row = document.querySelector(`tr[data-item-id="${id}"]`);
+        var discountedPrice = parseFloat(row.getAttribute('data-discounted-price'));
+        var newSubtotal = discountedPrice * quantity;
+        
+        // Update subtotal display
+        document.getElementById('subtotal-' + id).innerHTML = 'Rp' + formatNumber(newSubtotal);
+        
+        // Update total keseluruhan
+        updateGrandTotal();
+    }
+    
+    // Fungsi untuk format number seperti Laravel number_format
+    function formatNumber(num) {
+        return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    
+    // Fungsi untuk update grand total
+    function updateGrandTotal() {
+        var total = 0;
+        var rows = document.querySelectorAll('tr[data-item-id]');
+        
+        rows.forEach(function(row) {
+            var id = row.getAttribute('data-item-id');
+            var quantity = parseInt(document.getElementById('quantity-' + id).value);
+            var discountedPrice = parseFloat(row.getAttribute('data-discounted-price'));
+            total += discountedPrice * quantity;
+        });
+        
+        document.getElementById('total-price').innerHTML = formatNumber(total);
+    }
+    
     function confirmQuantity(id) {
         var quantityInput = document.getElementById('quantity-' + id);
         var newQuantity = parseInt(quantityInput.value);
-
+        
+        // Hide confirm button
         document.getElementById('confirm-' + id).style.display = 'none';
-
-        var form = document.querySelector('form');
-        form.submit();
+        
+        // Create form data
+        var formData = new FormData();
+        formData.append('id', id);
+        formData.append('quantity', newQuantity);
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        
+        // Send AJAX request
+        fetch('/cart/update', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update dengan data dari server (untuk memastikan konsistensi)
+                document.getElementById('total-price').innerText = data.new_total;
+                document.getElementById('subtotal-' + id).innerHTML = 'Rp' + data.item_total;
+                
+                console.log('Quantity updated successfully!');
+            } else {
+                alert('Failed to update quantity');
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error updating cart:', error);
+            alert('There was an error updating the cart.');
+            location.reload();
+        });
     }
+    
+    // Event listener untuk perubahan manual quantity input
+    document.addEventListener('DOMContentLoaded', function() {
+        var quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(function(input) {
+            input.addEventListener('input', function() {
+                var id = this.id.replace('quantity-', '');
+                var quantity = parseInt(this.value) || 1;
+                
+                if (quantity < 1) {
+                    this.value = 1;
+                    quantity = 1;
+                }
+                
+                updateSubtotalDisplay(id, quantity);
+                document.getElementById('confirm-' + id).style.display = 'inline-block';
+            });
+        });
+    });
 </script>

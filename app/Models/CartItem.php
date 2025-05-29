@@ -4,9 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CartItem extends Model
 {
+
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'variant_id',
+        'cart_qty',
+    ];
+
     // User dan CartItem (1 to many)
     public function user(): BelongsTo
     {

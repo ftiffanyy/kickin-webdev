@@ -16,6 +16,8 @@
     <!-- Make sure styles from the view are included -->
     @stack('styles') <!-- This will include the styles pushed from the views -->
     @stack('scripts')
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
     @include('include.header')
