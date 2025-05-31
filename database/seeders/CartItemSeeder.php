@@ -17,14 +17,14 @@ class CartItemSeeder extends Seeder
         $cartItems = [
             [
                 'user_id' => 1,
-                'variant_id' => 1,
+                'variant_id' => 7,
                 'qty' => 2,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'user_id' => 1,
-                'variant_id' => 2,
+                'variant_id' => 8,
                 'qty' => 3,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -73,14 +73,14 @@ class CartItemSeeder extends Seeder
             ],
             [
                 'user_id' => 3,
-                'variant_id' => 1,
+                'variant_id' => 7,
                 'qty' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'user_id' => 3,
-                'variant_id' => 3,
+                'variant_id' => 9,
                 'qty' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),

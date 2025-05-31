@@ -14,7 +14,7 @@ class CartItem extends Model
     protected $fillable = [
         'user_id',
         'variant_id',
-        'cart_qty',
+        'qty',
     ];
 
     // User dan CartItem (1 to many)

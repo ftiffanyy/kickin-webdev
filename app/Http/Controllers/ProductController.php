@@ -72,31 +72,47 @@ class ProductController extends Controller
         return view('cust.cart', compact('cart'));
     }
 
-    public function addToCart(Request $request, $variantId)
+    public function addToCart(Request $request, $productId)
     {
-        $userId = session('user_id');  // Mendapatkan user_id dari sesi login
+         // Validasi input untuk quantity
+        $request->validate([
+            'size' => 'required|exists:variants,size,product_id,' . $productId,
+            'qty' => 'required|integer|min:1'
+        ]);
+
+        $userId = session('user_id'); // Pastikan user sudah login
+        $size = $request->size;
+        $qty = $request->qty;
+
+        // Cari variant berdasarkan product_id dan size
+        $variant = Variant::where('product_id', $productId)
+                        ->where('size', $size)
+                        ->firstOrFail(); // Ambil variant_id berdasarkan produk dan size yang dipilih
 
         // Cek apakah item sudah ada di cart
-        $cartItem = CartItem::where('user_id', $userId)
-            ->where('variant_id', $variantId)
-            ->first();
+        $existingCartItem = CartItem::where('user_id', $userId)
+                                    ->where('variant_id', $variant->id)
+                                    ->first();
 
-        if ($cartItem) {
+        if ($existingCartItem) {
             // Jika sudah ada, update quantity
-            $cartItem->qty += $request->quantity;
-            $cartItem->save();
+            $existingCartItem->qty += $qty;
+            $existingCartItem->save();
         } else {
-            // Jika belum ada, buat item baru di cart
+            // Jika belum ada, buat cart item baru
             CartItem::create([
+                'qty' => $qty,
                 'user_id' => $userId,
-                'variant_id' => $variantId,
-                'qty' => $request->quantity,
+                'variant_id' => $variant->id,
             ]);
         }
 
-        // Return to the previous page with a success message
-        return redirect()->back()->with('success', 'Product added to cart!');
+        return redirect()->back()->with('success', 'Product added to cart successfully!');
+
+        dd($request->all()); // Check if the request is being received correctly
     }
+
+
 
     public function updateCart(Request $request)
     {

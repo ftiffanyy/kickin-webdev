@@ -1,6 +1,20 @@
 @extends('base.base')
 
 @section('content')
+
+<!-- Display Error/Success Messages -->
+    @if(session('error'))
+        <div class="alert alert-danger mt-3" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if(session('success'))
+        <div class="alert alert-success mt-3" role="alert">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div class="container-fluid" style="background-color: #FFFFFF; padding-top: 25px; padding-bottom: 50px;">
         <div class="container">
             <div class="row">
@@ -33,11 +47,11 @@
                     <div class="mt-3">
                         <p class="text-muted" style="font-family: 'Fredoka', sans-serif; font-size: 16px;">
                             <strong style="font-family: 'Bebas Neue', sans-serif; font-size: 22px;">
-                                {{ $products->brand }} - {{ $products->gender }}
+                                {{ strtoupper($products->brand) }} - {{ $products->gender }}
                             </strong>
                         </p>
                         <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: #181B1E;">
-                            <strong>{{ $products->name }}</strong>
+                            <strong>{{ strtoupper($products->name) }}</strong>
                         </h3>
                         <p style="font-family: 'Fredoka', sans-serif; font-size: 14px; color: #5F6266; text-align: justify;">
                             {{ $products->description }}
@@ -68,35 +82,53 @@
                         </p>
                     </div>
 
-                    <!-- EU Size Selection (Grid Layout) -->
-                    <div class="mt-3">
-                        <h4 style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #181B1E;">Size</h4>
-                        <div class="row row-cols-5 g-1">
-                            @foreach ($availableSizes as $size => $stock)
-                                <div class="col">
-                                    <button type="button" class="size-btn w-100 
-                                        @if ($stock == 0) disabled @endif"
-                                        style="font-family: 'Fredoka', sans-serif; font-size: 14px; 
-                                            @if ($stock == 0) color: #A5A9AE; @endif"
-                                        onclick="highlightSize(this)">
-                                        {{ $size }}
-                                    </button>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-
-
-                    {{-- <form action="{{ route('add_to_cart', $product->product_id) }}" method="POST"> --}}
+                    <form action="{{ route('add_to_cart', $products->id) }}" method="POST" id="add-to-cart-form">
                         @csrf
-                        <!-- Hidden input to pass quantity -->
-                        <input type="hidden" name="quantity" id="quantity-input">
+                        
+                        <!-- EU Size Selection (Radio Button Style) -->
+                        <div class="mt-3">
+                            <h4 style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #181B1E;">Size</h4>
+                            <div class="row row-cols-5 g-1">
+                                @foreach ($availableSizes as $size => $stock)
+                                    <div class="col">
+                                        <div class="form-check">
+                                            <input type="radio" 
+                                                   class="form-check-input size-radio" 
+                                                   name="size" 
+                                                   id="size-{{ $loop->index }}" 
+                                                   value="{{ $size }}" 
+                                                   data-stock="{{ $stock }}" 
+                                                   @if ($stock == 0) disabled @endif
+                                                   onchange="handleSizeSelection(this, '{{ $size }}', {{ $stock }})"
+                                                   required>
+                                            <label class="form-check-label size-label" 
+                                                   for="size-{{ $loop->index }}" 
+                                                   style="font-family: 'Fredoka', sans-serif; font-size: 14px; 
+                                                          padding: 12px 8px; border: 2px solid #181B1E; 
+                                                          background-color: #F8F9FA; color: #181B1E; 
+                                                          border-radius: 8px; cursor: pointer; 
+                                                          transition: all 0.3s ease; display: block; 
+                                                          text-align: center; width: 100%;
+                                                          @if ($stock == 0) 
+                                                              border-color: #A5A9AE; background-color: #e9ecef; 
+                                                              color: #A5A9AE; cursor: not-allowed; opacity: 0.6; 
+                                                          @endif">
+                                                {{ $size }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <!-- Error message for size -->
+                            <div id="size-error" style="color: red; font-size: 12px; display: none; margin-top: 5px;">
+                                Please select a size!
+                            </div>
+                        </div>
                         
                         <!-- Quantity Dropdown -->
                         <div class="mt-3">
                             <h4 style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #181B1E;">Quantity</h4>
-                            <select name="quantity" class="form-select" id="quantity-select" style="font-family: 'Fredoka', sans-serif; font-size: 14px;">
+                            <select name="qty" class="form-select" id="quantity-select" style="font-family: 'Fredoka', sans-serif; font-size: 14px;" required>
                                 @for ($i = 1; $i <= 10; $i++)
                                     <option value="{{ $i }}">{{ $i }}</option>
                                 @endfor
@@ -104,7 +136,8 @@
                         </div>
                         
                         <!-- Add to Cart Button -->
-                        <button type="submit" class="btn w-100 mt-3" style="font-family: 'Fredoka', sans-serif; font-size: 16px; border: 2px solid #181B1E; background-color: #181B1E; color: #F8F9FA; transition: all 0.3s ease;">
+                        <button type="submit" class="btn w-100 mt-3" id="add-to-cart-btn" 
+                                style="font-family: 'Fredoka', sans-serif; font-size: 16px; border: 2px solid #181B1E; background-color: #181B1E; color: #F8F9FA; transition: all 0.3s ease;">
                             <i class="fas fa-cart-shopping"></i> Add to Cart
                         </button>
                     </form>
@@ -119,7 +152,6 @@
                         </button>
                     </form>
 
-
                 </div>
             </div>
         </div>
@@ -127,119 +159,183 @@
 
 @endsection
 
-
 @section('scripts')
-    <script>
-        document.getElementById('quantity-select').addEventListener('change', function() {
-            // Update the hidden quantity input with the selected value
-            document.getElementById('quantity-input').value = this.value;
-        });
+<script>
+    let selectedSize = '';
+    let selectedStock = 0;
 
-        // Set the initial quantity when the page loads (default quantity value)
-        document.getElementById('quantity-input').value = document.getElementById('quantity-select').value;
+    function handleSizeSelection(radioButton, size, stock) {
+        if (stock === 0) return; // Prevent selection of out of stock items
+        
+        selectedSize = size;
+        selectedStock = stock;
+        
+        console.log('Selected Size:', size);
+        console.log('Available Stock:', stock);
+        
+        // Hide error message
+        document.getElementById('size-error').style.display = 'none';
+        
+        // Update quantity dropdown based on stock
+        updateQuantityDropdown(stock);
+        
+        // Update label styling
+        updateSizeLabels();
+    }
 
-        // Function to handle the highlighting behavior
-        function highlightSize(button) {
-            // Remove the 'active' class from all buttons
-            var buttons = document.querySelectorAll('.size-btn');
-            buttons.forEach(function(btn) {
-                btn.classList.remove('active');
-            });
-
-            // Add the 'active' class to the clicked button
-            if (!button.disabled) {
-                button.classList.add('active');
+    function updateSizeLabels() {
+        // Remove selected styling from all labels
+        document.querySelectorAll('.size-label').forEach(label => {
+            if (!label.closest('.form-check').querySelector('input').disabled) {
+                label.style.backgroundColor = '#F8F9FA';
+                label.style.color = '#181B1E';
             }
+        });
+        
+        // Add selected styling to the selected label
+        const selectedRadio = document.querySelector('input[name="size"]:checked');
+        if (selectedRadio) {
+            const selectedLabel = document.querySelector(`label[for="${selectedRadio.id}"]`);
+            selectedLabel.style.backgroundColor = '#181B1E';
+            selectedLabel.style.color = '#F8F9FA';
         }
-    </script>
-@endsection
+    }
 
+    // Function to update the quantity dropdown based on available stock
+    function updateQuantityDropdown(stock) {
+        let quantitySelect = document.getElementById('quantity-select');
+        // Clear previous options
+        quantitySelect.innerHTML = '';
+        
+        // Add new options based on stock (max 10 or stock, whichever is lower)
+        const maxQty = Math.min(10, stock);
+        for (let i = 1; i <= maxQty; i++) {
+            let option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            quantitySelect.appendChild(option);
+        }
+    }
+
+    // Form validation before submit
+    document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
+        const selectedSizeRadio = document.querySelector('input[name="size"]:checked');
+        
+        if (!selectedSizeRadio) {
+            e.preventDefault();
+            document.getElementById('size-error').style.display = 'block';
+            document.getElementById('size-error').textContent = 'Please select a size!';
+            
+            // Scroll to size selection
+            document.querySelector('input[name="size"]').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            
+            return false;
+        }
+        
+        const quantity = parseInt(document.getElementById('quantity-select').value);
+        const stock = parseInt(selectedSizeRadio.dataset.stock);
+        
+        if (quantity > stock) {
+            e.preventDefault();
+            alert(`Sorry, only ${stock} items available for size ${selectedSizeRadio.value}`);
+            return false;
+        }
+        
+        console.log('Form submitted with:', {
+            size: selectedSizeRadio.value,
+            quantity: quantity
+        });
+        
+        return true;
+    });
+
+    // Auto-hide alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            }, 5000);
+        });
+        
+        // Add hover effects for size labels
+        document.querySelectorAll('.size-label').forEach(label => {
+            const input = label.closest('.form-check').querySelector('input');
+            
+            if (!input.disabled) {
+                label.addEventListener('mouseenter', function() {
+                    if (!input.checked) {
+                        this.style.backgroundColor = '#181B1E';
+                        this.style.color = '#F8F9FA';
+                    }
+                });
+                
+                label.addEventListener('mouseleave', function() {
+                    if (!input.checked) {
+                        this.style.backgroundColor = '#F8F9FA';
+                        this.style.color = '#181B1E';
+                    }
+                });
+            }
+        });
+    });
+</script>
+@endsection
 
 @push('styles')
     <style>
+        /* Hide default radio button */
+        .size-radio {
+            display: none;
+        }
+        
         /* Carousel Arrows Styling */
         .carousel-control-prev-icon, .carousel-control-next-icon {
-            background-color: rgba(0, 0, 0, 0.5); /* Circular black with 50% transparency */
-            border-radius: 50%; /* Circular shape */
-            padding: 10px; /* Increase padding to make the buttons larger */
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            padding: 10px;
         }
 
-        /* Position and hide arrows initially */
         .carousel-control-prev, .carousel-control-next {
-            width: 5%; /* Adjust the width of the control button areas */
+            width: 5%;
             top: 50%;
             transform: translateY(-50%);
-            opacity: 0; /* Hide arrows by default */
-            transition: opacity 0.3s ease; /* Smooth transition for opacity */
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        /* Show arrows on hover over the carousel */
         .carousel:hover .carousel-control-prev, .carousel:hover .carousel-control-next {
-            opacity: 1; /* Show arrows when carousel is hovered */
+            opacity: 1;
         }
 
-        /* Carousel container styling */
         .carousel-inner img {
-            object-fit: cover; /* Ensure the images cover the container */
-            height: 400px; /* Fixed height for images */
+            object-fit: cover;
+            height: 400px;
         }
 
-
-        /* Quantity Dropdown Styling */
         .form-select {
-            width: 100%; /* Ensure the dropdown takes full width */
+            width: 100%;
         }
 
-        /* Buttons Styling */
         .btn {
-            font-size: 16px; /* Make the text inside buttons larger */
-            padding: 12px; /* Increase padding for larger buttons */
+            font-size: 16px;
+            padding: 12px;
         }
 
         .mt-3 {
             margin-top: 20px;
         }
-
-        /* Button Styling */
-        .size-btn {
-            width: 100%;
-            background-color: #ffffff;  /* Light gray background color */
-            border: 1px solid #A5A9AE;  /* Thin border with dark color */
-            padding: 15px;
-            text-align: center;
-            color: #000000;  /* Light font color */
-            font-family: 'Fredoka', sans-serif; /* Use Fredoka for small text */
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
+        
+        .alert {
+            border-radius: 5px;
+            margin-top: 15px;
         }
-
-        /* Button Hover Effect */
-        .size-btn:hover {
-            background-color: #5F6266; /* Darker gray background on hover */
-            color: #F8F9FA;  /* Light font color on hover */
-            border-radius: 0px;
-        }
-
-        /* Button Focus Effect (when button is focused) */
-        .size-btn:focus {
-            background-color: #5F6266; /* Darker gray background on focus */
-            color: #F8F9FA;  /* Light font color on focus */
-            border-radius: 0px;
-            outline: none;
-        }
-
-        /* Button when selected (active) */
-        .size-btn.active {
-            background-color: #181B1E; /* Dark background color for selected state */
-            color: #F8F9FA; /* White text for selected button */
-        }
-
-        /* Disabled Button Styling */
-        .size-btn.disabled {
-            background-color: #F8F9FA;  /* Light gray for disabled button */
-            cursor: not-allowed; /* Disable the cursor */
-        }
-
     </style>
 @endpush
