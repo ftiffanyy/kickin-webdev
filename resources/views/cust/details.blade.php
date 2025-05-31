@@ -4,14 +4,16 @@
 
 <!-- Display Error/Success Messages -->
     @if(session('error'))
-        <div class="alert alert-danger mt-3" role="alert">
+        <div class="alert alert-success alert-danger fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px;">
             {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     @if(session('success'))
-        <div class="alert alert-success mt-3" role="alert">
+        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px;">
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
@@ -85,42 +87,29 @@
                     <form action="{{ route('add_to_cart', $products->id) }}" method="POST" id="add-to-cart-form">
                         @csrf
                         
-                        <!-- EU Size Selection (Radio Button Style) -->
+                        <!-- EU Size Selection (Modern Radio Button Style) -->
                         <div class="mt-3">
-                            <h4 style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #181B1E;">Size</h4>
-                            <div class="row row-cols-5 g-1">
+                            <h4 style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #181B1E; margin-bottom: 15px;">Size</h4>
+                            <div class="size-grid">
                                 @foreach ($availableSizes as $size => $stock)
-                                    <div class="col">
-                                        <div class="form-check">
-                                            <input type="radio" 
-                                                   class="form-check-input size-radio" 
-                                                   name="size" 
-                                                   id="size-{{ $loop->index }}" 
-                                                   value="{{ $size }}" 
-                                                   data-stock="{{ $stock }}" 
-                                                   @if ($stock == 0) disabled @endif
-                                                   onchange="handleSizeSelection(this, '{{ $size }}', {{ $stock }})"
-                                                   required>
-                                            <label class="form-check-label size-label" 
-                                                   for="size-{{ $loop->index }}" 
-                                                   style="font-family: 'Fredoka', sans-serif; font-size: 14px; 
-                                                          padding: 12px 8px; border: 2px solid #181B1E; 
-                                                          background-color: #F8F9FA; color: #181B1E; 
-                                                          border-radius: 8px; cursor: pointer; 
-                                                          transition: all 0.3s ease; display: block; 
-                                                          text-align: center; width: 100%;
-                                                          @if ($stock == 0) 
-                                                              border-color: #A5A9AE; background-color: #e9ecef; 
-                                                              color: #A5A9AE; cursor: not-allowed; opacity: 0.6; 
-                                                          @endif">
-                                                {{ $size }}
-                                            </label>
-                                        </div>
+                                    <div class="size-option">
+                                        <input type="radio" 
+                                               class="size-radio" 
+                                               name="size" 
+                                               id="size-{{ $loop->index }}" 
+                                               value="{{ $size }}" 
+                                               data-stock="{{ $stock }}" 
+                                               @if ($stock == 0) disabled @endif
+                                               required>
+                                        <label class="size-btn {{ $stock == 0 ? 'disabled' : '' }}" 
+                                               for="size-{{ $loop->index }}">
+                                            {{ $size }}
+                                        </label>
                                     </div>
                                 @endforeach
                             </div>
                             <!-- Error message for size -->
-                            <div id="size-error" style="color: red; font-size: 12px; display: none; margin-top: 5px;">
+                            <div id="size-error" style="color: #dc3545; font-size: 14px; display: none; margin-top: 10px; font-family: 'Fredoka', sans-serif;">
                                 Please select a size!
                             </div>
                         </div>
@@ -164,6 +153,33 @@
     let selectedSize = '';
     let selectedStock = 0;
 
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle size selection
+        const sizeRadios = document.querySelectorAll('.size-radio');
+        
+        sizeRadios.forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    const size = this.value;
+                    const stock = parseInt(this.getAttribute('data-stock'));
+                    handleSizeSelection(this, size, stock);
+                }
+            });
+        });
+
+        // Auto-hide alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            }, 5000);
+        });
+    });
+
     function handleSizeSelection(radioButton, size, stock) {
         if (stock === 0) return; // Prevent selection of out of stock items
         
@@ -178,27 +194,6 @@
         
         // Update quantity dropdown based on stock
         updateQuantityDropdown(stock);
-        
-        // Update label styling
-        updateSizeLabels();
-    }
-
-    function updateSizeLabels() {
-        // Remove selected styling from all labels
-        document.querySelectorAll('.size-label').forEach(label => {
-            if (!label.closest('.form-check').querySelector('input').disabled) {
-                label.style.backgroundColor = '#F8F9FA';
-                label.style.color = '#181B1E';
-            }
-        });
-        
-        // Add selected styling to the selected label
-        const selectedRadio = document.querySelector('input[name="size"]:checked');
-        if (selectedRadio) {
-            const selectedLabel = document.querySelector(`label[for="${selectedRadio.id}"]`);
-            selectedLabel.style.backgroundColor = '#181B1E';
-            selectedLabel.style.color = '#F8F9FA';
-        }
     }
 
     // Function to update the quantity dropdown based on available stock
@@ -251,41 +246,6 @@
         
         return true;
     });
-
-    // Auto-hide alerts after 5 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            setTimeout(function() {
-                alert.style.transition = 'opacity 0.5s';
-                alert.style.opacity = '0';
-                setTimeout(function() {
-                    alert.remove();
-                }, 500);
-            }, 5000);
-        });
-        
-        // Add hover effects for size labels
-        document.querySelectorAll('.size-label').forEach(label => {
-            const input = label.closest('.form-check').querySelector('input');
-            
-            if (!input.disabled) {
-                label.addEventListener('mouseenter', function() {
-                    if (!input.checked) {
-                        this.style.backgroundColor = '#181B1E';
-                        this.style.color = '#F8F9FA';
-                    }
-                });
-                
-                label.addEventListener('mouseleave', function() {
-                    if (!input.checked) {
-                        this.style.backgroundColor = '#F8F9FA';
-                        this.style.color = '#181B1E';
-                    }
-                });
-            }
-        });
-    });
 </script>
 @endsection
 
@@ -294,6 +254,90 @@
         /* Hide default radio button */
         .size-radio {
             display: none;
+        }
+        
+        /* Size Grid Layout */
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        /* Size Button Styling */
+        .size-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 12px 8px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            background-color: #ffffff;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            color: #333333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Hover Effect */
+        .size-btn:hover:not(.disabled) {
+            border-color: #181B1E;
+            background-color: #f8f9fa;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Focus Effect (when button is focused) */
+        .size-btn:focus:not(.disabled) {
+            background-color: #5F6266;
+            color: #F8F9FA;
+            border-color: #5F6266;
+            outline: none;
+        }
+        
+        /* Selected State - when radio is checked */
+        .size-radio:checked + .size-btn {
+            background-color: #181B1E !important;
+            border-color: #181B1E !important;
+            color: #F8F9FA !important;
+            box-shadow: 0 2px 8px rgba(24, 27, 30, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* Disabled State */
+        .size-btn.disabled {
+            background-color: #f5f5f5;
+            border-color: #d0d0d0;
+            color: #999999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .size-btn.disabled:hover {
+            transform: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: #f5f5f5;
+            border-color: #d0d0d0;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .size-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+            
+            .size-btn {
+                min-height: 44px;
+                padding: 10px 6px;
+                font-size: 13px;
+            }
         }
         
         /* Carousel Arrows Styling */
