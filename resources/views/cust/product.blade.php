@@ -191,6 +191,20 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Loading spinner for wishlist actions */
+        .wishlist-loading {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 35px;
+            z-index: 11;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
     </style>
 
     <div class="container" style="padding-top: 25px; padding-bottom: 50px;">
@@ -304,10 +318,21 @@
                         <div class="product-card">
                             <!-- Wishlist Icon -->
                             <div class="wishlist-icon">
-                                <input type="checkbox" id="wishlist-{{ $product->id }}" class="wishlist-checkbox">
+                                <input type="checkbox" id="wishlist-{{ $product->id }}" class="wishlist-checkbox" 
+                                       data-product-id="{{ $product->id }}"
+                                       @auth
+                                           @if(App\Models\Wishlist::isInWishlist(auth()->user()->id, $product->id)) checked @endif
+                                       @endauth>
                                 <label for="wishlist-{{ $product->id }}" class="wishlist-btn">
                                     <i class="fas fa-heart"></i>
                                 </label>
+                            </div>
+
+                            <!-- Loading spinner -->
+                            <div class="wishlist-loading" id="loading-{{ $product->id }}">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                             </div>
 
                             <div class="card-body">
@@ -364,10 +389,85 @@
             
             wishlistCheckboxes.forEach(function(checkbox) {
                 checkbox.addEventListener('change', function() {
-                    const productId = this.id.replace('wishlist-', '');
-                    console.log('Product ID:', productId, 'Added to wishlist:', this.checked);
+                    const productId = this.dataset.productId;
+                    const isChecked = this.checked;
+                    const loadingSpinner = document.getElementById('loading-' + productId);
+                    
+                    // Show loading spinner
+                    loadingSpinner.style.display = 'block';
+                    
+                    // Disable checkbox temporarily
+                    this.disabled = true;
+                    
+                    // Send AJAX request
+                    fetch('{{ route("wishlist.toggle") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            product_id: productId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success message
+                            showToast(data.message, 'success');
+                            
+                            // Update checkbox state based on server response
+                            this.checked = (data.action === 'added');
+                        } else {
+                            // Revert checkbox state on error
+                            this.checked = !isChecked;
+                            showToast(data.message || 'An error occurred', 'error');
+                            
+                            // If not logged in, redirect to login
+                            if (data.message === 'Please login first') {
+                                window.location.href = '{{ route("login") }}';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Revert checkbox state on error
+                        this.checked = !isChecked;
+                        showToast('An error occurred. Please try again.', 'error');
+                    })
+                    .finally(() => {
+                        // Hide loading spinner and re-enable checkbox
+                        loadingSpinner.style.display = 'none';
+                        this.disabled = false;
+                    });
                 });
             });
         });
+
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            // Remove existing toasts
+            const existingToasts = document.querySelectorAll('.custom-toast');
+            existingToasts.forEach(toast => toast.remove());
+            
+            // Create new toast
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg custom-toast`;
+            toast.style.minWidth = '300px';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                if (toast && toast.parentNode) {
+                    toast.remove();
+                }
+            }, 3000);
+        }
     </script>
 @endsection

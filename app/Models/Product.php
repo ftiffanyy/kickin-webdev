@@ -31,4 +31,46 @@ class Product extends Model
         return $this->hasMany(Wishlist::class, 'product_id');
     }
 
+    /**
+ * Get the users who have this product in their wishlist.
+ */
+public function wishlistedBy()
+{
+    return $this->belongsToMany(User::class, 'wishlists');
+}
+
+/**
+ * Check if this product is in a specific user's wishlist
+ */
+public function isInWishlistOf($userId)
+{
+    return $this->wishlists()->where('user_id', $userId)->exists();
+}
+
+/**
+ * Get the total number of users who have this product in their wishlist
+ */
+public function getWishlistCountAttribute()
+{
+    return $this->wishlists()->count();
+}
+
+/**
+ * Scope to get products that are in a specific user's wishlist
+ */
+public function scopeInWishlistOf($query, $userId)
+{
+    return $query->whereHas('wishlists', function($q) use ($userId) {
+        $q->where('user_id', $userId);
+    });
+}
+
+/**
+ * Scope to get products with wishlist count
+ */
+public function scopeWithWishlistCount($query)
+{
+    return $query->withCount('wishlists');
+}
+
 }

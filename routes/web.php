@@ -150,7 +150,10 @@ Route::middleware(['auth'])->group(function(){
         Route::post('/checkout', [ProductController::class, 'checkout'])->name('checkout');
         //wishlist
         Route::get('/wishlist', [WishlistController::class, 'showWishlist'])->name('wishlist');
-
+        Route::post('/wishlist/add', [WishlistController::class, 'addToWishlist'])->name('wishlist.add');
+        Route::post('/wishlist/remove', [WishlistController::class, 'removeFromWishlist'])->name('wishlist.remove');
+        Route::post('/wishlist/toggle', [WishlistController::class, 'toggleWishlist'])->name('wishlist.toggle');
+        Route::post('/wishlist/status', [WishlistController::class, 'getWishlistStatus'])->name('wishlist.status');
         //orders
         Route::get('/orders', [OrderCustController::class, 'show'])->name('order_customer');
         //order details

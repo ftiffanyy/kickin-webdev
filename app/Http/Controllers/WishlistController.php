@@ -3,96 +3,166 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
+use App\Models\Wishlist;
+use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class WishlistController extends Controller
 {
     public function showWishlist()
     {
-        // Hardcoded wishlist data (for demo purposes)
-        $wishlist = [
-            [
-                'product_id' => 1,
-                'product_name' => "Nike Air Force 1 '07 White",
-                'price' => 1549000,
-                'discount' => 30,
-                'brand' => 'NIKE',
-                'gender' => 'Men',
-                'rating_avg' => 4.4,
-                'total_reviews' => 102,
-                'image' => $this->getFirstImage(1), // Adjust the path based on your structure
-            ],
-            // Add more products here...
-            [
-                'product_id' => 4,
-                'product_name' => "Speedcat OG Unisex Lifestyle Shoes - Red",
-                'price' => 1899000,
-                'discount' => 0,
-                'brand' => 'PUMA',
-                'gender' => 'Unisex',
-                'rating_avg' => 4.5,
-                'total_reviews' => 98,
-                'image' => $this->getFirstImage(4), // Adjust the path based on your structure
-            ],
-        ];
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('auth')->with('error', 'Please login to view your wishlist');
+        }
 
-        // Return the wishlist view with data
+        // Get wishlist items with product details
+        $wishlist = DB::table('wishlists')
+            ->join('products', 'wishlists.product_id', '=', 'products.id')
+            ->leftJoin('images', function($join) {
+                $join->on('products.id', '=', 'images.product_id')
+                     ->whereRaw('images.id = (SELECT MIN(id) FROM images WHERE product_id = products.id)');
+            })
+            ->leftJoin(DB::raw('(SELECT product_id, AVG(rating) as rating_avg, COUNT(*) as total_reviews FROM reviews GROUP BY product_id) as review_stats'), 
+                      'products.id', '=', 'review_stats.product_id')
+            ->where('wishlists.user_id', $user->id)
+            ->select(
+                'products.id as product_id',
+                'products.name as product_name',
+                'products.brand',
+                'products.gender',
+                'products.price',
+                'products.discount',
+                'images.url as image',
+                DB::raw('COALESCE(review_stats.rating_avg, 0) as rating_avg'),
+                DB::raw('COALESCE(review_stats.total_reviews, 0) as total_reviews')
+            )
+            ->get()
+            ->map(function($item) {
+                // Format image path
+                $item->image = $item->image ? 'images/' . $item->image : 'images/default-product.jpg';
+                return $item;
+            });
+
         return view('cust.wishlist', compact('wishlist'));
     }
 
-
-
-    public function addToWishlist($productId)
+    public function addToWishlist(Request $request)
     {
-        // Logic for adding product to wishlist (You can use session or database to store the wishlist)
-        return redirect()->route('wishlist')->with('success', 'Product added to wishlist!');
-    }
-
-    public function removeFromWishlist($productId)
-    {
-        // Logic to remove product from wishlist
-        // e.g., remove it from the session or database if implemented
-
-        // Example (assuming using session for wishlist)
-        $wishlist = session()->get('wishlist', []);
-
-        if (isset($wishlist[$productId])) {
-            unset($wishlist[$productId]);
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Please login first'], 401);
         }
 
-        // Save the updated wishlist back to session
-        session()->put('wishlist', $wishlist);
-
-        return redirect()->route('wishlist')->with('success', 'Product removed from wishlist!');
-    }
-
-    private function getFirstImage($productId)
-    {
-        $path = public_path("images/products/{$productId}");
-        $files = File::allFiles($path); // Get all files in the folder
-
-        // Return the first image's relative path (if available)
-        if (count($files) > 0) {
-            return asset("images/products/{$productId}/" . $files[0]->getBasename());
+        $productId = $request->input('product_id');
+        
+        // Check if product exists
+        $product = Product::find($productId);
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
         }
 
-        return null; // If no image found, return null
+        // Check if already in wishlist
+        $exists = Wishlist::where('user_id', $user->id)
+                         ->where('product_id', $productId)
+                         ->exists();
+
+        if ($exists) {
+            return response()->json(['success' => false, 'message' => 'Product already in wishlist']);
+        }
+
+        // Add to wishlist
+        Wishlist::create([
+            'user_id' => $user->id,
+            'product_id' => $productId
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Product added to wishlist']);
     }
 
-    // In WishlistController.php
-    public function toggleWishlist(Request $request, $productId)
+    public function removeFromWishlist(Request $request)
     {
-        $isInWishlist = $request->input('is_in_wishlist', false);
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Please login first'], 401);
+        }
 
-        // Store the wishlist status (in session or database)
-        if ($isInWishlist) {
-            // Add to wishlist logic (e.g., save to session or database)
+        $productId = $request->input('product_id');
+        
+        $deleted = Wishlist::where('user_id', $user->id)
+                          ->where('product_id', $productId)
+                          ->delete();
+
+        if ($deleted) {
+            return response()->json(['success' => true, 'message' => 'Product removed from wishlist']);
         } else {
-            // Remove from wishlist logic
+            return response()->json(['success' => false, 'message' => 'Product not found in wishlist']);
         }
-
-        return response()->json(['status' => 'success']);
     }
 
+    public function toggleWishlist(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Please login first'], 401);
+        }
 
+        $productId = $request->input('product_id');
+        
+        // Check if product exists
+        $product = Product::find($productId);
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
+
+        // Check if already in wishlist
+        $wishlistItem = Wishlist::where('user_id', $user->id)
+                               ->where('product_id', $productId)
+                               ->first();
+
+        if ($wishlistItem) {
+            // Remove from wishlist
+            $wishlistItem->delete();
+            return response()->json(['success' => true, 'action' => 'removed', 'message' => 'Product removed from wishlist']);
+        } else {
+            // Add to wishlist
+            Wishlist::create([
+                'user_id' => $user->id,
+                'product_id' => $productId
+            ]);
+            return response()->json(['success' => true, 'action' => 'added', 'message' => 'Product added to wishlist']);
+        }
+    }
+
+    public function getWishlistStatus(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json(['wishlisted' => false]);
+        }
+
+        $productIds = $request->input('product_ids', []);
+        
+        if (empty($productIds)) {
+            return response()->json(['wishlisted' => []]);
+        }
+
+        $wishlistedIds = Wishlist::where('user_id', $user->id)
+                                ->whereIn('product_id', $productIds)
+                                ->pluck('product_id')
+                                ->toArray();
+
+        $result = [];
+        foreach ($productIds as $productId) {
+            $result[$productId] = in_array($productId, $wishlistedIds);
+        }
+
+        return response()->json(['wishlisted' => $result]);
+    }
 }

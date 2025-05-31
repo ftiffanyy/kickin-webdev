@@ -62,4 +62,61 @@ class User extends Authenticatable
         return $this->hasMany(Wishlist::class, 'user_id');
     }
 
+/**
+ * Get the products in user's wishlist.
+ */
+public function wishlistProducts()
+{
+    return $this->belongsToMany(Product::class, 'wishlists');
+}
+
+/**
+ * Check if user has a product in wishlist
+ */
+public function hasInWishlist($productId)
+{
+    return $this->wishlists()->where('product_id', $productId)->exists();
+}
+
+/**
+ * Add product to user's wishlist
+ */
+public function addToWishlist($productId)
+{
+    if (!$this->hasInWishlist($productId)) {
+        return $this->wishlists()->create(['product_id' => $productId]);
+    }
+    return false;
+}
+
+/**
+ * Remove product from user's wishlist
+ */
+public function removeFromWishlist($productId)
+{
+    return $this->wishlists()->where('product_id', $productId)->delete();
+}
+
+/**
+ * Toggle product in user's wishlist
+ */
+public function toggleWishlist($productId)
+{
+    if ($this->hasInWishlist($productId)) {
+        $this->removeFromWishlist($productId);
+        return 'removed';
+    } else {
+        $this->addToWishlist($productId);
+        return 'added';
+    }
+}
+
+/**
+ * Get user's wishlist count
+ */
+public function getWishlistCountAttribute()
+{
+    return $this->wishlists()->count();
+}
+
 }
