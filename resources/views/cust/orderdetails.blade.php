@@ -4,6 +4,20 @@
 
 @php
     $isShipping = strtolower($order->status) === 'shipping';
+
+    // Tentukan progress bar width sesuai shipping_status
+    $progressPercent = 0;
+    $status = strtolower($order->shipping_status ?? '');
+
+    if ($status === 'pending') {
+        $progressPercent = 2;
+    } elseif ($status === 'dispatched') {
+        $progressPercent = 35;
+    } elseif ($status === 'in transit') {
+        $progressPercent = 65;
+    } elseif ($status === 'delivered') {
+        $progressPercent = 100;
+    }
 @endphp
 
 <style>
@@ -80,22 +94,13 @@
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
   }
 
-  /* Animated progress */
+  /* Loading bar progress - dinamis width */
   .loading-bar-progress {
     height: 100%;
-    width: 0;
     background: linear-gradient(90deg, #38b2ac 0%, #81e6d9 100%);
     border-radius: 10px 0 0 10px;
-    animation: loadingAnim 3s forwards ease-in-out;
-  }
-
-  @keyframes loadingAnim {
-    0% {
-      width: 0;
-    }
-    100% {
-      width: 70%;
-    }
+    width: {{ $progressPercent }}%;
+    transition: width 0.6s ease;
   }
 
   /* Label container below bar */
@@ -354,11 +359,11 @@
 
     @if($isShipping)
       <!-- Shipping content -->
-      <div class="loading-bar-container">
+      <div class="loading-bar-container" aria-label="Shipment Progress">
         <div class="loading-bar-progress"></div>
       </div>
-      <div class="loading-labels">
-        <span>Ordered</span>
+      <div class="loading-labels" aria-hidden="true">
+        <span>Pending</span>
         <span>Dispatched</span>
         <span>In Transit</span>
         <span>Delivered</span>
@@ -400,7 +405,6 @@
           referrerpolicy="no-referrer-when-downgrade">
         </iframe>
       </div>
-
 
       <div class="delivery-info">
         <p><strong>Pick-up Location</strong></p>
@@ -459,7 +463,5 @@
     @endif
   </div>
 </div>
-
-
 
 @endsection

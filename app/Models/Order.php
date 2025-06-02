@@ -8,6 +8,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Order extends Model
 {
+    protected $fillable = [
+        'date',
+        'total_price',
+        'total_qty',
+        'status',
+        'shipping_address',
+        'shipping_status',
+        'invoice_number',
+        'payment_url',
+        'user_id',
+    ];
+    
     // User dan Order (1 to many)
     public function user(): BelongsTo
     {

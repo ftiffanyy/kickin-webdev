@@ -1,5 +1,19 @@
 @extends('base.base')
 
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px;">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-success alert-danger fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px;">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 @section('content')
 <style>
     body {
@@ -59,14 +73,14 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        flex: 1; /* supaya label sama lebar */
+        flex: 1;
         text-align: center;
         transition: all 0.3s ease;
     }
 
     /* Active button (when selected) */
     .delivery-options input[type="radio"]:checked + label {
-        background-color: #333; /* Black background for selected */
+        background-color: #333;
         color: white;
         border-color: #333;
     }
@@ -75,51 +89,13 @@
         display: none;
     }
 
-    .shipping-address {
-        display: flex;
-        margin-bottom: 20px;
-    }
-
-    .shipping-address label {
-        font-size: 16px;
-        color: #333;
-        margin-right: 20px;
-    }
-
-    .name-fields {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        gap: 20px;
-    }
-
-    .name-fields input {
-        flex: 1;
-        padding: 10px;
-        border-radius: 4px;
-        border: 1px solid #ddd;
-        font-size: 14px;
-    }
-
-    .address-fields input,
-    .contact-fields input {
+    .address-fields input {
         width: 100%;
         padding: 10px;
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 14px;
         margin-bottom: 10px;
-    }
-
-    .contact-fields {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 30px;
-        gap: 20px;
-    }
-
-    .contact-fields input {
-        flex: 1;
     }
 
     .pick-up-section {
@@ -131,12 +107,36 @@
         display: block;
     }
 
-    select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+    select#pickup-select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
         background-color: #fff;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 12px 40px 12px 16px;
+        font-size: 16px;
+        color: #333;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="%23333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px 16px;
+        transition: border-color 0.3s ease;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    select#pickup-select:hover {
+        border-color: #555;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    select#pickup-select:focus {
+        outline: none;
+        border-color: #222;
+        box-shadow: 0 0 6px #555;
     }
 
     .save-continue-btn {
@@ -158,7 +158,7 @@
         color: white;
     }
 
-    /* Right Section - Order Summary */
+    /* Right Section - Order Summary (style asli, tidak diubah) */
     .right-section {
         width: 35%;
         background-color: #ffffff;
@@ -192,7 +192,6 @@
         padding-right: 5px;
     }
 
-    /* Scrollbar */
     .order-items::-webkit-scrollbar {
         width: 6px;
     }
@@ -241,13 +240,12 @@
 
     .order-item-price {
         text-align: right;
-        white-space: nowrap; /* supaya tetap sebaris tanpa wrap */
+        white-space: nowrap;
         font-weight: 700;
         font-size: 16px;
         color: #444;
-        width: 100px; /* atau sesuai kebutuhan */
+        width: 100px;
     }
-
 
     .summary-box {
         border-top: 2px solid #eee;
@@ -274,29 +272,19 @@
         padding-top: 14px;
     }
 
-    .size-display,
-    .quantity-display {
+    /* Style untuk label Size: dan Quantity: supaya konsisten */
+    .order-item-info p {
         font-family: 'Fredoka', sans-serif;
         font-size: 1rem;
         color: #5F6266;
-        display: inline; /* hilangkan kotak, inline saja */
-        padding: 0; /* hilangkan padding */
-        border: none; /* hilangkan border */
-        user-select: none;
+        margin: 0 0 6px 0;
     }
-    /* Style untuk label Size: dan Quantity: supaya konsisten */
-.order-item-info p {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1rem;
-    color: #5F6266;
-    margin: 0 0 6px 0;
-}
 
-.order-item-info p span.size-display,
-.order-item-info p span.quantity-display {
-    font-weight: 600; /* supaya beda dengan label */
-    color: #4A4A4A; /* warna lebih gelap untuk isi size dan quantity */
-}
+    .order-item-info p span.size-display,
+    .order-item-info p span.quantity-display {
+        font-weight: 600;
+        color: #4A4A4A;
+    }
 
 
     /* RESPONSIVE */
@@ -317,13 +305,6 @@
         .delivery-type label {
             width: 100% !important;
             padding: 15px 0 !important;
-        }
-        .name-fields, .contact-fields {
-            flex-direction: column;
-        }
-        .name-fields input, .contact-fields input {
-            width: 100% !important;
-            margin-bottom: 15px;
         }
     }
 
@@ -353,59 +334,70 @@
             width: 80px;
         }
     }
+
+    /* Map container style from your example */
+    #my-map-display {
+        overflow:hidden;
+        max-width:100%;
+        width: 100%;
+        height: 250px;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+    #my-map-display iframe {
+        height: 100%;
+        width: 100%;
+        border: 0;
+    }
 </style>
 
 <div class="copage-container">
     <!-- Left Section -->
     <div class="left-section">
         <h1>CHECKOUT</h1>
-        <form action="#" method="POST">
+        <form action="{{ route('checkout') }}" method="POST">
+            @csrf
             <div class="delivery-options">
                 <h2>DELIVERY OPTIONS</h2>
                 <div class="delivery-type">
-                    <input type="radio" name="delivery" value="ship" checked id="ship-option" onclick="toggleDeliveryFields('ship')">
-                    <label for="ship-option" class="active">Ship</label>
+                    <input type="radio" name="delivery" value="Shipping" checked id="ship-option" onclick="toggleDeliveryFields('Shipping')">
+                    <label for="ship-option" class="active">Shipping</label>
 
-                    <input type="radio" name="delivery" value="pick-up" id="pick-up-option" onclick="toggleDeliveryFields('pick-up')">
+                    <input type="radio" name="delivery" value="Pick Up" id="pick-up-option" onclick="toggleDeliveryFields('Pick Up')">
                     <label for="pick-up-option">Pick Up</label>
-                </div>
-
-                <!-- Name Fields -->
-                <div class="name-fields" id="name-fields">
-                    <input type="text" placeholder="First Name" required>
-                    <input type="text" placeholder="Last Name" required>
                 </div>
 
                 <!-- Address Fields -->
                 <div class="address-fields" id="address-fields">
-                    <input type="text" placeholder="Start typing the first line of your address" required>
-                </div>
-
-                <!-- Contact Fields -->
-                <div class="contact-fields" id="contact-fields">
-                    <input type="email" placeholder="Email" required>
-                    <input type="tel" placeholder="Phone Number" required>
+                    <input id="address-input" name="address" type="text" placeholder="Start typing the first line of your address" required>
                 </div>
 
                 <!-- Pick Up Location -->
                 <div class="pick-up-section" id="pick-up-section">
                     <h3>Select a Location</h3>
-                    <select>
-                        <option value="pakuwon-mall">Pakuwon Mall</option>
-                        <option value="pakuwon-city-mall">Pakuwon City Mall</option>
-                        <option value="galaxy-mall">Galaxy Mall</option>
-                        <option value="tunjungan-plaza">Tunjungan Plaza</option>
-                        <option value="ciputra-world">Ciputra World</option>
+                    <select id="pickup-select" name="pickup_location">
+                        <option value="Pakuwon Mall, Surabaya">Pakuwon Mall</option>
+                        <option value="Pakuwon City Mall, Surabaya">Pakuwon City Mall</option>
+                        <option value="Galaxy Mall, Surabaya">Galaxy Mall</option>
+                        <option value="Tunjungan Plaza, Surabaya">Tunjungan Plaza</option>
+                        <option value="Ciputra World, Surabaya">Ciputra World</option>
                     </select>
                 </div>
+
+                <!-- Map -->
+                <div id="my-map-display">
+                    <iframe
+                        id="map-frame"
+                        frameborder="0"
+                        src="https://www.google.com/maps/embed/v1/place?q=Surabaya&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
+                        allowfullscreen>
+                    </iframe>
+                </div>
             </div>
-        </form>
-        <form action="{{ route('checkout') }}" method="POST">
-            @csrf
+
             <button type="submit" class="save-continue-btn">SAVE & CONTINUE</button>
         </form>
     </div>
-
     <!-- Right Section -->
     <div class="right-section">
         <h2>IN YOUR BAG</h2>
@@ -438,18 +430,16 @@
                     $discountedPrice = $item->variant->product->price * (1 - $discount / 100);
                     $subtotalPrice += $discountedPrice * $item->qty;
                 }
-                $shippingCost = 20000; // Contoh tetap
                 $tax = 0;
-                $totalPrice = $subtotalPrice + $shippingCost + $tax;
             @endphp
 
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span>Rp {{ number_format($subtotalPrice, 0, ',', '.') }}</span>
+                <span id="subtotal-price">Rp {{ number_format($subtotalPrice, 0, ',', '.') }}</span>
             </div>
             <div class="summary-row">
                 <span>Shipping</span>
-                <span>Rp {{ number_format($shippingCost, 0, ',', '.') }}</span>
+                <span id="shipping-price">Rp 20.000</span>
             </div>
             <div class="summary-row">
                 <span>Tax</span>
@@ -457,7 +447,7 @@
             </div>
             <div class="summary-row total">
                 <span>Total</span>
-                <span>Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
+                <span id="total-price">Rp {{ number_format($subtotalPrice + 20000, 0, ',', '.') }}</span>
             </div>
         </div>
     </div>
@@ -465,17 +455,75 @@
 
 <script>
     function toggleDeliveryFields(deliveryType) {
-        if (deliveryType === 'pick-up') {
+        if (deliveryType === 'Pick Up') {
             document.getElementById('pick-up-section').classList.add('active');
-            document.getElementById('name-fields').style.display = 'none';
             document.getElementById('address-fields').style.display = 'none';
-            document.getElementById('contact-fields').style.display = 'none';
         } else {
             document.getElementById('pick-up-section').classList.remove('active');
-            document.getElementById('name-fields').style.display = 'flex';
             document.getElementById('address-fields').style.display = 'block';
-            document.getElementById('contact-fields').style.display = 'flex';
         }
+        updateShippingPrice();
     }
+
+    function formatRupiah(num) {
+        return 'Rp ' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function updateShippingPrice() {
+        const shipPrice = 20000;
+        const pickupPrice = 0;
+        const isShip = document.getElementById('ship-option').checked;
+
+        const shippingPriceEl = document.getElementById('shipping-price');
+        const totalPriceEl = document.getElementById('total-price');
+        const subtotalPriceEl = document.getElementById('subtotal-price');
+
+        let shippingCost = isShip ? shipPrice : pickupPrice;
+
+        shippingPriceEl.textContent = formatRupiah(shippingCost);
+
+        // Ambil subtotal dari elemen
+        let subtotalText = subtotalPriceEl.textContent.replace(/[^\d]/g, '');
+        let subtotalNumber = parseInt(subtotalText, 10) || 0;
+
+        let total = subtotalNumber + shippingCost;
+        totalPriceEl.textContent = formatRupiah(total);
+    }
+
+    // Update map iframe src sesuai alamat input atau pickup
+    const addressInput = document.getElementById('address-input');
+    const pickupSelect = document.getElementById('pickup-select');
+    const mapFrame = document.getElementById('map-frame');
+
+    function updateMap(location) {
+        const apiKey = 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8';
+        const encodedLocation = encodeURIComponent(location);
+        const src = `https://www.google.com/maps/embed/v1/place?q=${encodedLocation}&key=${apiKey}`;
+        mapFrame.src = src;
+    }
+
+    addressInput.addEventListener('input', () => {
+        if(addressInput.value.trim() !== '') {
+            updateMap(addressInput.value);
+        }
+    });
+
+    pickupSelect.addEventListener('change', () => {
+        updateMap(pickupSelect.value);
+    });
+
+    // Update harga shipping saat radio button berubah
+    document.getElementById('ship-option').addEventListener('change', updateShippingPrice);
+    document.getElementById('pick-up-option').addEventListener('change', updateShippingPrice);
+
+    // Init harga dan maps saat load
+    window.addEventListener('load', () => {
+        updateShippingPrice();
+        if(document.getElementById('ship-option').checked) {
+            updateMap(addressInput.value || 'Surabaya');
+        } else {
+            updateMap(pickupSelect.value);
+        }
+    });
 </script>
 @endsection

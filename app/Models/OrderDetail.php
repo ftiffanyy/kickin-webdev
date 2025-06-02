@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderDetail extends Model
 {
+    protected $fillable = [
+        'price_at_purchase',
+        'qty',
+        'variant_id',
+        'order_id',
+    ];
+    
     // Order dan OrderDetail (1 to many)
     public function order(): BelongsTo
     {

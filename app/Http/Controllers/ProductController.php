@@ -3,11 +3,18 @@
 namespace App\Http\Controllers;
 
 use id;
+use Midtrans\Snap;
+use App\Models\User;
+use Midtrans\Config;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Variant;
 use App\Models\CartItem;
+use App\Models\OrderDetail;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
@@ -26,21 +33,6 @@ class ProductController extends Controller
 
         // Pass the products, brands, and sizes to the view
         return view('cust.product', compact('products', 'brands', 'sizes'));
-    }
-
-
-    // Helper method to get the first image from a product folder
-    private function getFirstImage($productId)
-    {
-        $path = public_path("images/products/{$productId}");
-        $files = File::allFiles($path); // Get all files in the folder
-
-        // Return the first image's relative path (if available)
-        if (count($files) > 0) {
-            return asset("images/products/{$productId}/" . $files[0]->getBasename());
-        }
-
-        return null; // If no image found, return null
     }
 
     public function showDetail($id)
@@ -210,8 +202,110 @@ class ProductController extends Controller
 
     public function checkout(Request $request)
     {
-        return redirect()->route('order_customer')->with('success', 'Checkout Complete!');
+        $userId = session('user_id');
+        $checkoutItems = session('checkout_items', []);
+
+        if (empty($checkoutItems)) {
+            return back()->with('error', 'Keranjang kosong.');
+        }
+
+        $cartItems = CartItem::with('variant.product')
+            ->where('user_id', $userId)
+            ->whereIn('id', $checkoutItems)
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return back()->with('error', 'Item checkout tidak ditemukan.');
+        }
+
+        $request->validate([
+            'delivery' => 'required|in:Pick Up,Shipping',
+            'address' => 'required_if:delivery,Shipping|string|max:65535',
+            'pickup_location' => 'required_if:delivery,Pick Up|string|max:65535',
+        ]);
+
+        // Hitung total qty dan harga
+        $totalQty = 0;
+        $totalPrice = 0;
+        foreach ($cartItems as $item) {
+            $discount = $item->variant->product->product_discount ?? $item->variant->product->discount ?? 0;
+            $price = $item->variant->product->price * (1 - $discount / 100);
+            $totalPrice += $price * $item->qty;
+            $totalQty += $item->qty;
+        }
+
+        // Ongkos kirim
+        $shippingCost = ($request->delivery == 'Shipping') ? 20000 : 0;
+        $totalPrice += $shippingCost;
+
+        $invoiceNumber = strtoupper(Str::random(10));
+
+        // Midtrans Config
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        $user = User::find($userId);
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $invoiceNumber,
+                'gross_amount' => $totalPrice,
+            ],
+            'customer_details' => [
+                'first_name' => $user ? $user->name : 'Guest',
+                'email' => $user ? $user->email : 'guest@example.com',
+            ],
+            'callback' => [  // NOTE: biasanya 'callback' bukan 'callbacks'
+                'finish' => route('order_customer'),
+            ],
+        ];
+
+        DB::beginTransaction();
+
+        try {
+            $snapUrl = Snap::createTransaction($params)->redirect_url;
+
+            $shippingAddress = ($request->delivery == 'Shipping') ? $request->address : $request->pickup_location;
+
+            $order = Order::create([
+                'date' => now(),
+                'total_price' => $totalPrice,
+                'total_qty' => $totalQty,
+                'status' => $request->delivery,
+                'shipping_address' => $shippingAddress,
+                'shipping_status' => 'Pending',
+                'invoice_number' => $invoiceNumber,
+                'payment_url' => $snapUrl,
+                'user_id' => $userId,
+            ]);
+
+            foreach ($cartItems as $item) {
+                $discount = $item->variant->product->product_discount ?? $item->variant->product->discount ?? 0;
+                $priceAtPurchase = $item->variant->product->price * (1 - $discount / 100);
+
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'variant_id' => $item->variant_id,
+                    'qty' => $item->qty,
+                    'price_at_purchase' => $priceAtPurchase,
+                ]);
+            }
+
+            CartItem::where('user_id', $userId)->whereIn('id', $checkoutItems)->delete();
+            session()->forget('checkout_items');
+
+            DB::commit();
+
+            return redirect($snapUrl);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan saat proses checkout: ' . $e->getMessage());
+        }
     }
+
 
     public function filterProducts(Request $request)
     {
