@@ -107,7 +107,11 @@ Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('regi
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 
 Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.password');
-Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('forgot.send');
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot.send');
+
+// Routes tambahan untuk reset password (perlu ditambahkan)
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
 Route::middleware(['auth'])->group(function(){
     Route::get('/about', [HomeController::class, 'about'])->name('about');
