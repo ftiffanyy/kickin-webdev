@@ -46,18 +46,22 @@
                 <tbody>
                     @foreach ($products as $product)
                         <tr>
-                            <th scope="row" class="align-middle text-center">{{ $product['product_id'] }}</th>
+                            <th scope="row" class="align-middle text-center">{{ $product->id }}</th>
                             <td class="align-middle text-center">
-                                <img src="{{ $product['image'] }}" class="card-img-top product-image" alt="{{ $product['product_name'] }}" style="max-width: 100px; height: auto;">
+                                @if ($product->images->isNotEmpty()) <!-- Check if there are images -->
+                                    <img src="{{ asset('images/' . $product->images->first()->url) }}" class="card-img-top product-image" alt="{{ $product->name }}" style="max-width: 100px; height: auto;">
+                                @else
+                                    <p>No image available</p>
+                                @endif
                             </td>
-                            <td class="align-middle" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266; vertical-align: middle;">{{ $product['product_name'] }}</td>
-                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">Rp {{ number_format($product['price'], 0, ',', '.') }}</td>
-                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product['discount'] }}%</td>
-                            <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product['brand'] }}</td>
-                            <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product['gender'] }}</td>
-                            <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product['rating_avg'] }} <i class="fas fa-star text-warning"></i></td>
-                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product['total_reviews'] }}</td>
-                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product['sold'] }}</td>
+                            <td class="align-middle" style="font-family: 'Fredoka', sans-serif; font-size: 0.8rem; color: #5F6266; vertical-align: middle;">{{ strtoupper($product->name) }}</td>
+                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.8rem; color: #5F6266;">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.8rem; color: #5F6266;">{{ $product->discount }}%</td>
+                            <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.8rem; color: #5F6266;">{{ $product->brand }}</td>
+                            <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.8rem; color: #5F6266;">{{ $product->gender }}</td>
+                            <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.8rem; color: #5F6266;">{{ $product->rating_avg }} <i class="fas fa-star text-warning"></i></td>
+                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.8rem; color: #5F6266;">{{ $product->total_reviews }}</td>
+                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.8rem; color: #5F6266;">{{ $product->sold }}</td>
                             <td class="align-middle">
                                 <!-- Toggle Show Product: On/Off (Just the UI without backend connection) -->
                                 <div class="form-check form-switch">
@@ -67,7 +71,7 @@
                             </td>
                             <td class="align-middle">
                                 <!-- Show Details Button -->
-                                <a href="{{ route('product.details', ['id' => $product['product_id']]) }}" class="btn btn-info btn-sm btn-spacing no-border">Show Details</a>
+                                <a href="{{ route('productadmin.details', ['id' => $product->id]) }}" class="btn btn-info btn-sm btn-spacing no-border">Show Details</a>
                                 
                                 <!-- Edit Button -->
                                 <a href="{{ route('edit_product_form') }}" class="btn btn-warning btn-sm btn-spacing no-border">Edit</a>

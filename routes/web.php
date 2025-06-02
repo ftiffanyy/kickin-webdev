@@ -169,6 +169,8 @@ Route::middleware(['auth'])->group(function(){
         Route::get('/admin', [HomeController::class, 'admin'])->name('dashboard_admin');
         // liat produk semua versi admin (HEADER)
         Route::get('/productadmin', [AdminController::class, 'showadmin'])->name('productadmin.show');
+        // details
+        Route::get('/product/viewadmin/{id}', [AdminController::class, 'showDetailAdmin'])->name('productadmin.details');
         // liat form create
         Route::get('/product/create-form', [AdminController::class, 'create_product_form'])->name('create_product_form');
         // proses create
