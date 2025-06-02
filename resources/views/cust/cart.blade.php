@@ -5,7 +5,6 @@
     <i class="bi bi-cart" style="color: #181B1E; font-size: 30px; margin-right: 10px;"></i> My Cart
 </h2>
 
-
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px;">
         {{ session('success') }}
@@ -20,7 +19,9 @@
             <table class="table" style="background-color: #F8F9FA; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
                 <thead class="thead-light" style="background-color: #CFD1D4; color: #181B1E;">
                     <tr>
-                        <th> <input type="checkbox" id="select-all" onclick="toggleSelectAll()" style="cursor: pointer; width: 20px; height: 20px; border: 2px solid #CFD1D4; background-color: #FFF; accent-color: #181B1E; border-radius: 5px; transition: all 0.3s ease;"></th>
+                        <th> 
+                            <input type="checkbox" id="select-all" onclick="toggleSelectAll()" style="cursor: pointer; width: 20px; height: 20px; border: 2px solid #CFD1D4; background-color: #FFF; accent-color: #181B1E; border-radius: 5px; transition: all 0.3s ease;">
+                        </th>
                         <th style="font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem;"></th>
                         <th style="font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem;">Name</th>
                         <th style="font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem;">Size</th>
@@ -35,8 +36,6 @@
                         @php 
                             $total += $item->price * $item->qty; 
                             $productImage = $item->variant->image ?? 'default-image.jpg';
-                            
-                            // Hitung harga diskon
                             $discount = $item->variant->product->product_discount ?? $item->variant->product->discount ?? 0;
                             $originalPrice = $item->variant->product->price;
                             $discountedPrice = $originalPrice * (1 - $discount / 100);
@@ -67,7 +66,7 @@
                                 {{ $item->variant->size }}
                             </td>
                             
-                            <!-- price column (harga per unit setelah diskon) -->
+                            <!-- price column -->
                             <td style="font-family: 'Fredoka', sans-serif; font-size: 1rem; color: #5F6266; vertical-align: middle;">
                                 Rp{{ number_format($discountedPrice, 0, ',', '.') }}
                             </td>
@@ -106,16 +105,9 @@
             </span>
         </h5>
 
-        <button type="submit" class="btn" style="font-family: 'Fredoka', sans-serif; background-color: #5F6266; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-transform: uppercase;">Remove</button>
-        </form>
-        <form action="{{ route('copage') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn" style="font-family: 'Fredoka', sans-serif; background-color: #181B1E; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-transform: uppercase;">
-                Checkout
-            </button>
-        </form>
-
-
+        <button type="submit" name="action" value="remove" class="btn" style="font-family: 'Fredoka', sans-serif; background-color: #5F6266; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-transform: uppercase;">Remove</button>
+        <button type="submit" name="action" value="checkout" class="btn" style="font-family: 'Fredoka', sans-serif; background-color: #181B1E; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-transform: uppercase; margin-left: 10px;">Checkout</button>
+    </form>
 
 @else
     <p style="font-family: 'Fredoka', sans-serif; color: #5F6266;">Your cart is empty. Please add products to your cart.</p>
@@ -210,6 +202,7 @@
 
     </style>
 @endpush
+
 <script>
     function toggleSelectAll() {
         var isChecked = document.getElementById('select-all').checked;

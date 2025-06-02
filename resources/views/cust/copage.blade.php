@@ -274,6 +274,31 @@
         padding-top: 14px;
     }
 
+    .size-display,
+    .quantity-display {
+        font-family: 'Fredoka', sans-serif;
+        font-size: 1rem;
+        color: #5F6266;
+        display: inline; /* hilangkan kotak, inline saja */
+        padding: 0; /* hilangkan padding */
+        border: none; /* hilangkan border */
+        user-select: none;
+    }
+    /* Style untuk label Size: dan Quantity: supaya konsisten */
+.order-item-info p {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1rem;
+    color: #5F6266;
+    margin: 0 0 6px 0;
+}
+
+.order-item-info p span.size-display,
+.order-item-info p span.quantity-display {
+    font-weight: 600; /* supaya beda dengan label */
+    color: #4A4A4A; /* warna lebih gelap untuk isi size dan quantity */
+}
+
+
     /* RESPONSIVE */
 
     @media (max-width: 1024px) {
@@ -386,41 +411,53 @@
         <h2>IN YOUR BAG</h2>
 
         <div class="order-items">
-            <div class="order-item">
-                <img src="{{ asset('images/products/1/NIKE air force 1 _07 men_s basketball shoes - white,1.webp') }}" alt="NIKE Air Force 1">
-                <div class="order-item-info">
-                    <p>NIKE Air Force 1 '07 Men's Basketball Shoes - White</p>
-                    <p>Step into a legend with the Nike Air Force 1 '07.</p>
+            @foreach($cartItems as $item)
+                @php
+                    $discount = $item->variant->product->product_discount ?? $item->variant->product->discount ?? 0;
+                    $discountedPrice = $item->variant->product->price * (1 - $discount / 100);
+                    $subtotal = $discountedPrice * $item->qty;
+                    $productImage = $item->variant->product->images->first()->url ?? 'default-image.jpg';
+                @endphp
+                <div class="order-item">
+                    <img src="{{ asset('images/' . $productImage) }}" alt="{{ $item->variant->product->name }}">
+                    <div class="order-item-info">
+                        <p>{{ $item->variant->product->name }}</p>
+                        <p>Size: <span class="size-display">{{ $item->variant->size }}</span></p>
+                        <p>Quantity: <span class="quantity-display">{{ $item->qty }}</span></p>
+                    </div>
+                    <div class="order-item-price">Rp {{ number_format($subtotal, 0, ',', '.') }}</div>
                 </div>
-                <div class="order-item-price">Rp 1.084.300</div>
-            </div>
-
-            <div class="order-item">
-                <img src="{{ asset('images/products/4/PUMA speedcat og unisex lifestyle shoes - red,1.webp') }}" alt="PUMA Speedcat">
-                <div class="order-item-info">
-                    <p>PUMA speedcat og unisex lifestyle shoes - red</p>
-                    <p>Drive your street style with the Speedcat OG in vibrant red.</p>
-                </div>
-                <div class="order-item-price">Rp 1.899.000</div>
-            </div>
+            @endforeach
         </div>
 
         <div class="summary-box">
+            @php
+                $subtotalPrice = 0;
+                foreach ($cartItems as $item) {
+                    $discount = $item->variant->product->product_discount ?? $item->variant->product->discount ?? 0;
+                    $discountedPrice = $item->variant->product->price * (1 - $discount / 100);
+                    $subtotalPrice += $discountedPrice * $item->qty;
+                }
+                $shippingCost = 20000; // Contoh tetap
+                $tax = 0;
+                $totalPrice = $subtotalPrice + $shippingCost + $tax;
+            @endphp
+
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span>Rp 2.983.300</span>
+                <span>Rp {{ number_format($subtotalPrice, 0, ',', '.') }}</span>
             </div>
             <div class="summary-row">
                 <span>Shipping</span>
-                <span>Rp 20.000</span>
+                <span>Rp {{ number_format($shippingCost, 0, ',', '.') }}</span>
             </div>
             <div class="summary-row">
                 <span>Tax</span>
-                <span>Rp 0</span>
+                <span>Rp {{ number_format($tax, 0, ',', '.') }}</span>
             </div>
             <div class="summary-row total">
                 <span>Total</span>
-                <span>Rp 3.003.300</span>
+                <span>Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
             </div>
         </div>
     </div>

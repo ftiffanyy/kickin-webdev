@@ -149,7 +149,7 @@ Route::middleware(['auth'])->group(function(){
         // filter product
         Route::get('/products/filter', [ProductController::class, 'filterProducts'])->name('products.filter');
         //page checkout
-        Route::post('/copage', [ProductController::class, 'copage'])->name('copage');
+        Route::match(['get', 'post'], 'copage', [ProductController::class, 'copage'])->name('copage');
         //fungsi checkout
         Route::post('/checkout', [ProductController::class, 'checkout'])->name('checkout');
         //wishlist
@@ -168,17 +168,17 @@ Route::middleware(['auth'])->group(function(){
         //ADMIN
         Route::get('/admin', [HomeController::class, 'admin'])->name('dashboard_admin');
         // liat produk semua versi admin (HEADER)
-        Route::get('/productadmin', [ProductController::class, 'showadmin'])->name('productadmin.show');
+        Route::get('/productadmin', [AdminController::class, 'showadmin'])->name('productadmin.show');
         // liat form create
-        Route::get('/product/create-form', [ProductController::class, 'create_product_form'])->name('create_product_form');
+        Route::get('/product/create-form', [AdminController::class, 'create_product_form'])->name('create_product_form');
         // proses create
-        Route::post('/product/create', [ProductController::class, 'create_product'])->name('create_product');
+        Route::post('/product/create', [AdminController::class, 'create_product'])->name('create_product');
 
         // harusnya ada parameter id (tp nanti aja setelah ada database)
         // liat form edit
-        Route::get('/product/edit-form', [ProductController::class, 'edit_product_form'])->name('edit_product_form');
+        Route::get('/product/edit-form', [AdminController::class, 'edit_product_form'])->name('edit_product_form');
         // proses edit (hrsnya put dan ada parameter id)
-        Route::post('/product/update', [ProductController::class, 'update_product'])->name('update_product');
+        Route::post('/product/update', [AdminController::class, 'update_product'])->name('update_product');
 
         //order admin
         Route::get('/orderadmin', [AdminController::class, 'orderadmin'])->name('orderadmin');
