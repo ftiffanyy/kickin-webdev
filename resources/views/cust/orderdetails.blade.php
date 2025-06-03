@@ -18,6 +18,7 @@
     } elseif ($status === 'delivered') {
         $progressPercent = 100;
     }
+    $canReview = in_array($status, ['delivered', 'already pick up']);
 @endphp
 
 <style>
@@ -272,6 +273,60 @@
     color: #222;
   }
 
+  .review-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between; /* pastikan ada jarak antar elemen */
+    gap: 12px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    font-size: 28px;
+    gap: 4px;
+    align-items: center;
+    margin: 0;
+  }
+
+  .star-rating input[type="radio"] {
+    display: none;
+  }
+
+  .star-rating label {
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .star-rating input[type="radio"]:checked ~ label,
+  .star-rating label:hover,
+  .star-rating label:hover ~ label {
+    color: gold;
+  }
+
+  .review-form button {
+    background-color: white;
+    border: 1.5px solid black;
+    color: black;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .review-form button:hover {
+    background-color: black;
+    color: white;
+  }
+
+
+
   /* Responsive */
 
   @media (max-width: 1024px) {
@@ -422,17 +477,45 @@
     <h2>Products</h2>
 
     @foreach($order->orderDetails as $detail)
-    <a href="{{ route('product.details', ['id' => $detail->variant->product->id]) }}" class="product" tabindex="0">
-      <img src="{{ asset('images/' . $detail->variant->product->images->firstWhere('main', 1)->url) }}" alt="Product Image">
-      <div class="product-info">
-        <p>{{ $detail->variant->product->name }}</p>
-        <p class="qty-size">QTY: {{ $detail->qty }}</p>
-        <p class="qty-size">Size: {{ $detail->variant->size }}</p>
-      </div>
-      <div class="product-price">
-        Rp {{ number_format($detail->qty * $detail->price_at_purchase, 0, ',', '.') }}
-      </div>
-    </a>
+        @php
+            $productId = $detail->variant->product->id;
+            $existingReview = isset($userReviews) && $userReviews->has($productId) ? $userReviews->get($productId)->rating : 0;
+        @endphp
+
+        <a href="{{ route('product.details', ['id' => $productId]) }}" class="product" tabindex="0">
+          <img src="{{ asset('images/' . $detail->variant->product->images->firstWhere('main', 1)->url) }}" alt="Product Image">
+          <div class="product-info">
+            <p>{{ $detail->variant->product->name }}</p>
+            <p class="qty-size">QTY: {{ $detail->qty }}</p>
+            <p class="qty-size">Size: {{ $detail->variant->size }}</p>
+
+            @if($canReview)
+              <form method="POST" action="{{ route('review_submit', ['order_id' => $order->id, 'product_id' => $productId]) }}" class="review-form">
+                  @csrf
+                  <div class="star-rating" data-product-id="{{ $productId }}">
+                      @for ($i = 5; $i >= 1; $i--)
+                          <input type="radio" id="star{{ $i }}-{{ $productId }}" name="rating" value="{{ $i }}" {{ ($existingReview == $i) ? 'checked' : '' }}>
+                          <label for="star{{ $i }}-{{ $productId }}" title="{{ $i }} stars">&#9733;</label>
+                      @endfor
+                  </div>
+
+                  @if(!$existingReview)
+                    <button type="submit">Submit</button>
+                  @endif
+              </form>
+            @elseif($existingReview)
+              <p>Your rating:
+                @for ($i = 1; $i <= 5; $i++)
+                    <span style="color: {{ $i <= $existingReview ? 'gold' : '#ccc' }};">&#9733;</span>
+                @endfor
+              </p>
+            @endif
+
+          </div>
+          <div class="product-price">
+            Rp {{ number_format($detail->qty * $detail->price_at_purchase, 0, ',', '.') }}
+          </div>
+        </a>
     @endforeach
 
     <div class="summary">

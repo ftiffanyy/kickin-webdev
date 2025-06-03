@@ -16,6 +16,7 @@
 
 @section('content')
 <style>
+    /* -- semua style kamu tetap -- */
     body {
         font-family: 'Poppins', sans-serif;
         margin: 0;
@@ -286,9 +287,7 @@
         color: #4A4A4A;
     }
 
-
     /* RESPONSIVE */
-
     @media (max-width: 1024px) {
         .copage-container {
             flex-direction: column;
@@ -335,10 +334,10 @@
         }
     }
 
-    /* Map container style from your example */
+    /* Map container style */
     #my-map-display {
-        overflow:hidden;
-        max-width:100%;
+        overflow: hidden;
+        max-width: 100%;
         width: 100%;
         height: 250px;
         border-radius: 10px;
@@ -355,7 +354,7 @@
     <!-- Left Section -->
     <div class="left-section">
         <h1>CHECKOUT</h1>
-        <form action="{{ route('checkout') }}" method="POST">
+        <form action="{{ route('checkout') }}" method="POST" id="checkout-form">
             @csrf
             <div class="delivery-options">
                 <h2>DELIVERY OPTIONS</h2>
@@ -369,7 +368,7 @@
 
                 <!-- Address Fields -->
                 <div class="address-fields" id="address-fields">
-                    <input id="address-input" name="address" type="text" placeholder="Start typing the first line of your address" required>
+                    <input id="address-input" name="address" type="text" placeholder="Start typing the first line of your address">
                 </div>
 
                 <!-- Pick Up Location -->
@@ -454,6 +453,7 @@
 </div>
 
 <script>
+    // Toggle tampilan field alamat/pickup
     function toggleDeliveryFields(deliveryType) {
         if (deliveryType === 'Pick Up') {
             document.getElementById('pick-up-section').classList.add('active');
@@ -465,10 +465,12 @@
         updateShippingPrice();
     }
 
+    // Format angka ke Rupiah
     function formatRupiah(num) {
         return 'Rp ' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
 
+    // Update harga shipping dan total
     function updateShippingPrice() {
         const shipPrice = 20000;
         const pickupPrice = 0;
@@ -482,7 +484,6 @@
 
         shippingPriceEl.textContent = formatRupiah(shippingCost);
 
-        // Ambil subtotal dari elemen
         let subtotalText = subtotalPriceEl.textContent.replace(/[^\d]/g, '');
         let subtotalNumber = parseInt(subtotalText, 10) || 0;
 
@@ -490,7 +491,7 @@
         totalPriceEl.textContent = formatRupiah(total);
     }
 
-    // Update map iframe src sesuai alamat input atau pickup
+    // Update map iframe sesuai input alamat atau pickup
     const addressInput = document.getElementById('address-input');
     const pickupSelect = document.getElementById('pickup-select');
     const mapFrame = document.getElementById('map-frame');
@@ -512,17 +513,37 @@
         updateMap(pickupSelect.value);
     });
 
-    // Update harga shipping saat radio button berubah
+    // Update harga saat pilihan delivery berubah
     document.getElementById('ship-option').addEventListener('change', updateShippingPrice);
     document.getElementById('pick-up-option').addEventListener('change', updateShippingPrice);
 
-    // Init harga dan maps saat load
+    // Inisialisasi harga dan peta saat load
     window.addEventListener('load', () => {
         updateShippingPrice();
         if(document.getElementById('ship-option').checked) {
             updateMap(addressInput.value || 'Surabaya');
         } else {
             updateMap(pickupSelect.value);
+        }
+    });
+
+    // Validasi form custom sebelum submit supaya tidak error invalid form control
+    document.getElementById('checkout-form').addEventListener('submit', function(e) {
+        const delivery = document.querySelector('input[name="delivery"]:checked').value;
+        const addressVal = addressInput.value.trim();
+        const pickupVal = pickupSelect.value.trim();
+
+        if(delivery === 'Shipping' && addressVal === '') {
+            e.preventDefault();
+            alert('Alamat wajib diisi untuk pengiriman.');
+            addressInput.focus();
+            return false;
+        }
+        if(delivery === 'Pick Up' && pickupVal === '') {
+            e.preventDefault();
+            alert('Harap pilih lokasi pick up.');
+            pickupSelect.focus();
+            return false;
         }
     });
 </script>

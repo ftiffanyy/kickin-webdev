@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Variant;
 use App\Models\CartItem;
 use App\Models\OrderDetail;
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -66,7 +67,7 @@ class ProductController extends Controller
 
     public function addToCart(Request $request, $productId)
     {
-         // Validasi input untuk quantity
+        // Validasi input untuk quantity dan size
         $request->validate([
             'size' => 'required|exists:variants,size,product_id,' . $productId,
             'qty' => 'required|integer|min:1'
@@ -74,24 +75,36 @@ class ProductController extends Controller
 
         $userId = session('user_id'); // Pastikan user sudah login
         $size = $request->size;
-        $qty = $request->qty;
+        $qty = (int) $request->qty;
 
         // Cari variant berdasarkan product_id dan size
         $variant = Variant::where('product_id', $productId)
                         ->where('size', $size)
-                        ->firstOrFail(); // Ambil variant_id berdasarkan produk dan size yang dipilih
+                        ->firstOrFail();
 
+        // Cek tombol yang ditekan: add_to_cart atau buy_now
+        if ($request->input('action') === 'buy_now') {
+            session(['buy_now_item' => [
+            'variant_id' => $variant->id,
+            'qty' => $qty,
+            ]]);
+
+            // Redirect ke route copage (checkout page)
+            return redirect()->route('copage');
+        }
+
+        // Kalau tombol Add to Cart:
         // Cek apakah item sudah ada di cart
         $existingCartItem = CartItem::where('user_id', $userId)
                                     ->where('variant_id', $variant->id)
                                     ->first();
 
         if ($existingCartItem) {
-            // Jika sudah ada, update quantity
+            // Update qty
             $existingCartItem->qty += $qty;
             $existingCartItem->save();
         } else {
-            // Jika belum ada, buat cart item baru
+            // Buat item baru
             CartItem::create([
                 'qty' => $qty,
                 'user_id' => $userId,
@@ -100,9 +113,8 @@ class ProductController extends Controller
         }
 
         return redirect()->back()->with('success', 'Product added to cart successfully!');
-
-        dd($request->all()); // Check if the request is being received correctly
     }
+
 
 
 
@@ -190,6 +202,28 @@ class ProductController extends Controller
     public function copage(Request $request)
     {
         $userId = session('user_id');
+
+        // Cek dulu ada buy_now_item di session gak
+        $buyNowItem = session('buy_now_item');
+
+        if ($buyNowItem) {
+            // Jika ada, ambil variant dan buat collection agar view bisa render sama seperti cartItems
+            $variant = Variant::with('product.images')->findOrFail($buyNowItem['variant_id']);
+
+            $cartItems = collect([
+                (object)[
+                    'id' => 0, // dummy id
+                    'variant' => $variant,
+                    'qty' => $buyNowItem['qty'],
+                    'variant_id' => $variant->id,
+                    'price_at_purchase' => $variant->product->price * (1 - ($variant->product->discount ?? 0) / 100),
+                ]
+            ]);
+
+            return view('cust.copage', compact('cartItems'));
+        }
+
+        // Kalau gak ada buy_now_item, ambil dari cart berdasarkan session checkout_items
         $checkoutItems = session('checkout_items', []);
 
         $cartItems = CartItem::with('variant.product.images')
@@ -200,27 +234,44 @@ class ProductController extends Controller
         return view('cust.copage', compact('cartItems'));
     }
 
+
     public function checkout(Request $request)
     {
         $userId = session('user_id');
         $checkoutItems = session('checkout_items', []);
 
+        // Jika checkout_items kosong, cek data buy now dari request
         if (empty($checkoutItems)) {
-            return back()->with('error', 'Keranjang kosong.');
+            $buyNowItem = session('buy_now_item');
+            $variant = Variant::with('product.images')->findOrFail($buyNowItem['variant_id']);
+
+            // Buat koleksi dummy cartItems dari data buy now
+            $cartItems = collect([
+                (object)[
+                    'id' => 0, // dummy id supaya uniform
+                    'variant' => $variant,
+                    'qty' => $buyNowItem['qty'],
+                    'variant_id' => $variant->id,
+                ]
+            ]);
+            session()->forget('buy_now_item');
+
+        } else {
+            // Checkout dari cart biasa
+            $cartItems = CartItem::with('variant.product')
+                ->where('user_id', $userId)
+                ->whereIn('id', $checkoutItems)
+                ->get();
+
+            if ($cartItems->isEmpty()) {
+                return back()->with('error', 'Item checkout tidak ditemukan.');
+            }
         }
 
-        $cartItems = CartItem::with('variant.product')
-            ->where('user_id', $userId)
-            ->whereIn('id', $checkoutItems)
-            ->get();
-
-        if ($cartItems->isEmpty()) {
-            return back()->with('error', 'Item checkout tidak ditemukan.');
-        }
-
+        // Validasi delivery & alamat
         $request->validate([
             'delivery' => 'required|in:Pick Up,Shipping',
-            'address' => 'required_if:delivery,Shipping|string|max:65535',
+            'address' => 'required_if:delivery,Shipping|max:65535',
             'pickup_location' => 'required_if:delivery,Pick Up|string|max:65535',
         ]);
 
@@ -257,7 +308,7 @@ class ProductController extends Controller
                 'first_name' => $user ? $user->name : 'Guest',
                 'email' => $user ? $user->email : 'guest@example.com',
             ],
-            'callback' => [  // NOTE: biasanya 'callback' bukan 'callbacks'
+            'callback' => [
                 'finish' => route('order_customer'),
             ],
         ];
@@ -281,6 +332,7 @@ class ProductController extends Controller
                 'user_id' => $userId,
             ]);
 
+            // Simpan order details
             foreach ($cartItems as $item) {
                 $discount = $item->variant->product->product_discount ?? $item->variant->product->discount ?? 0;
                 $priceAtPurchase = $item->variant->product->price * (1 - $discount / 100);
@@ -293,8 +345,11 @@ class ProductController extends Controller
                 ]);
             }
 
-            CartItem::where('user_id', $userId)->whereIn('id', $checkoutItems)->delete();
-            session()->forget('checkout_items');
+            // Kalau checkout dari cart, hapus item dari cart dan session
+            if (!empty($checkoutItems)) {
+                CartItem::where('user_id', $userId)->whereIn('id', $checkoutItems)->delete();
+                session()->forget('checkout_items');
+            }
 
             DB::commit();
 

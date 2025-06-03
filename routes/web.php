@@ -150,6 +150,7 @@ Route::middleware(['auth'])->group(function(){
         Route::get('/products/filter', [ProductController::class, 'filterProducts'])->name('products.filter');
         //page checkout
         Route::match(['get', 'post'], 'copage', [ProductController::class, 'copage'])->name('copage');
+        Route::post('/copage-buynow', [ProductController::class, 'copageBuyNow'])->name('copage_buynow');
         //fungsi checkout
         Route::post('/checkout', [ProductController::class, 'checkout'])->name('checkout');
         //wishlist
@@ -162,6 +163,7 @@ Route::middleware(['auth'])->group(function(){
         Route::get('/orders', [OrderCustController::class, 'show'])->name('order_customer');
         //order details
         Route::get('/order-details/{id}', [OrderCustController::class, 'orderdetails'])->name('order_details');
+        Route::post('/order/{order_id}/product/{product_id}/review', [OrderCustController::class, 'submitReview'])->name('review_submit');
     });
 
     Route::middleware(['role:Admin'])->group(function(){

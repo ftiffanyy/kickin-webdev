@@ -12,6 +12,7 @@ class Review extends Model
         'product_id',
         'rating',
         'review',
+        'user_id',
     ];
 
     // Product dan Review (1 to many)
