@@ -38,4 +38,9 @@ class Order extends Model
         return $this->hasMany(Shipping::class, 'order_id');
     }
 
+    // Relasi Order ke Review (One to Many)
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'order_id');
+    }
 }
