@@ -70,6 +70,7 @@ class AdminController extends Controller
         // Return the product details view with the data
         return view('admin.detailsadmin', compact('products', 'images', 'availableSizes'));
     }
+    
     // create product form
     public function create_product_form()
     {
