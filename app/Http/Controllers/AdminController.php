@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Image;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Variant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AdminController extends Controller
 {
@@ -70,7 +75,7 @@ class AdminController extends Controller
         // Return the product details view with the data
         return view('admin.detailsadmin', compact('products', 'images', 'availableSizes'));
     }
-    
+
     // create product form
     public function create_product_form()
     {
@@ -136,107 +141,122 @@ class AdminController extends Controller
             ->with('imageUrls', $imageNames); // Add imageUrls in session if needed
     }
 
-
-    // Method for displaying the edit product form with hardcoded data
-    public function edit_product_form()
+    // Method for displaying the edit product form with dynamic data from the database
+    public function edit_product_form($id)
     {
-        $product_data = [
-            'product_name' => "AIR FORCE 1 '07 MEN'S BASKETBALL SHOES - WHITE",
-            'price' => 1549000,
-            'discount' => 30,
-            'brand' => 'NIKE',
-            'gender' => 'Men',
-            'description' => "Step into a legend with the Nike Air Force 1 '07. Featuring crisp white leather and classic hoops-inspired style, this icon brings timeless street appeal and durable comfort. Padded collars and Nike Air cushioning provide all-day support on and off the court.",
-            'rating_avg' => 4.4,
-            'total_reviews' => 102,
-            'sold' => 1323,
-        ];
-
-        $existingQuantities = [
-            '35' => 0,
-            '35.5' => 0,
-            '36' => 0,
-            '36.5' => 0,
-            '37' => 0,
-            '37.5' => 0,
-            '38' => 5,
-            '38.5' => 5,
-            '39' => 5,
-            '39.5' => 5,
-            '40' => 5,
-            '40.5' => 5,
-            '41' => 5,
-            '41.5' => 5,
-            '42' => 5,
-            '42.5' => 5,
-            '43' => 5,
-            '43.5' => 5,
-            '44' => 5,
-            '44.5' => 5,
-            '45' => 5,
-            '45.5' => 5,
-            '46' => 5,
-        ];
-
-        $productId = 1;  
-        $imagesPath = public_path("images/products/{$productId}");
-
-        // If the folder exists, get the image files
-        $imageUrls = [];
-        if (File::exists($imagesPath)) {
-            $images = File::files($imagesPath);
+        try {
+            // Fetch the product with its related data
+            $product = Product::with(['images', 'variants'])->findOrFail($id);
             
-            // Generate the image URLs (you can manually define these if you know the file names)
-            foreach ($images as $image) {
-                $imageUrls[] = asset("images/products/{$productId}/" . $image->getFilename());
-            }
+            return view('admin.edit', compact('product'));
+            
+        } catch (ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'Product not found');
         }
-
-        // Pass the hardcoded data and image URLs to the edit product view
-        return view('admin.edit', compact('product_data', 'existingQuantities', 'imageUrls'));
     }
 
 
-    public function update_product(Request $request)
+
+    public function update_product(Request $request, $id)
     {
-        // Validate the input
+        // Validation
         $request->validate([
-            'product_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0|max:100',
             'brand' => 'required|string|max:255',
-            'gender' => 'required|in:Unisex,Men,Woman',
+            'gender' => 'required|in:Male,Female,Unisex',
             'description' => 'required|string',
-            'images' => 'nullable|array|max:10',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'sizes' => 'nullable|array',
-            'sizes.*' => 'nullable|numeric|min:0', // Ensuring the quantity is numeric
-        ], [
-            'product_name.required' => 'Nama produk wajib diisi.',
-            'price.required' => 'Harga produk wajib diisi.',
-            'price.numeric' => 'Harga harus berupa angka.',
-            'price.min' => 'Harga tidak boleh negatif.',
-            'brand.required' => 'Merek produk wajib diisi.',
-            'description.required' => 'Deskripsi produk wajib diisi.',
-            'images.*.image' => 'Hanya gambar yang boleh diunggah.',
-            'sizes.*.numeric' => 'Jumlah stok harus berupa angka.',
+            'sizes.*' => 'nullable|integer|min:0',
+            'keep_images' => 'nullable|array',
+            'keep_images.*' => 'integer'
         ]);
 
-        
-        // Handle image uploads
-        $imageNames = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $imageName = time() . '.' . $image->extension();
-                $image->move(public_path('images'), $imageName);
-                $imageNames[] = $imageName;  // Store image names
+
+        DB::beginTransaction();
+
+        // Find the product
+        $product = Product::findOrFail($id);
+
+        // Update product basic information
+        $product->update([
+            'name' => $request->name,
+            'price' => $request->price,
+            'discount' => $request->discount,
+            'brand' => $request->brand,
+            'gender' => $request->gender,
+            'description' => $request->description,
+        ]);
+
+        // Handle image updates
+        if ($request->hasFile('images') || !empty($request->keep_images)) {
+            // Get current images
+            $currentImages = $product->images;
+            $keepImageIds = $request->keep_images ?? [];
+
+            // Remove images that are not in keep_images array
+            foreach ($currentImages as $image) {
+                if (!in_array($image->id, $keepImageIds)) {
+                    // Delete file from storage
+                    if (Storage::disk('public')->exists($image->image_url)) {
+                        Storage::disk('public')->delete($image->image_url);
+                    }
+                    // Delete from database
+                    $image->delete();
+                }
+            }
+
+            // Add new images
+            if ($request->hasFile('images')) {
+                $existingImageCount = count($keepImageIds);
+                $newImageCount = count($request->file('images'));
+                
+                // Check total image limit (max 10)
+                if (($existingImageCount + $newImageCount) > 10) {
+                    DB::rollBack();
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', 'Maximum 10 images allowed. You have ' . $existingImageCount . ' existing images.');
+                }
+
+                foreach ($request->file('images') as $image) {
+                    // Store the image
+                    $imagePath = $image->store('products', 'public');
+                        
+                    // Save to database
+                    Image::create([
+                        'product_id' => $product->id,
+                        'url' => $imagePath
+                    ]);
+                }
             }
         }
 
-        // Simulate success (no actual database insert)
-        return redirect()->route('productadmin.show')
-            ->with('success', 'Product successfully updated!')
-            ->with('imageUrls', $imageNames); // Add imageUrls in session if needed
+        // Handle sizes update
+        if ($request->has('sizes')) {
+            // Delete existing sizes
+            Variant::where('product_id', $product->id)->delete();
+
+            // Add new sizes
+             foreach ($request->sizes as $size => $stock) {
+                if ($stock > 0) { // Only add sizes with stock > 0
+                    Variant::create([
+                        'product_id' => $product->id,
+                        'size' => $size,
+                        'stock' => $stock
+                    ]);
+                }
+            }
+        }
+
+        DB::commit();
+
+        return redirect()->route('productadmin.show') // Adjust this route name to your products listing route
+            ->with('success', 'Product updated successfully!');
+
+
     }
 
 

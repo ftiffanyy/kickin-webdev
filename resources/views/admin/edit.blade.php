@@ -7,16 +7,20 @@
         <i class="bi bi-pencil-square" style="color: #181B1E; font-size: 30px; margin-right: 10px;"></i> Edit Product
     </h2>
 
-    <form action="{{ route('update_product') }}" method="POST" enctype="multipart/form-data" class="shadow p-4 bg-white rounded-lg">
+    <form action="{{ route('update_product', ['id' => $product->id]) }}" method="POST" enctype="multipart/form-data" class="shadow p-4 bg-white rounded-lg">
         @csrf
+        @method('PUT')
 
         <div class="row" style="margin-left: -10px; margin-right: -10px;">
             <!-- Left Column -->
             <div class="col-md-6" style="min-height: 600px; padding-right: 60px;">
                 <!-- Product Name -->
                 <div class="form-group mb-3">
-                    <label for="product_name" class="form-label" style="font-family: 'Bebas Neue', sans-serif; color: #181B1E;">Product Name</label>
-                    <input type="text" name="product_name" id="product_name" class="form-control" value="air force 1 '07 men's basketball shoes - white" required>
+                    <label for="name" class="form-label" style="font-family: 'Bebas Neue', sans-serif; color: #181B1E;">Product Name</label>
+                    <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $product->name) }}" required>
+                    @error('name')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <!-- Price -->
@@ -24,23 +28,32 @@
                     <label for="price" class="form-label" style="color: #181B1E;">Price</label>
                     <div class="input-group">
                         <span class="input-group-text" style="background-color: #F8F9FA; color: #181B1E;">Rp</span>
-                        <input type="number" name="price" id="price" class="form-control" value="1549000" required>
+                        <input type="number" name="price" id="price" class="form-control" value="{{ old('price', $product->price) }}" required>
                     </div>
+                    @error('price')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <!-- Discount -->
                 <div class="form-group mb-3">
                     <label for="discount" class="form-label" style="color: #181B1E;">Discount <span style="color: #A5A9AE;">(Optional)</span></label>
                     <div class="input-group">
-                        <input type="number" name="discount" id="discount" class="form-control" value="30" min="0" max="100" required>
+                        <input type="number" name="discount" id="discount" class="form-control" value="{{ old('discount', $product->discount ?? 0) }}" min="0" max="100">
                         <span class="input-group-text" style="background-color: #F8F9FA; color: #181B1E;">%</span>
                     </div>
+                    @error('discount')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <!-- Brand -->
                 <div class="form-group mb-3">
                     <label for="brand" class="form-label" style="color: #181B1E;">Brand</label>
-                    <input type="text" name="brand" id="brand" class="form-control" value="NIKE" required>
+                    <input type="text" name="brand" id="brand" class="form-control" value="{{ old('brand', $product->brand) }}" required>
+                    @error('brand')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <!-- Gender -->
@@ -48,18 +61,23 @@
                     <label for="gender" class="form-label" style="color: #181B1E;">Gender</label>
                     <div class="custom-select-container">
                         <select name="gender" id="gender" class="form-control custom-select" required>
-                            <option value="Unisex" @if(old('gender') == 'Unisex') selected @endif>Unisex</option>
-                            <option value="Men" @if(old('gender') == 'Men' || old('gender') == '' ) selected @endif>Men</option>
-                            <option value="Women" @if(old('gender') == 'Women') selected @endif>Women</option>
+                            <option value="Unisex" {{ old('gender', $product->gender) == 'Unisex' ? 'selected' : '' }}>Unisex</option>
+                            <option value="Male" {{ old('gender', $product->gender) == 'Male' ? 'selected' : '' }}>Male</option>
+                            <option value="Female" {{ old('gender', $product->gender) == 'Female' ? 'selected' : '' }}>Female</option>
                         </select>
                     </div>
+                    @error('gender')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
                 </div>
-
 
                 <!-- Description -->
                 <div class="form-group mb-3">
                     <label for="description" class="form-label" style="color: #181B1E;">Description</label>
-                    <textarea name="description" id="description" rows="6" class="form-control" style="min-height: 400px;" required>Step into a legend with the Nike Air Force 1 '07. Featuring crisp white leather and classic hoops-inspired style, this icon brings timeless street appeal and durable comfort. Padded collars and Nike Air cushioning provide all-day support on and off the court.</textarea>
+                    <textarea name="description" id="description" rows="6" class="form-control" style="min-height: 400px;" required>{{ old('description', $product->description) }}</textarea>
+                    @error('description')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
@@ -69,25 +87,34 @@
                 <div class="form-group mb-3">
                     <label for="images" class="form-label" style="color: #181B1E;">Product Images (Up to 10)</label>
                     <div id="image-upload-container">
-                        <div class="uploaded-images mb-3">
-                            <!-- Display images dynamically -->
-                        </div>
                         <input type="file" name="images[]" class="form-control image-input" accept="image/*" multiple>
                     </div>
+                    <small class="text-muted">Max 10 images. Leave empty to keep existing images.</small>
+                    @error('images')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                    @error('images.*')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
 
-                    <small class="text-muted">Max 10 images</small>
-
-                    <!-- Display Images Below -->
-                    <div id="imagePreview" class="d-flex flex-wrap" style="gap: 10px; margin-top: 20px;">
-                        <!-- Loop through the imageUrls and display each image -->
-                        @foreach ($imageUrls as $imageUrl)
-                            <div class="image-preview-container" style="width: 100px; height: 100px; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; position: relative;">
-                                <img src="{{ $imageUrl }}" alt="Image Preview" style="max-width: 100%; max-height: 100%;" />
-                                <!-- Close button to remove image -->
-                                <button type="button" class="close-btn" style="position: absolute; top: 5px; right: 5px; background: transparent; border: none; color: #CFD1D4; font-size: 16px; cursor: pointer;">X</button>
+                    <!-- Display Current Images -->
+                    @if(isset($product->images) && count($product->images) > 0)
+                        <div class="mt-3">
+                            <label class="form-label" style="color: #181B1E;">Current Images:</label>
+                            <div id="currentImages" class="d-flex flex-wrap" style="gap: 10px; margin-top: 10px;">
+                                @foreach ($product->images as $index => $image)
+                                    <div class="image-preview-container" style="width: 100px; height: 100px; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; position: relative;">
+                                        <img src="{{ asset('images/' . $image->url) }}" alt="Current Image" style="max-width: 100%; max-height: 100%; object-fit: cover;" />
+                                        <button type="button" class="remove-existing-image" data-image-id="{{ $image->id }}" style="position: absolute; top: 2px; right: 2px; background: rgba(255,0,0,0.8); border: none; color: white; font-size: 12px; cursor: pointer; width: 20px; height: 20px; border-radius: 50%;">×</button>
+                                        <input type="hidden" name="keep_images[]" value="{{ $image->id }}" class="keep-image-{{ $image->id }}">
+                                    </div>
+                                @endforeach
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endif
+
+                    <!-- Preview New Images -->
+                    <div id="imagePreview" class="d-flex flex-wrap" style="gap: 10px; margin-top: 20px;"></div>
                 </div>
 
                 <!-- Additional Info for Admin -->
@@ -103,24 +130,36 @@
                     <label for="sizes" class="form-label" style="color: #181B1E;">Sizes <span style="color: #A5A9AE;">(EU)</span></label>
                     <div class="row">
                         @foreach(range(35, 46, 0.5) as $size)
+                            @php
+                                $sizeKey = number_format($size, 1);
+                                $currentQuantity = 0;
+                                
+                                // Find current quantity for this size by checking if it exists in the product's variants
+                                $variant = $product->variants->firstWhere('size', $sizeKey);
+                                if ($variant) {
+                                    $currentQuantity = $variant->stock;
+                                }
+                            @endphp
                             <div class="col-3 mb-2">
-                                <label for="size_{{ $size }}" class="form-label" style="color: #181B1E;">{{ $size }}</label>
-                                <!-- Use the old() function to preserve values after validation failure, and fill the values from existingQuantities -->
+                                <label for="size_{{ $sizeKey }}" class="form-label" style="color: #181B1E;">{{ $sizeKey }}</label>
                                 <input 
                                     type="number" 
-                                    name="sizes[{{ $size }}]" 
-                                    id="size_{{ $size }}" 
+                                    name="sizes[{{ $sizeKey }}]" 
+                                    id="size_{{ $sizeKey }}" 
                                     class="form-control" 
-                                    value="{{ old('sizes.' . $size, isset($existingQuantities[$size]) ? $existingQuantities[$size] : 0) }}" 
+                                    value="{{ old('sizes.' . $sizeKey, $currentQuantity) }}" 
                                     min="0" 
                                     placeholder="Quantity"
                                 >
                             </div>
                         @endforeach
                     </div>
+                    @error('sizes')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
                 </div>
-            </div>
 
+            </div>
         </div>
 
         <!-- Submit Button -->
@@ -156,45 +195,70 @@
             transform: translateY(-50%);
             pointer-events: none; /* Prevent the arrow from being clickable */
         }
+
+        .remove-existing-image:hover {
+            background: rgba(255,0,0,1) !important;
+        }
     </style>
 @endpush
 
 @section('scripts')
 <script>
-    // Add event listener for "Add More Images" button
-    document.getElementById('add-more-images').addEventListener('click', function() {
-        const container = document.getElementById('image-upload-container');
-        const newInput = document.createElement('input');
-        newInput.type = 'file';
-        newInput.name = 'images[]';
-        newInput.classList.add('form-control', 'image-input');
-        newInput.accept = 'image/*';
-        newInput.id = 'imageInput' + (container.querySelectorAll('input').length + 1);  // Ensure unique IDs
+    // Handle new image previews when files are selected
+    document.addEventListener('change', function(event) {
+        if (event.target.classList.contains('image-input')) {
+            const files = event.target.files;
+            const imagePreview = document.getElementById("imagePreview");
+            
+            // Clear previous previews
+            imagePreview.innerHTML = '';
 
-        // Add the new input to the container
-        container.appendChild(newInput);
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const container = document.createElement('div');
+                    container.className = 'image-preview-container';
+                    container.style.cssText = 'width: 100px; height: 100px; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; position: relative;';
+                    
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.alt = "New Image Preview";
+                    img.style.cssText = "max-width: 100%; max-height: 100%; object-fit: cover;";
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.style.cssText = 'position: absolute; top: 2px; right: 2px; background: rgba(255,0,0,0.8); border: none; color: white; font-size: 12px; cursor: pointer; width: 20px; height: 20px; border-radius: 50%;';
+                    
+                    removeBtn.addEventListener('click', function() {
+                        container.remove();
+                    });
+                    
+                    container.appendChild(img);
+                    container.appendChild(removeBtn);
+                    imagePreview.appendChild(container);
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
     });
 
-    // Handle image previews when files are selected
-    document.getElementById("image-upload-container").addEventListener("change", function(event) {
-        if (event.target.classList.contains('image-input')) {
-            var reader = new FileReader();
-
-            reader.onload = function(e) {
-                var imagePreview = document.getElementById("imagePreview");
-                
-                // Create an img element for the preview
-                var img = document.createElement("img");
-                img.src = e.target.result;
-                img.alt = "Image Preview";
-                img.style.maxWidth = "100%";  // Ensure the image is responsive within the container
-                img.style.maxHeight = "100%"; // Limit height to fit container
-                
-                // Append the image to the preview container
-                imagePreview.appendChild(img);
-            };
-
-            reader.readAsDataURL(event.target.files[0]);
+    // Handle removal of existing images
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('remove-existing-image')) {
+            event.preventDefault();
+            const imageId = event.target.getAttribute('data-image-id');
+            const container = event.target.closest('.image-preview-container');
+            const keepInput = document.querySelector('.keep-image-' + imageId);
+            
+            if (confirm('Are you sure you want to remove this image?')) {
+                container.style.display = 'none';
+                if (keepInput) {
+                    keepInput.remove();
+                }
+            }
         }
     });
 </script>

@@ -10,6 +10,10 @@ class Image extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'product_id', 'url'
+    ];
+    
     // Product dan Image (1 to many)
     public function product(): BelongsTo
     {

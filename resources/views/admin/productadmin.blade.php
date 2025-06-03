@@ -74,7 +74,7 @@
                                 <a href="{{ route('productadmin.details', ['id' => $product->id]) }}" class="btn btn-info btn-sm btn-spacing no-border">Show Details</a>
                                 
                                 <!-- Edit Button -->
-                                <a href="{{ route('edit_product_form') }}" class="btn btn-warning btn-sm btn-spacing no-border">Edit</a>
+                                <a href="{{ route('edit_product_form', ['id' => $product->id]) }}" class="btn btn-warning btn-sm btn-spacing no-border">Edit</a>
 
                                 <!-- Delete Button -->
                                 <a class="btn btn-black" 
