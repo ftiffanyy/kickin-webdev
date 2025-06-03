@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -37,7 +38,6 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            // return redirect()->intended('/');
 
             // Redirect based on role
             $user = Auth::user();
@@ -157,12 +157,26 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // Register user logic (ensure you handle password hashing)
-        // For simplicity, we will assign a default role for now
+        // Validate the request data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'required|string|regex:/^[0-9]+$/|min:10|max:15',
+            'password' => 'required|string',
+        ], [
+            'phone.regex' => 'Phone number must contain only numbers.',
+            'phone.min' => 'Phone number must be at least 10 digits.',
+            'phone.max' => 'Phone number must not exceed 15 digits.',
+        ]);
+        
+
+        // Create new user
         $user = User::create([
+            'name' => $request->input('name'),
             'email' => $request->input('email'),
+            'phone' => $request->input('phone'),
             'password' => bcrypt($request->input('password')),
-            'role' => 'User', // Default to User role
+            'role' => 'Customer', // Fixed role as Customer
         ]);
 
         // Log the user in after registration

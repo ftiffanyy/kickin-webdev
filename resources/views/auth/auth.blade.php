@@ -117,6 +117,11 @@
       font-size: 16px;
     }
 
+    /* Phone number input specific styling */
+    input[type="tel"] {
+      background: var(--silver);
+    }
+
     button {
       background-color: var(--dark);
       color: white;
@@ -225,6 +230,15 @@
       font-size: 36px;
       margin-bottom: 20px;
     }
+
+    /* Error message styling */
+    .error-message {
+      color: #ff6b6b;
+      font-size: 12px;
+      margin-top: -4px;
+      margin-bottom: 4px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -253,10 +267,13 @@
           @csrf
           <input type="text" name="name" placeholder="Username" required>
           <input type="email" name="email" placeholder="Email" required>
+          <input type="tel" name="phone" id="phoneNumber" placeholder="Phone Number" required oninput="validatePhone(this)">
+          <div class="error-message" id="phoneError"></div>
           <div class="eye-icon-wrapper">
             <input type="password" name="password" id="signupPassword" placeholder="Password" required>
             <i class="far fa-eye-slash eye-icon" id="toggleSignupPassword" onclick="togglePassword('signupPassword', this)"></i>
           </div>
+          <div class="error-message" id="passwordError"></div> <!-- Added password error -->
           <button type="submit">Sign Up</button>
         </form>
       </div>
@@ -307,6 +324,86 @@
       icon.classList.toggle('fa-eye-slash'); // Toggle to eye-slash icon when clicked
       icon.classList.toggle('fa-eye'); // Toggle back to eye icon
     }
+
+    // Validate phone number input - FIXED VERSION
+    function validatePhone(input) {
+      const phoneError = document.getElementById('phoneError');
+      const value = input.value;
+      
+      // Remove any non-numeric characters
+      const numbersOnly = value.replace(/[^0-9]/g, '');
+      
+      // Update the input value with numbers only
+      input.value = numbersOnly;
+      
+      // Limit to 15 digits maximum
+      if (numbersOnly.length > 15) {
+        input.value = numbersOnly.substring(0, 15);
+      }
+      
+      // Show/hide error message based on validation
+      if (numbersOnly.length > 0 && numbersOnly.length < 10) {
+        phoneError.textContent = 'Phone number must be at least 10 digits';
+        phoneError.style.display = 'block';
+      } else if (numbersOnly.length > 15) {
+        phoneError.textContent = 'Phone number must not exceed 15 digits';
+        phoneError.style.display = 'block';
+      } else {
+        phoneError.style.display = 'none';
+      }
+    }
+
+    // Remove password validation (checking for minimum length)
+    document.addEventListener('DOMContentLoaded', function() {
+      const registerForm = document.querySelector('#registerPanel form');
+      
+      if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+          const phoneInput = document.getElementById('phoneNumber');
+          const passwordInput = document.getElementById('signupPassword');
+          const phoneValue = phoneInput.value.trim();
+          const passwordValue = passwordInput.value;
+          
+          // Reset previous error states
+          phoneInput.style.border = '';
+          passwordInput.style.border = '';
+          document.getElementById('phoneError').style.display = 'none';
+          document.getElementById('passwordError').style.display = 'none'; // Reset password error
+
+          let hasError = false;
+          
+          // Validate phone number
+          if (!/^[0-9]+$/.test(phoneValue)) {
+            e.preventDefault();
+            phoneInput.style.border = '2px solid #ff6b6b';
+            document.getElementById('phoneError').textContent = 'Phone number must contain only numbers';
+            document.getElementById('phoneError').style.display = 'block';
+            phoneInput.focus();
+            hasError = true;
+          } else if (phoneValue.length < 10) {
+            e.preventDefault();
+            phoneInput.style.border = '2px solid #ff6b6b';
+            document.getElementById('phoneError').textContent = 'Phone number must be at least 10 digits';
+            document.getElementById('phoneError').style.display = 'block';
+            phoneInput.focus();
+            hasError = true;
+          } else if (phoneValue.length > 15) {
+            e.preventDefault();
+            phoneInput.style.border = '2px solid #ff6b6b';
+            document.getElementById('phoneError').textContent = 'Phone number must not exceed 15 digits';
+            document.getElementById('phoneError').style.display = 'block';
+            phoneInput.focus();
+            hasError = true;
+          }
+          
+          // If no errors, form will submit normally
+          if (!hasError) {
+            // Hide error messages
+            console.log('Form validation passed, submitting to Laravel backend');
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>

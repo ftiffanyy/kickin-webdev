@@ -103,8 +103,7 @@ use App\Models\Product;
 Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth');
 Route::post('/login', [AuthController::class, 'login'])->name('login'); // dummy handler
 
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
 
 Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.password');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot.send');
@@ -157,7 +156,8 @@ Route::middleware(['auth'])->group(function(){
         Route::get('/wishlist', [WishlistController::class, 'showWishlist'])->name('wishlist');
         Route::post('/wishlist/add', [WishlistController::class, 'addToWishlist'])->name('wishlist.add');
         Route::post('/wishlist/remove', [WishlistController::class, 'removeFromWishlist'])->name('wishlist.remove');
-        Route::post('/wishlist/toggle', [WishlistController::class, 'toggleWishlist'])->name('wishlist.toggle');
+        // Route::post('/wishlist/toggle', [WishlistController::class, 'toggleWishlist'])->name('wishlist.toggle');
+        Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
         Route::post('/wishlist/status', [WishlistController::class, 'getWishlistStatus'])->name('wishlist.status');
         //orders
         Route::get('/orders', [OrderCustController::class, 'show'])->name('order_customer');
