@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use id;
+use Exception;
 use Midtrans\Snap;
 use App\Models\User;
 use Midtrans\Config;
@@ -10,8 +11,8 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Variant;
 use App\Models\CartItem;
+use App\Models\Wishlist;
 use App\Models\OrderDetail;
-use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,17 +24,25 @@ class ProductController extends Controller
 
     public function show()
     {
-        // Fetch all products from the database
-        $products = Product::all(); // You can filter with where conditions if needed
+        $userId = session('user_id');
 
-        // Fetch unique brands from the products table
-        $brands = Product::distinct()->pluck('brand'); // Fetch distinct brands
+        // Ambil semua produk
+        $products = Product::with('images')->get();
 
-        // Fetch unique sizes from the variants table
-        $sizes = Variant::distinct()->pluck('size'); // Fetch distinct sizes
+        // Ambil daftar brand unik
+        $brands = Product::distinct()->pluck('brand');
 
-        // Pass the products, brands, and sizes to the view
-        return view('cust.product', compact('products', 'brands', 'sizes'));
+        // Ambil daftar ukuran unik dari variant
+        $sizes = Variant::distinct()->pluck('size');
+
+        // Ambil daftar produk yang sudah di wishlist user (jika login)
+        $userWishlistProductIds = collect();
+        if ($userId) {
+            $userWishlistProductIds = Wishlist::where('user_id', $userId)
+                ->pluck('product_id'); // hanya ambil product_id saja
+        }
+
+        return view('cust.product', compact('products', 'brands', 'sizes', 'userWishlistProductIds'));   
     }
 
     public function showDetail($id)

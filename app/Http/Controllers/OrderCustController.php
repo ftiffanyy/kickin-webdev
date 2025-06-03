@@ -22,22 +22,6 @@ class OrderCustController extends Controller
         return view('cust.orders', compact('orders'));
     }
 
-
-    // public function orderdetails($id)
-    // {
-    //     $order = Order::with([
-    //         'orderDetails.variant.product.images',
-    //         'shippings'
-    //     ])->findOrFail($id);
-
-    //     // Pastikan order milik user login
-    //     if ($order->user_id !== session('user_id')) {
-    //         abort(403, 'Unauthorized access');
-    //     }
-
-    //     return view('cust.orderdetails', compact('order'));
-    // }
-
     public function orderdetails($id)
     {
         $userId = session('user_id');
