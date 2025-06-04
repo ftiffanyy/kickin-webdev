@@ -2,7 +2,7 @@
 
 @section('content')
     <style>
-        /* Simple wishlist icon styling (matching the product page) */
+        /* Wishlist icon */
         .wishlist-icon {
             position: absolute;
             top: 4px;
@@ -10,35 +10,27 @@
             z-index: 10; /* Ensure it's above other elements */
         }
 
-        /* Hide the actual checkbox */
-        .wishlist-checkbox {
-            display: none;
-        }
-
-        /* Style for the heart icon */
+        /* Style for the heart button */
         .wishlist-btn {
             font-size: 20px;
             background: none;
             border: none;
             cursor: pointer;
             padding: 5px;
-        }
-
-        /* Style for the default heart - outlined with white inside */
-        .wishlist-btn i {
             color: white;
             -webkit-text-stroke: 1.5px #181b1e; /* Black outline */
             text-stroke: 1.5px #181b1e; /* Black outline */
+            transition: color 0.3s ease;
         }
 
-        /* Style for when heart is checked (active) */
-        .wishlist-checkbox:checked + .wishlist-btn i {
+        /* Style for the active heart button (filled red) */
+        .wishlist-btn.active {
             color: red;
             -webkit-text-stroke: 0;
             text-stroke: 0;
         }
 
-        /* Product card styling - Matching product page behavior */
+        /* Product card styling */
         .product-card {
             display: flex;
             flex-direction: column;
@@ -141,7 +133,7 @@
         }
     </style>
 
-     <div class="container" style="padding-top: 25px; padding-bottom: 50px;">
+    <div class="container" style="padding-top: 25px; padding-bottom: 50px;">
         <h2>My Wishlist</h2>
 
         @if($wishlist->isEmpty())
@@ -157,14 +149,14 @@
                 @foreach ($wishlist as $product)
                     <div class="col">
                         <div class="card product-card">
-                            <!-- Wishlist Heart Icon - Using consistent styling -->
-                            <div class="wishlist-icon">
-                                <input type="checkbox" id="wishlist-{{ $product->product_id }}" class="wishlist-checkbox" 
-                                       data-product-id="{{ $product->product_id }}" checked>
-                                <label for="wishlist-{{ $product->product_id }}" class="wishlist-btn">
+                            <!-- Wishlist Heart Icon -->
+                            <form action="{{ route('wishlist.toggle') }}" method="POST" class="wishlist-form" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->product_id }}">
+                                <button type="submit" class="wishlist-btn {{ $wishlist ? 'active' : '' }}" aria-label="Toggle wishlist" title="Toggle wishlist">
                                     <i class="fas fa-heart"></i>
-                                </label>
-                            </div>
+                                </button>
+                            </form>
 
                             <!-- Loading spinner -->
                             <div class="wishlist-loading" id="loading-{{ $product->product_id }}">
@@ -190,11 +182,11 @@
                                 <p class="card-text">
                                     @for ($i = 1; $i <= 5; $i++)
                                         @if ($i <= floor($product->rating_avg))
-                                            <i class="fas fa-star text-warning"></i> <!-- Full Star -->
+                                            <i class="fas fa-star text-warning"></i>
                                         @elseif ($i - 0.5 <= $product->rating_avg && $product->rating_avg - floor($product->rating_avg) >= 0.25)
-                                            <i class="fas fa-star-half-alt text-warning"></i> <!-- Half Star -->
+                                            <i class="fas fa-star-half-alt text-warning"></i>
                                         @else
-                                            <i class="fas fa-star text-muted"></i> <!-- Empty Star -->
+                                            <i class="fas fa-star text-muted"></i>
                                         @endif
                                     @endfor
                                     ({{ $product->total_reviews }} reviews)
@@ -209,105 +201,59 @@
 @endsection
 
 @section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const wishlistCheckboxes = document.querySelectorAll('.wishlist-checkbox');
-            
-            wishlistCheckboxes.forEach(function(checkbox) {
-                checkbox.addEventListener('change', function() {
-                    const productId = this.dataset.productId;
-                    const isChecked = this.checked;
-                    const loadingSpinner = document.getElementById('loading-' + productId);
-                    const productCard = this.closest('.col');
-                    
-                    // Show loading spinner
-                    loadingSpinner.style.display = 'block';
-                    
-                    // Disable checkbox temporarily
-                    this.disabled = true;
-                    
-                    // Send AJAX request
-                    fetch('{{ route("wishlist.toggle") }}', {
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.wishlist-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const productId = this.dataset.productId;
+                const btnElement = this;
+
+                btnElement.disabled = true;
+
+                try {
+                    const response = await fetch('{{ route("wishlist.toggle") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
-                        body: JSON.stringify({
-                            product_id: productId
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            if (data.action === 'removed') {
-                                // Remove the product card from wishlist page with animation
-                                productCard.style.transition = 'all 0.5s ease';
-                                productCard.style.transform = 'scale(0)';
-                                productCard.style.opacity = '0';
-                                
-                                setTimeout(() => {
-                                    productCard.remove();
-                                    
-                                    // Check if wishlist is now empty
-                                    const remainingProducts = document.querySelectorAll('.product-card').length;
-                                    if (remainingProducts === 0) {
-                                        // Reload page to show empty wishlist message
-                                        window.location.reload();
-                                    }
-                                }, 500);
-                                
-                                showToast('Product removed from wishlist', 'success');
-                            } else {
-                                // This shouldn't happen on wishlist page, but handle it
-                                this.checked = true;
-                                showToast('Product added to wishlist', 'success');
-                            }
-                        } else {
-                            // Revert checkbox state on error
-                            this.checked = !isChecked;
-                            showToast(data.message || 'An error occurred', 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        // Revert checkbox state on error
-                        this.checked = !isChecked;
-                        showToast('An error occurred. Please try again.', 'error');
-                    })
-                    .finally(() => {
-                        // Hide loading spinner and re-enable checkbox
-                        loadingSpinner.style.display = 'none';
-                        this.disabled = false;
+                        body: JSON.stringify({ product_id: productId })
                     });
-                });
+
+                    const data = await response.json();
+
+                    if(data.success) {
+                        showToast(data.message, 'success');
+                        // tidak toggle class sesuai permintaan
+                    } else {
+                        showToast(data.message || 'Terjadi kesalahan', 'error');
+                    }
+                } catch(err) {
+                    showToast('Kesalahan jaringan. Coba lagi.', 'error');
+                } finally {
+                    btnElement.disabled = false;
+                }
             });
         });
+    });
 
-        // Toast notification function
-        function showToast(message, type = 'success') {
-            // Remove existing toasts
-            const existingToasts = document.querySelectorAll('.custom-toast');
-            existingToasts.forEach(toast => toast.remove());
-            
-            // Create new toast
-            const toast = document.createElement('div');
-            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg custom-toast`;
-            toast.style.minWidth = '300px';
-            toast.style.zIndex = '9999';
-            toast.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-            
-            document.body.appendChild(toast);
-            
-            // Auto-hide after 3 seconds
-            setTimeout(() => {
-                if (toast && toast.parentNode) {
-                    toast.remove();
-                }
-            }, 3000);
-        }
-    </script>
+    function showToast(message, type = 'success') {
+        document.querySelectorAll('.custom-toast').forEach(t => t.remove());
+
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg custom-toast`;
+        toast.style.minWidth = '300px';
+        toast.style.zIndex = '9999';
+        toast.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            if (toast && toast.parentNode) toast.remove();
+        }, 3000);
+    }
+</script>
 @endsection

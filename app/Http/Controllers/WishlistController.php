@@ -12,13 +12,15 @@ class WishlistController extends Controller
 {
     public function showWishlist()
     {
+        // Ambil data user yang sedang login
         $user = Auth::user();
         
+        // Jika user tidak login, arahkan ke halaman login
         if (!$user) {
             return redirect()->route('auth')->with('error', 'Please login to view your wishlist');
         }
 
-        // Get wishlist items with product details
+        // Mengambil data wishlist yang terkait dengan user
         $wishlist = DB::table('wishlists')
             ->join('products', 'wishlists.product_id', '=', 'products.id')
             ->leftJoin('images', function($join) {
@@ -41,129 +43,13 @@ class WishlistController extends Controller
             )
             ->get()
             ->map(function($item) {
-                // Format image path
+                // Format path image
                 $item->image = $item->image ? 'images/' . $item->image : 'images/default-product.jpg';
                 return $item;
             });
 
+        // Return ke view dengan data wishlist
         return view('cust.wishlist', compact('wishlist'));
-    }
-
-    public function addToWishlist(Request $request)
-    {
-        $user = Auth::user();
-        
-        if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Please login first'], 401);
-        }
-
-        $productId = $request->input('product_id');
-        
-        // Check if product exists
-        $product = Product::find($productId);
-        if (!$product) {
-            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
-        }
-
-        // Check if already in wishlist
-        $exists = Wishlist::where('user_id', $user->id)
-                         ->where('product_id', $productId)
-                         ->exists();
-
-        if ($exists) {
-            return response()->json(['success' => false, 'message' => 'Product already in wishlist']);
-        }
-
-        // Add to wishlist
-        Wishlist::create([
-            'user_id' => $user->id,
-            'product_id' => $productId
-        ]);
-
-        return response()->json(['success' => true, 'message' => 'Product added to wishlist']);
-    }
-
-    public function removeFromWishlist(Request $request)
-    {
-        $user = Auth::user();
-        
-        if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Please login first'], 401);
-        }
-
-        $productId = $request->input('product_id');
-        
-        $deleted = Wishlist::where('user_id', $user->id)
-                          ->where('product_id', $productId)
-                          ->delete();
-
-        if ($deleted) {
-            return response()->json(['success' => true, 'message' => 'Product removed from wishlist']);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Product not found in wishlist']);
-        }
-    }
-
-    // public function toggleWishlist(Request $request)
-    // {
-    //     $user = Auth::user();
-        
-    //     if (!$user) {
-    //         return response()->json(['success' => false, 'message' => 'Please login first'], 401);
-    //     }
-
-    //     $productId = $request->input('product_id');
-        
-    //     // Check if product exists
-    //     $product = Product::find($productId);
-    //     if (!$product) {
-    //         return response()->json(['success' => false, 'message' => 'Product not found'], 404);
-    //     }
-
-    //     // Check if already in wishlist
-    //     $wishlistItem = Wishlist::where('user_id', $user->id)
-    //                            ->where('product_id', $productId)
-    //                            ->first();
-
-    //     if ($wishlistItem) {
-    //         // Remove from wishlist
-    //         $wishlistItem->delete();
-    //         return response()->json(['success' => true, 'action' => 'removed', 'message' => 'Product removed from wishlist']);
-    //     } else {
-    //         // Add to wishlist
-    //         Wishlist::create([
-    //             'user_id' => $user->id,
-    //             'product_id' => $productId
-    //         ]);
-    //         return response()->json(['success' => true, 'action' => 'added', 'message' => 'Product added to wishlist']);
-    //     }
-    // }
-
-    public function getWishlistStatus(Request $request)
-    {
-        $user = Auth::user();
-        
-        if (!$user) {
-            return response()->json(['wishlisted' => false]);
-        }
-
-        $productIds = $request->input('product_ids', []);
-        
-        if (empty($productIds)) {
-            return response()->json(['wishlisted' => []]);
-        }
-
-        $wishlistedIds = Wishlist::where('user_id', $user->id)
-                                ->whereIn('product_id', $productIds)
-                                ->pluck('product_id')
-                                ->toArray();
-
-        $result = [];
-        foreach ($productIds as $productId) {
-            $result[$productId] = in_array($productId, $wishlistedIds);
-        }
-
-        return response()->json(['wishlisted' => $result]);
     }
 
     public function toggle(Request $request)
