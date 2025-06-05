@@ -112,6 +112,20 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
+//coba
+// Route untuk verifikasi kode
+Route::get('/verify-code', function () {
+    return view('auth.verification');
+})->name('verify.code.form');
+
+Route::post('/verify-code', [AuthController::class, 'verifyCode'])->name('verify.code');
+
+Route::get('/password/reset/{email}', function ($email) {
+    return view('auth.reset', ['email' => $email]);
+})->name('password.reset.form');
+
+
+
 Route::middleware(['auth'])->group(function(){
     Route::get('/about', [HomeController::class, 'about'])->name('about');
 
