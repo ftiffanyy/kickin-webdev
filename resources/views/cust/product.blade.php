@@ -112,6 +112,14 @@
         margin-right: 20px;
         position: sticky;
         top: 0;
+        max-height: 90vh;
+        overflow-y: scroll;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    }
+
+    .filter-container::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
     }
 
     .filter-container label {
@@ -123,7 +131,7 @@
 
     .filter-container input[type="checkbox"],
     .filter-container input[type="radio"] {
-        margin-right: 8px;
+        display: none;
     }
 
     .filter-btn {
@@ -146,6 +154,8 @@
         display: flex;
         align-items: center;
         margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 5px;
     }
 
     .filter-section {
@@ -168,24 +178,84 @@
     }
 
     .filter-option {
-        margin-left: 20px;
+        margin-left: 0px;
     }
 
     .filter-section .collapse {
-        margin-left: 20px;
+        margin-left: 0px;
     }
-    
+
     /* Responsive grid */
     @media (max-width: 991px) {
         .product-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-    
+
     @media (max-width: 767px) {
         .product-grid {
             grid-template-columns: 1fr;
         }
+    }
+
+    /* Tambahan untuk tombol interaktif filter */
+    .filter-option input[type="checkbox"] {
+        display: none;
+    }
+    .filter-option label {
+        border: 1px solid #ccc;
+        padding: 8px 12px;
+        border-radius: 5px;
+        margin: 5px 0;
+        cursor: pointer;
+        display: inline-block;
+        align-items: center;
+        gap: 8px;
+        min-width: 80px;
+        text-align: center;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .filter-option input[type="checkbox"]:checked + label,
+    .filter-option input[type="radio"]:checked + label {
+        background-color: #000;
+        color: white;
+        border-color: #000;
+        transform: scale(0.98);
+    }
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .filter-color-circle {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: inline-block;
+        border: 1px solid #ccc;
+    }
+    .color-black { background-color: black; }
+    .color-white { background-color: white; border: 1px solid #888; }
+    .color-red { background-color: red; }
+    .color-blue { background-color: blue; }
+
+    .clear-btn {
+        background-color: #f9f9f9;
+        color: #000;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        padding: 12px 18px;
+        transition: background-color 0.3s ease;
+    }
+    .clear-btn:hover {
+        background-color: #e5e5e5;
+        color: #000;
+        text-decoration: none;
     }
 </style>
 
@@ -195,25 +265,21 @@
         <div class="col-md-3">
             <div class="filter-container">
                 <form method="GET" action="{{ route('products.filter') }}">
-                    <!-- Filters here (Jenis Kelamin, Warna, Ukuran, Brand, Sort) -->
-                    <!-- ... tetap seperti kode kamu yang sudah ada -->
-                    <!-- Kamu bisa copy-paste bagian filter dari kode awal supaya lengkap -->
-                    
                     <!-- Gender Filter -->
                     <div class="filter-section">
                         <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#gender-filter" aria-expanded="false" aria-controls="gender-filter">
-                            Jenis Kelamin
-                            <i class="fas fa-chevron-down"></i>
+                            Jenis Kelamin <i class="fas fa-chevron-down"></i>
                         </div>
                         <div id="gender-filter" class="collapse">
-                            <div class="filter-option">
-                                <input type="checkbox" name="gender[]" value="Male" @if(in_array('Male', request('gender', []))) checked @endif> <label>Male</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="checkbox" name="gender[]" value="Female" @if(in_array('Female', request('gender', []))) checked @endif> <label>Female</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="checkbox" name="gender[]" value="Unisex" @if(in_array('Unisex', request('gender', []))) checked @endif> <label>Unisex</label>
+                            <div class="filter-option filter-grid">
+                                <input type="checkbox" name="gender[]" value="Male" id="gender_male" @if(in_array('Male', request('gender', []))) checked @endif>
+                                <label for="gender_male">Male</label>
+
+                                <input type="checkbox" name="gender[]" value="Female" id="gender_female" @if(in_array('Female', request('gender', []))) checked @endif>
+                                <label for="gender_female">Female</label>
+
+                                <input type="checkbox" name="gender[]" value="Unisex" id="gender_unisex" @if(in_array('Unisex', request('gender', []))) checked @endif>
+                                <label for="gender_unisex">Unisex</label>
                             </div>
                         </div>
                     </div>
@@ -221,21 +287,17 @@
                     <!-- Color Filter -->
                     <div class="filter-section">
                         <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#color-filter" aria-expanded="false" aria-controls="color-filter">
-                            Warna
-                            <i class="fas fa-chevron-down"></i>
+                            Warna <i class="fas fa-chevron-down"></i>
                         </div>
                         <div id="color-filter" class="collapse">
-                            <div class="filter-option">
-                                <input type="checkbox" name="color[]" value="black" @if(in_array('black', request('color', []))) checked @endif> <label>Black</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="checkbox" name="color[]" value="white" @if(in_array('white', request('color', []))) checked @endif> <label>White</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="checkbox" name="color[]" value="red" @if(in_array('red', request('color', []))) checked @endif> <label>Red</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="checkbox" name="color[]" value="blue" @if(in_array('blue', request('color', []))) checked @endif> <label>Blue</label>
+                            <div class="filter-option filter-grid">
+                                @foreach (['black', 'white', 'red', 'blue'] as $color)
+                                    <input type="checkbox" name="color[]" value="{{ $color }}" id="color_{{ $color }}" @if(in_array($color, request('color', []))) checked @endif>
+                                    <label for="color_{{ $color }}">
+                                        <span class="filter-color-circle color-{{ $color }}"></span> {{ ucfirst($color) }}
+                                    </label>
+                                @endforeach
+
                             </div>
                         </div>
                     </div>
@@ -243,51 +305,53 @@
                     <!-- Size Filter -->
                     <div class="filter-section">
                         <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#size-filter" aria-expanded="false" aria-controls="size-filter">
-                            Ukuran
-                            <i class="fas fa-chevron-down"></i>
+                            Ukuran <i class="fas fa-chevron-down"></i>
                         </div>
                         <div id="size-filter" class="collapse">
-                            @foreach ($sizes as $size)
-                                <div class="filter-option">
-                                    <input type="checkbox" name="size[]" value="{{ $size }}" @if(in_array($size, request('size', []))) checked @endif> <label>{{ $size }}</label>
-                                </div>
-                            @endforeach
+                            <div class="filter-option filter-grid">
+                                @foreach ($sizes as $size)
+                                    <input type="checkbox" name="size[]" value="{{ $size }}" id="size_{{ $size }}" @if(in_array($size, request('size', []))) checked @endif>
+                                    <label for="size_{{ $size }}">{{ $size }}</label>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
 
                     <!-- Brand Filter -->
                     <div class="filter-section">
                         <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#brand-filter" aria-expanded="false" aria-controls="brand-filter">
-                            Brand
-                            <i class="fas fa-chevron-down"></i>
+                            Brand <i class="fas fa-chevron-down"></i>
                         </div>
                         <div id="brand-filter" class="collapse">
-                            @foreach ($brands as $brand)
-                                <div class="filter-option">
-                                    <input type="checkbox" name="brand[]" value="{{ $brand }}" @if(in_array($brand, request('brand', []))) checked @endif> <label>{{ ucfirst($brand) }}</label>
-                                </div>
-                            @endforeach
+                            <div class="filter-option filter-grid">
+                                @foreach ($brands as $brand)
+                                    <input type="checkbox" name="brand[]" value="{{ $brand }}" id="brand_{{ $brand }}" @if(in_array($brand, request('brand', []))) checked @endif>
+                                    <label for="brand_{{ $brand }}">{{ ucfirst($brand) }}</label>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Sort By Price -->
+                    <!-- Sort -->
                     <div class="filter-section">
                         <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#sort-filter" aria-expanded="false" aria-controls="sort-filter">
-                            Sort By
-                            <i class="fas fa-chevron-down"></i>
+                            Sort By <i class="fas fa-chevron-down"></i>
                         </div>
                         <div id="sort-filter" class="collapse">
                             <div class="filter-option">
-                                <input type="radio" name="sort" value="low_high" @if(request('sort') == 'low_high') checked @endif> <label>Price: Low to High</label>
+                                <input type="radio" name="sort" value="low_high" id="sort_low" @if(request('sort') == 'low_high') checked @endif>
+                                <label for="sort_low">Price: Low to High</label>
                             </div>
                             <div class="filter-option">
-                                <input type="radio" name="sort" value="high_low" @if(request('sort') == 'high_low') checked @endif> <label>Price: High to Low</label>
+                                <input type="radio" name="sort" value="high_low" id="sort_high" @if(request('sort') == 'high_low') checked @endif>
+                                <label for="sort_high">Price: High to Low</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="filter-btn-container">
                         <button type="submit" class="filter-btn">Apply Filters</button>
+                        <a href="{{ route('product.show') }}" class="filter-btn clear-btn">Clear Filters</a>
                     </div>
                 </form>
             </div>
@@ -305,7 +369,6 @@
                     @endphp
 
                     <div class="product-card" style="position:relative;">
-                        <!-- Form submit toggle wishlist -->
                         <form action="{{ route('wishlist.toggle') }}" method="POST" class="wishlist-form" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
@@ -352,66 +415,7 @@
                 @endforeach
             </div>
         </div>
-
     </div>
 </div>
 
-@endsection
-
-@section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.wishlist-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                const productId = this.dataset.productId;
-                const btnElement = this;
-
-                btnElement.disabled = true;
-
-                try {
-                    const response = await fetch('{{ route("wishlist.toggle") }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({ product_id: productId })
-                    });
-
-                    const data = await response.json();
-
-                    if(data.success) {
-                        showToast(data.message, 'success');
-                        // tidak toggle class sesuai permintaan
-                    } else {
-                        showToast(data.message || 'Terjadi kesalahan', 'error');
-                    }
-                } catch(err) {
-                    showToast('Kesalahan jaringan. Coba lagi.', 'error');
-                } finally {
-                    btnElement.disabled = false;
-                }
-            });
-        });
-    });
-
-    function showToast(message, type = 'success') {
-        document.querySelectorAll('.custom-toast').forEach(t => t.remove());
-
-        const toast = document.createElement('div');
-        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-lg custom-toast`;
-        toast.style.minWidth = '300px';
-        toast.style.zIndex = '9999';
-        toast.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            if (toast && toast.parentNode) toast.remove();
-        }, 3000);
-    }
-</script>
 @endsection
