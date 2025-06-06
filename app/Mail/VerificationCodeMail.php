@@ -13,20 +13,22 @@ class VerificationCodeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $verificationCode;
+    public $otp;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($verificationCode)
+    public function __construct($otp)
     {
         //
-        $this->verificationCode = $verificationCode;
+        $this->otp = $otp;
     }
 
     public function build()
     {
-        return $this->subject('Your Verification Code')->view('emails.verification_code');
+        return $this->view('auth.verification')
+                    ->with(['otp' => $this->otp])
+                    ->subject('Your OTP for Password Reset');
     }
 
     /**
@@ -45,7 +47,7 @@ class VerificationCodeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'auth.verification',
         );
     }
 

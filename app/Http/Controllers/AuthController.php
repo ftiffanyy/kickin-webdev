@@ -17,22 +17,6 @@ use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
-    // public function login(Request $request)
-    // {
-    //     $email = $request->input('email');
-    //     $password = $request->input('password');
-
-    //     if ($email === 'user@user.com' && $password === 'user') {
-    //         session(['user_email' => $email, 'user_role' => 'User']);
-    //         return redirect('/');
-    //     } elseif ($email === 'admin@admin.com' && $password === 'admin') {
-    //         session(['user_email' => $email, 'user_role' => 'Admin']);
-    //         return redirect('/admin');
-    //     } else {
-    //         return back()->with('error', 'Invalid credentials');
-    //     }
-    // }
-
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -69,132 +53,138 @@ class AuthController extends Controller
 
     public function forgotPassword(Request $request)
     {
-        // Validasi email
-    $request->validate([
-        'email' => 'required|email|exists:users,email',
-    ], [
-        'email.required' => 'Email address is required.',
-        'email.email' => 'Please enter a valid email address.',
-        'email.exists' => 'Email address is not registered in our system.',
-    ]);
-
-    try {
-        // Debugging point
-        dd('Starting to generate verification code for email: ' . $request->email);
-
-        // Generate 6-digit verification code
-        $verificationCode = rand(100000, 999999);
-
-        // Simpan kode verifikasi ke database atau password_resets (tabel yang sesuai)
-        DB::table('password_resets')->where('email', $request->email)->delete();  // Hapus jika ada sebelumnya
-        DB::table('password_resets')->insert([
-            'email' => $request->email,
-            'token' => $verificationCode,
-            'created_at' => now(),
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
         ]);
 
-        // Debugging point
-        dd('Verification code generated and saved to database.');
+        // Generate 6-digit OTP
+        $otp = rand(100000, 999999);
 
-        // Kirimkan email dengan kode verifikasi
-        Mail::to($request->email)->send(new VerificationCodeMail($verificationCode));
-
-        // Kirimkan reset link
-        $status = Password::sendResetLink(
-            $request->only('email')
+        // Save OTP to database
+        DB::table('password_resets')->updateOrInsert(
+            ['email' => $request->email],
+            ['token' => $otp, 'created_at' => now()]
         );
 
-        // Handle status setelah reset link dikirim
-        if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', 'Password reset link has been sent to your email address. Please check your inbox.');
-        } else {
-            switch ($status) {
-                case Password::INVALID_USER:
-                    return back()->withErrors(['email' => 'Email address is not registered.']);
-                case Password::RESET_THROTTLED:
-                    return back()->withErrors(['email' => 'Please wait before requesting another reset link.']);
-                default:
-                    return back()->withErrors(['email' => 'Unable to send reset link. Please try again later.']);
-            }
-        }
-    } catch (\Exception $e) {
-        Log::error('Password reset error: ' . $e->getMessage());
-        return back()->withErrors(['email' => 'An error occurred. Please try again later.']);
-    }
+        // Send OTP to user's email
+        Mail::to($request->email)->send(new VerificationCodeMail($otp));
+
+        // // Return success message to the view
+        // return back()->with('status', 'OTP has been sent to your email.');
+
+        // Store email in session to use later for password reset
+        session(['email' => $request->email]);
+
+        // Redirect to OTP page with a success message
+        return redirect()->route('otp.form')->with('status', 'OTP has been sent to your email.');
     }
 
-    // Function baru untuk menampilkan form reset password
-    public function showResetForm(Request $request, $token = null)
+    // Show OTP form
+    public function showOtpForm()
     {
-        return view('auth.reset')->with([
-            'token' => $token,
-            'email' => $request->email
-        ]);
+        return view('auth.otp');
     }
 
-    // Function baru untuk memproses reset password
-    public function resetPassword(Request $request)
+    // Handle OTP verification
+    public function verifyOtp(Request $request)
     {
         $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
-        ], [
-            'password.required' => 'Password is required.',
-            'password.min' => 'Password must be at least 8 characters.',
-            'password.confirmed' => 'Password confirmation does not match.',
+            'otp' => 'required|numeric',
         ]);
 
-        try {
-            $status = Password::reset(
-                $request->only('email', 'password', 'password_confirmation', 'token'),
-                function (User $user, string $password) {
-                    $user->forceFill([
-                        'password' => Hash::make($password)
-                    ])->setRememberToken(Str::random(60));
+        // Get OTP from the session or database
+        $email = session('email');  // Assuming you stored the email in session when sending OTP
+        $otp = DB::table('password_resets')->where('email', $email)->first()->token;
 
-                    $user->save();
-
-                    event(new PasswordReset($user));
-                }
-            );
-
-            if ($status === Password::PASSWORD_RESET) {
-                return redirect()->route('auth')->with('status', 'Your password has been reset successfully. Please login with your new password.');
-            } else {
-                return back()->withErrors(['email' => [__($status)]]);
-            }
-        } catch (\Exception $e) {
-            Log::error('Password reset error: ' . $e->getMessage());
-            return back()->withErrors(['email' => 'An error occurred. Please try again later.']);
+        if ($request->otp == $otp) {
+            // Pass the email as a parameter when redirecting to the password reset page
+            return redirect()->route('password.reset.form', ['email' => $email]);
         }
+
+        return back()->with('status', 'Invalid OTP. Please try again.');
     }
 
-    public function verifyCode(Request $request)
+    // Show password reset form
+    public function showResetPasswordForm($email)
     {
-        // Validasi kode verifikasi
-        $request->validate([
-            'verification_code' => 'required|numeric|digits:6',
-        ]);
-
-        // Cek kode verifikasi di tabel password_resets
-        $reset = DB::table('password_resets')
-                    ->where('token', $request->verification_code)
-                    ->first();
-
-        if (!$reset) {
-            return back()->withErrors(['verification_code' => 'Invalid verification code.']);
-        }
-
-        // Kode valid, arahkan ke halaman reset password
-        return redirect()->route('password.reset.form', ['email' => $reset->email]);
+        // $email = session('email');  // Retrieve email from the session
+        return view('auth.reset', compact('email'));
     }
 
+    // Handle password reset
+    public function updatePassword(Request $request, $email)
+    {
+        $request->validate([
+            'new_password' => 'required|string',
+        ]);
 
-    // public function register(Request $request) {
-    //     session(['user_role' => 'User']);
-    //     // bisa simpan data sementara di session / flash message
-    //     return redirect()->route('dashboard');/*->with('status', 'Registered successfully. Please login.');*/
+        // $email = session('email');  // Get email from session
+        DB::table('users')->where('email', $email)->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        // Delete OTP entry after successful password reset
+        DB::table('password_resets')->where('email', $email)->delete();
+
+        return redirect('/auth')->with('status', 'Password has been reset successfully. Please login.');
+    }
+
+    // // Function baru untuk memproses reset password
+    // public function resetPassword(Request $request)
+    // {
+    //     $request->validate([
+    //         'token' => 'required',
+    //         'email' => 'required|email',
+    //         'password' => 'required|min:8|confirmed',
+    //     ], [
+    //         'password.required' => 'Password is required.',
+    //         'password.min' => 'Password must be at least 8 characters.',
+    //         'password.confirmed' => 'Password confirmation does not match.',
+    //     ]);
+
+    //     try {
+    //         $status = Password::reset(
+    //             $request->only('email', 'password', 'password_confirmation', 'token'),
+    //             function (User $user, string $password) {
+    //                 $user->forceFill([
+    //                     'password' => Hash::make($password)
+    //                 ])->setRememberToken(Str::random(60));
+
+    //                 $user->save();
+
+    //                 event(new PasswordReset($user));
+    //             }
+    //         );
+
+    //         if ($status === Password::PASSWORD_RESET) {
+    //             return redirect()->route('auth')->with('status', 'Your password has been reset successfully. Please login with your new password.');
+    //         } else {
+    //             return back()->withErrors(['email' => [__($status)]]);
+    //         }
+    //     } catch (\Exception $e) {
+    //         Log::error('Password reset error: ' . $e->getMessage());
+    //         return back()->withErrors(['email' => 'An error occurred. Please try again later.']);
+    //     }
+    // }
+
+    // public function verifyCode(Request $request)
+    // {
+    //     // Validasi kode verifikasi
+    //     $request->validate([
+    //         'verification_code' => 'required|numeric|digits:6',
+    //     ]);
+
+    //     // Cek kode verifikasi di tabel password_resets
+    //     $reset = DB::table('password_resets')
+    //                 ->where('token', $request->verification_code)
+    //                 ->first();
+
+    //     if (!$reset) {
+    //         return back()->withErrors(['verification_code' => 'Invalid verification code.']);
+    //     }
+
+    //     // Kode valid, arahkan ke halaman reset password
+    //     return redirect()->route('password.reset.form', ['email' => $reset->email]);
     // }
 
     public function register(Request $request)

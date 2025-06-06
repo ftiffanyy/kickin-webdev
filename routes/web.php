@@ -108,21 +108,26 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.password');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot.send');
 
-// Routes tambahan untuk reset password (perlu ditambahkan)
-Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
-Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+Route::get('/otp', [AuthController::class, 'showOtpForm'])->name('otp.form');
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
+Route::get('/password/reset/{email}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset.form');
+Route::post('/update-password/{email}', [AuthController::class, 'updatePassword'])->name('password.update');
 
-//coba
-// Route untuk verifikasi kode
-Route::get('/verify-code', function () {
-    return view('auth.verification');
-})->name('verify.code.form');
+// // Routes tambahan untuk reset password (perlu ditambahkan)
+// Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+// Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
-Route::post('/verify-code', [AuthController::class, 'verifyCode'])->name('verify.code');
+// //coba
+// // Route untuk verifikasi kode
+// Route::get('/verify-code', function () {
+//     return view('auth.verification');
+// })->name('verify.code.form');
 
-Route::get('/password/reset/{email}', function ($email) {
-    return view('auth.reset', ['email' => $email]);
-})->name('password.reset.form');
+// Route::post('/verify-code', [AuthController::class, 'verifyCode'])->name('verify.code');
+
+// Route::get('/password/reset/{email}', function ($email) {
+//     return view('auth.reset', ['email' => $email]);
+// })->name('password.reset.form');
 
 
 
