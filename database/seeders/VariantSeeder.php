@@ -16,7 +16,7 @@ class VariantSeeder extends Seeder
         DB::table('variants')->insert([
             [
                 'product_id' => 1,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -30,7 +30,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -44,7 +44,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -58,7 +58,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -72,7 +72,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -86,7 +86,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -100,7 +100,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -114,7 +114,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -128,7 +128,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -142,7 +142,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -156,7 +156,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -170,14 +170,14 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 1,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 2,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -191,7 +191,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -205,7 +205,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -219,7 +219,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -233,7 +233,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -247,7 +247,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -261,7 +261,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -275,7 +275,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -289,7 +289,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -303,7 +303,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -317,7 +317,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -331,14 +331,14 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 2,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 3,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -352,7 +352,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -366,7 +366,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -380,7 +380,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -394,7 +394,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -408,7 +408,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -422,7 +422,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -436,7 +436,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -450,7 +450,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -464,7 +464,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -478,7 +478,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -492,14 +492,14 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 3,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 4,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -513,7 +513,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -527,7 +527,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -541,7 +541,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -555,7 +555,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -569,7 +569,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -583,7 +583,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -597,7 +597,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -611,7 +611,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -625,7 +625,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -639,7 +639,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -653,14 +653,14 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 4,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 5,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -674,7 +674,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -688,7 +688,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -702,7 +702,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -716,7 +716,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -730,7 +730,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -744,7 +744,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -758,7 +758,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -772,7 +772,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -786,7 +786,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -800,7 +800,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -814,14 +814,14 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 5,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 6,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -835,7 +835,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -849,7 +849,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -863,7 +863,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -877,7 +877,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -891,7 +891,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -905,7 +905,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -919,7 +919,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -933,7 +933,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -947,7 +947,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -961,7 +961,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -975,14 +975,14 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 6,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 7,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -996,7 +996,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1010,7 +1010,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1024,7 +1024,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1038,7 +1038,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1052,7 +1052,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1066,7 +1066,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1080,7 +1080,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1094,7 +1094,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1108,7 +1108,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1122,7 +1122,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1136,14 +1136,14 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 7,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 8,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1157,7 +1157,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1171,7 +1171,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1185,7 +1185,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1199,7 +1199,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1213,7 +1213,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1227,7 +1227,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1241,7 +1241,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1255,7 +1255,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1269,7 +1269,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1283,7 +1283,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1297,14 +1297,14 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 8,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 9,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1318,7 +1318,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1332,7 +1332,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1346,7 +1346,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1360,7 +1360,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1374,7 +1374,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1388,7 +1388,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1402,7 +1402,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1416,7 +1416,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1430,7 +1430,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1444,7 +1444,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1458,14 +1458,14 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 9,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'product_id' => 10,
-                'size' => '35',
+                'size' => '35.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1479,7 +1479,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '36',
+                'size' => '36.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1493,7 +1493,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '37',
+                'size' => '37.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1507,7 +1507,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '38',
+                'size' => '38.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1521,7 +1521,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '39',
+                'size' => '39.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1535,7 +1535,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '40',
+                'size' => '40.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1549,7 +1549,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '41',
+                'size' => '41.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1563,7 +1563,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '42',
+                'size' => '42.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1577,7 +1577,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '43',
+                'size' => '43.0',
                 'stock' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1591,7 +1591,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '44',
+                'size' => '44.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1605,7 +1605,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '45',
+                'size' => '45.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1619,7 +1619,7 @@ class VariantSeeder extends Seeder
             ],
             [
                 'product_id' => 10,
-                'size' => '46',
+                'size' => '46.0',
                 'stock' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),

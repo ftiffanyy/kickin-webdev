@@ -236,20 +236,47 @@ class AdminController extends Controller
 
         // Handle sizes update
         if ($request->has('sizes')) {
-            // Delete existing sizes
-            Variant::where('product_id', $product->id)->delete();
+            // Get all existing variants for the product
+            $existingVariants = Variant::where('product_id', $product->id)->get()->keyBy('size');
 
-            // Add new sizes
-             foreach ($request->sizes as $size => $stock) {
-                if ($stock > 0) { // Only add sizes with stock > 0
-                    Variant::create([
-                        'product_id' => $product->id,
-                        'size' => $size,
+            foreach ($request->sizes as $size => $stock) {
+                // Convert stock to integer, treat empty as 0
+                $stock = intval($stock);
+                
+                // Check if the size exists in the existing variants
+                if (isset($existingVariants[$size])) {
+                    // If variant exists, update its stock (even if stock is 0)
+                    $existingVariants[$size]->update([
                         'stock' => $stock
                     ]);
+                    
+                    // Remove from collection so we know it was processed
+                    unset($existingVariants[$size]);
+                } else {
+                    // // If variant doesn't exist and stock > 0, create new variant
+                    // if ($stock > 0) {
+                    //     Variant::create([
+                    //         'product_id' => $product->id,
+                    //         'size' => $size,
+                    //         'stock' => $stock
+                    //     ]);
+                    // }
                 }
             }
+            
+            // Handle any existing variants that weren't in the request
+            // Option 1: Delete variants not in the form (uncomment if needed)
+            // foreach ($existingVariants as $unusedVariant) {
+            //     $unusedVariant->delete();
+            // }
+            
+            // Option 2: Set stock to 0 for variants not in the form (safer approach)
+            foreach ($existingVariants as $unusedVariant) {
+                $unusedVariant->update(['stock' => 0]);
+            }
         }
+
+
 
         DB::commit();
 
