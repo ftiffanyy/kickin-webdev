@@ -79,66 +79,98 @@ class AdminController extends Controller
     // create product form
     public function create_product_form()
     {
-        // sementara
-        // Define the product folder
-        $productId = 10;  // Product with ID 10
-        $imagesPath = public_path("images/products/{$productId}");
-
-        // If the folder exists, get the image files
-        $imageUrls = [];
-        if (File::exists($imagesPath)) {
-            $images = File::files($imagesPath);
-            
-            // Generate the image URLs (you can manually define these if you know the file names)
-            foreach ($images as $image) {
-                $imageUrls[] = asset("images/products/{$productId}/" . $image->getFilename());
-            }
-        }
-
-
         // Pass the image URLs to the view
-        return view('admin.create', compact('imageUrls'));
+        return view('admin.create');
     }
 
     public function create_product(Request $request)
     {
-        // Validate the input
-        $request->validate([
-            'product_name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'discount' => 'nullable|numeric|min:0|max:100',
-            'brand' => 'required|string|max:255',
-            'gender' => 'required|in:Unisex,Men,Woman',
-            'description' => 'required|string',
-            'images' => 'nullable|array|max:10',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'sizes' => 'nullable|array',
-            'sizes.*' => 'nullable|numeric|min:0', // Ensuring the quantity is numeric
-        ], [
-            'product_name.required' => 'Nama produk wajib diisi.',
-            'price.required' => 'Harga produk wajib diisi.',
-            'price.numeric' => 'Harga harus berupa angka.',
-            'price.min' => 'Harga tidak boleh negatif.',
-            'brand.required' => 'Merek produk wajib diisi.',
-            'description.required' => 'Deskripsi produk wajib diisi.',
-            'images.*.image' => 'Hanya gambar yang boleh diunggah.',
-            'sizes.*.numeric' => 'Jumlah stok harus berupa angka.',
-        ]);
+        // Start a database transaction to ensure atomicity
+        DB::beginTransaction();
 
-        // Handle image uploads
-        $imageNames = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $imageName = time() . '.' . $image->extension();
-                $image->move(public_path('images'), $imageName);
-                $imageNames[] = $imageName;  // Store image names
+        try {
+            // Insert product data into the 'products' table
+            $product = Product::create([
+                'name' => $request->name,
+                'price' => $request->price,
+                'discount' => $request->discount ?? 0, // Default to 0 if no discount
+                'brand' => $request->brand,
+                'gender' => $request->gender,
+                'description' => $request->description,
+                'rating_avg' => 0,
+                'total_reviews' => 0,
+                'sold' => 0,
+                'hide_status' => false,
+            ]);
+
+            // Insert variants (sizes and stock) into the 'variants' table
+            if ($request->has('sizes')) {
+                foreach ($request->sizes as $size => $stock) {
+
+                    // Format size to one decimal place
+                    $size = number_format((float)$size, 1, '.', ''); // Ensure the size is a float with one decimal place
+                    
+                    // If stock is empty, default it to 0
+                    $stock = $stock ? $stock : 0; 
+
+                    // Only insert if the size has a valid stock value (not null or 0)
+                    if ($stock >= 0) {
+                        Variant::create([
+                            'size' => $size,
+                            'stock' => $stock,
+                            'product_id' => $product->id,
+                        ]);
+                    }
+                }
             }
-        }
 
-        // Simulate success (no actual database insert)
-        return redirect()->route('productadmin.show')
-            ->with('success', 'Product successfully added!')
-            ->with('imageUrls', $imageNames); // Add imageUrls in session if needed
+            // Handle image uploads and store in the 'images' table
+            if ($request->hasFile('images')) {
+
+                $imageCount = count($request->file('images'));
+
+                // Check if the number of images exceeds 10
+                if ($imageCount > 10) {
+                    return redirect()->route('productadmin.show')->with('error', 'You can upload a maximum of 10 images.'); // Redirect back with an error message
+                }
+
+                $isMainImage = true;  // Mark the first image as the main image
+                $productFolderPath = public_path('images/products/' . $product->id); // Create folder path based on product ID
+
+                // Check if the product folder exists, if not, create it
+                if (!File::exists($productFolderPath)) {
+                    File::makeDirectory($productFolderPath, 0755, true);  // Create the directory if it doesn't exist
+                }
+
+                foreach ($request->file('images') as $image) {
+                    $imageName = time() . '-' . $image->getClientOriginalName();
+                    $image->move($productFolderPath, $imageName);  // Store image in the products folder
+
+                    // Save image information to the images table
+                    Image::create([
+                        'url' => 'products/' . $product->id . '/' . $imageName,  // Store the relative path of the image
+                        'main' => $isMainImage,                    // Mark the first image as the main image
+                        'product_id' => $product->id,              // Link to the product
+                    ]);
+
+                    // After the first image, set subsequent ones as non-main
+                    $isMainImage = false;
+                }
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            // Redirect with success message
+            return redirect()->route('productadmin.show')
+                ->with('success', 'Product successfully added!');
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of an error
+            DB::rollBack();
+
+            // Redirect with error message
+            return redirect()->back()->with('error', 'Something went wrong. Please try again!');
+        }
     }
 
     // Method for displaying the edit product form with dynamic data from the database
@@ -155,10 +187,28 @@ class AdminController extends Controller
         }
     }
 
-
-
     public function update_product(Request $request, $id)
     {
+
+        // Check if this is a delete image request - HANDLE THIS FIRST
+        if ($request->has('delete_image')) {
+            $imageId = $request->delete_image;
+            $image = Image::findOrFail($imageId);
+            
+            // Delete the file from storage
+            $imagePath = public_path('images/' . $image->url);
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
+            
+            // Delete from database
+            $image->delete();
+
+            // Redirect back to the edit form
+            return redirect()->back()->with('success', 'Image deleted successfully!');
+        }
+        
+
         // Validation
         $request->validate([
             'name' => 'required|string|max:255',
@@ -190,7 +240,7 @@ class AdminController extends Controller
             'description' => $request->description,
         ]);
 
-        // Handle image updates
+        // Handle image updates (adding images to existing folder)
         if ($request->hasFile('images') || !empty($request->keep_images)) {
             // Get current images
             $currentImages = $product->images;
@@ -199,20 +249,29 @@ class AdminController extends Controller
             // Remove images that are not in keep_images array
             foreach ($currentImages as $image) {
                 if (!in_array($image->id, $keepImageIds)) {
-                    // Delete file from storage
-                    if (Storage::disk('public')->exists($image->image_url)) {
-                        Storage::disk('public')->delete($image->image_url);
+                    // Delete the file from storage
+                    $imagePath = public_path('images/' . $image->url);
+                    if (File::exists($imagePath)) {
+                        File::delete($imagePath);
                     }
-                    // Delete from database
+                    // Delete from the database
                     $image->delete();
                 }
+            }
+
+            // Get the product folder path
+            $productFolderPath = public_path('images/products/' . $product->id); // Folder based on product ID
+
+            // Check if the folder exists; if not, create it
+            if (!File::exists($productFolderPath)) {
+                File::makeDirectory($productFolderPath, 0755, true);  // Create the directory if it doesn't exist
             }
 
             // Add new images
             if ($request->hasFile('images')) {
                 $existingImageCount = count($keepImageIds);
                 $newImageCount = count($request->file('images'));
-                
+
                 // Check total image limit (max 10)
                 if (($existingImageCount + $newImageCount) > 10) {
                     DB::rollBack();
@@ -222,18 +281,21 @@ class AdminController extends Controller
                 }
 
                 foreach ($request->file('images') as $image) {
-                    // Store the image
-                    $imagePath = $image->store('products', 'public');
-                        
-                    // Save to database
+                    // Generate a unique name for the image
+                    $imageName = time() . '-' . $image->getClientOriginalName();  // Ensure unique image name
+
+                    // Move the image to the product's folder
+                    $image->move($productFolderPath, $imageName);  // Store image in the products folder
+
+                    // Save the image to the database
                     Image::create([
                         'product_id' => $product->id,
-                        'url' => $imagePath
+                        'url' => 'products/' . $product->id . '/' . $imageName // Store the relative path
                     ]);
                 }
             }
         }
-
+        
         // Handle sizes update
         if ($request->has('sizes')) {
             // Get all existing variants for the product
@@ -263,12 +325,7 @@ class AdminController extends Controller
                     // }
                 }
             }
-            
-            // Handle any existing variants that weren't in the request
-            // Option 1: Delete variants not in the form (uncomment if needed)
-            // foreach ($existingVariants as $unusedVariant) {
-            //     $unusedVariant->delete();
-            // }
+
             
             // Option 2: Set stock to 0 for variants not in the form (safer approach)
             foreach ($existingVariants as $unusedVariant) {
@@ -282,8 +339,6 @@ class AdminController extends Controller
 
         return redirect()->route('productadmin.show') // Adjust this route name to your products listing route
             ->with('success', 'Product updated successfully!');
-
-
     }
 
 

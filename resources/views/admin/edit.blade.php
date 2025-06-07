@@ -103,9 +103,9 @@
                             <label class="form-label" style="color: #181B1E;">Current Images:</label>
                             <div id="currentImages" class="d-flex flex-wrap" style="gap: 10px; margin-top: 10px;">
                                 @foreach ($product->images as $index => $image)
-                                    <div class="image-preview-container" style="width: 100px; height: 100px; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; position: relative;">
+                                    <div class="image-preview-container" id="image-container-{{ $image->id }}" style="width: 100px; height: 100px; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; position: relative;">
                                         <img src="{{ asset('images/' . $image->url) }}" alt="Current Image" style="max-width: 100%; max-height: 100%; object-fit: cover;" />
-                                        <button type="button" class="remove-existing-image" data-image-id="{{ $image->id }}" style="position: absolute; top: 2px; right: 2px; background: rgba(255,0,0,0.8); border: none; color: white; font-size: 12px; cursor: pointer; width: 20px; height: 20px; border-radius: 50%;">×</button>
+                                        <button type="submit" name="delete_image" value="{{ $image->id }}" class="remove-existing-image" data-image-id="{{ $image->id }}" style="position: absolute; top: 2px; right: 2px; background: rgba(255,0,0,0.8); border: none; color: white; font-size: 12px; cursor: pointer; width: 20px; height: 20px; border-radius: 50%;" onclick="return confirm('Are you sure you want to remove this image?')">×</button>
                                         <input type="hidden" name="keep_images[]" value="{{ $image->id }}" class="keep-image-{{ $image->id }}">
                                     </div>
                                 @endforeach
@@ -245,22 +245,24 @@
         }
     });
 
-    // Handle removal of existing images
-    document.addEventListener('click', function(event) {
-        if (event.target.classList.contains('remove-existing-image')) {
-            event.preventDefault();
-            const imageId = event.target.getAttribute('data-image-id');
-            const container = event.target.closest('.image-preview-container');
-            const keepInput = document.querySelector('.keep-image-' + imageId);
+    // Handle removal of existing images - No longer needed since we're using submit buttons
+    // document.addEventListener('click', function(event) {
+    //     if (event.target.classList.contains('remove-existing-image')) {
+    //         event.preventDefault();
+    //         const imageId = event.target.getAttribute('data-image-id');
+    //         const container = document.getElementById('image-container-' + imageId);
+    //         const keepInput = document.querySelector('.keep-image-' + imageId);
             
-            if (confirm('Are you sure you want to remove this image?')) {
-                container.style.display = 'none';
-                if (keepInput) {
-                    keepInput.remove();
-                }
-            }
-        }
-    });
+    //         if (confirm('Are you sure you want to remove this image?')) {
+    //             // Hide the container
+    //             container.style.display = 'none';
+    //             // Remove the keep_images input so this image won't be kept
+    //             if (keepInput) {
+    //                 keepInput.remove();
+    //             }
+    //         }
+    //     }
+    // });
 </script>
 @endsection
 @endsection
