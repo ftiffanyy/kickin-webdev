@@ -239,18 +239,81 @@
       margin-bottom: 4px;
       display: none;
     }
+
+    /* Custom Alert Styling */
+    .custom-alert {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .alert-box {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .alert-box h3 {
+      color: #ff6b6b;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .alert-box p {
+      color: var(--dim);
+      font-family: 'Fredoka', sans-serif;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .alert-box button {
+      background-color: var(--dark);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .alert-box button:hover {
+      background-color: var(--dim);
+    }
   </style>
 </head>
 <body>
+  <!-- Custom Alert Modal -->
+  <div class="custom-alert" id="customAlert">
+    <div class="alert-box">
+      <h3 id="alertTitle">Login Error</h3>
+      <p id="alertMessage">Invalid email or password. Please try again.</p>
+      <button onclick="closeAlert()">OK</button>
+    </div>
+  </div>
+
   <div class="container" id="authContainer">
     <!-- Forms wrapper -->
     <div class="panel-container" id="panelContainer">
       <!-- Login Form -->
       <div class="form-panel" id="loginPanel">
         <h2>Login</h2>
-        <form action="{{ route('login') }}" method="POST">
+        <form id="loginForm" action="{{ route('login') }}" method="POST">
           @csrf
-          <input type="email" name="email" placeholder="Email" required>
+          <input type="email" name="email" id="loginEmail" placeholder="Email" required>
           <div class="eye-icon-wrapper">
             <input type="password" name="password" id="loginPassword" placeholder="Password" required>
             <i class="far fa-eye-slash eye-icon" id="toggleLoginPassword" onclick="togglePassword('loginPassword', this)"></i>
@@ -290,6 +353,20 @@
   </div>
 
   <script>
+    // Function to show custom alert
+    function showAlert(title, message) {
+      document.getElementById('alertTitle').textContent = title;
+      document.getElementById('alertMessage').textContent = message;
+      document.getElementById('customAlert').style.display = 'flex';
+    }
+
+    // Function to close custom alert
+    function closeAlert() {
+      document.getElementById('customAlert').style.display = 'none';
+    }
+
+    // Function removed - using Laravel backend validation instead
+
     function toggleForm() {
       const container = document.getElementById('authContainer');
       const sideTitle = document.getElementById('sideTitle');
@@ -353,10 +430,38 @@
       }
     }
 
-    // Remove password validation (checking for minimum length)
+    // Login form validation with alerts
     document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('loginForm');
       const registerForm = document.querySelector('#registerPanel form');
       
+      // Login form handler - only basic client-side validation
+      if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {          
+          const email = document.getElementById('loginEmail').value.trim();
+          const password = document.getElementById('loginPassword').value;
+          
+          // Basic validation - only check if fields are empty
+          if (!email || !password) {
+            e.preventDefault();
+            showAlert('Login Error', 'Please fill in all fields.');
+            return;
+          }
+          
+          // Email format validation
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            e.preventDefault();
+            showAlert('Login Error', 'Please enter a valid email address.');
+            return;
+          }
+          
+          // If basic validation passes, let Laravel handle the rest
+          // Form will submit normally to Laravel backend
+        });
+      }
+      
+      // Register form handler (existing code)
       if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
           const phoneInput = document.getElementById('phoneNumber');
@@ -368,7 +473,7 @@
           phoneInput.style.border = '';
           passwordInput.style.border = '';
           document.getElementById('phoneError').style.display = 'none';
-          document.getElementById('passwordError').style.display = 'none'; // Reset password error
+          document.getElementById('passwordError').style.display = 'none';
 
           let hasError = false;
           
@@ -398,12 +503,38 @@
           
           // If no errors, form will submit normally
           if (!hasError) {
-            // Hide error messages
             console.log('Form validation passed, submitting to Laravel backend');
           }
         });
       }
     });
+
+    // Close alert when clicking outside the alert box
+    document.getElementById('customAlert').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeAlert();
+      }
+    });
+
+    // Show Laravel validation errors if they exist
+    @if(session('error'))
+      document.addEventListener('DOMContentLoaded', function() {
+        showAlert('Login Failed', '{{ session('error') }}');
+      });
+    @endif
+
+    // Show Laravel validation errors for individual fields
+    @if($errors->has('email'))
+      document.addEventListener('DOMContentLoaded', function() {
+        showAlert('Login Error', '{{ $errors->first('email') }}');
+      });
+    @endif
+
+    @if($errors->has('password'))
+      document.addEventListener('DOMContentLoaded', function() {
+        showAlert('Login Error', '{{ $errors->first('password') }}');
+      });
+    @endif
   </script>
 </body>
 </html>

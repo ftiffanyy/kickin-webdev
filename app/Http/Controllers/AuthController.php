@@ -40,9 +40,7 @@ class AuthController extends Controller
             }
         }
 
-        return back()->with([
-            'error' => 'The provided credentials do not match our records.',
-        ]);
+        return back()->with('error', 'Email or password not found. Please try again');
     }
 
 
@@ -86,22 +84,71 @@ class AuthController extends Controller
     }
 
     // Handle OTP verification
+    // public function verifyOtp(Request $request)
+    // {
+    //     $request->validate([
+    //         'otp' => 'required|numeric',
+    //     ]);
+
+    //     // Get OTP from the session or database
+    //     $email = session('email');  // Assuming you stored the email in session when sending OTP
+    //     $otp = DB::table('password_resets')->where('email', $email)->first()->token;
+
+    //     if ($request->otp == $otp) {
+    //         // Pass the email as a parameter when redirecting to the password reset page
+    //         return redirect()->route('password.reset.form', ['email' => $email]);
+    //     }
+
+    //     return back()->with('status', 'Invalid OTP. Please try again.');
+    // }
+
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'otp' => 'required|numeric',
+            'otp1' => 'required|numeric',
+            'otp2' => 'required|numeric',
+            'otp3' => 'required|numeric',
+            'otp4' => 'required|numeric',
+            'otp5' => 'required|numeric',
+            'otp6' => 'required|numeric',
         ]);
 
-        // Get OTP from the session or database
-        $email = session('email');  // Assuming you stored the email in session when sending OTP
-        $otp = DB::table('password_resets')->where('email', $email)->first()->token;
+        // Combine the OTP fields into one string
+        $otp = $request->otp1 . $request->otp2 . $request->otp3 . $request->otp4 . $request->otp5 . $request->otp6;
 
-        if ($request->otp == $otp) {
-            // Pass the email as a parameter when redirecting to the password reset page
+        $email = session('email');  // Retrieve the email from session
+
+        // Get the OTP stored in the database
+        $storedOtp = DB::table('password_resets')->where('email', $email)->first()->token;
+
+        if ($otp == $storedOtp) {
             return redirect()->route('password.reset.form', ['email' => $email]);
         }
 
         return back()->with('status', 'Invalid OTP. Please try again.');
+    }
+
+    public function resendOtp(Request $request)
+    {
+        $email = session('email');  // Retrieve the email from the session
+
+        // Validate email exists in password_resets table
+        $reset = DB::table('password_resets')->where('email', $email)->first();
+
+        if ($reset) {
+            // Generate new 6-digit OTP
+            $otp = rand(100000, 999999);
+
+            // Update OTP in the database
+            DB::table('password_resets')->where('email', $email)->update(['token' => $otp, 'created_at' => now()]);
+
+            // Send the new OTP to the user's email
+            Mail::to($email)->send(new VerificationCodeMail($otp));
+
+            return back()->with('status', 'A new OTP has been sent to your email.');
+        }
+
+        return back()->with('status', 'OTP request has expired. Please request a new one.');
     }
 
     // Show password reset form
