@@ -543,13 +543,14 @@
 
     <!-- Top Products Section -->
     <div class="top-products" role="region" aria-label="Top 3 Products">
-        <h3>Top 3 Best-Selling Products</h3>
+        <h2>Top 3 Best-Selling Products</h2>
         <ul class="product-list">
           @foreach($topProducts as $index => $product)
             <li>
               <div class="product-info">
                 <img src="{{ asset('images/' . $product->image_url) }}" alt="{{ $product->name }}" class="product-img clickable" onclick="showImageModal(this.src)">
-                <span class="product-name">{{ $product->name }}</span>
+                <span class="product-name" style="text-transform: uppercase;">{{ $product->name }}</span>
+                
               </div>
               <span class="product-sales">{{ number_format($product->sold) }} sold</span>
             </li>
@@ -566,7 +567,7 @@
         <ul class="stock-list" tabindex="0">
           @foreach($inventory as $item)
                   <li>
-                    <span>{{ $item->product_name }}</span>
+                    <span style="text-transform: uppercase;">{{ $item->product_name }}</span>
                     @if($item->total_stock < 10)
                         <span style="color: white; background-color: red; padding: 2px 8px; border-radius: 10px;">
                             {{ $item->total_stock }} pcs
