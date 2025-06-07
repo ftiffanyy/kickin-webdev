@@ -18,12 +18,25 @@
     color: var(--color-text);
   }
 
+  /* rumah utama */
+  .rumah-utama {
+    display: flex;
+    max-width: 100%;
+  }
+
+  /* div 1 */
   .dashboard-wrapper {
-    max-width: 1200px;
+    flex: 3;
     margin: auto;
     margin-top: 20px;
     display: flex;
     gap: 30px;
+  }
+
+  /* div 2 */
+  .dashboard-wrapper-kanan {
+    flex: 1;
+    
   }
 
   .dashboard {
@@ -126,40 +139,6 @@
     color: var(--color-text);
   }
 
-  .recent-movement {
-    background: var(--color-primary);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 3px 8px rgb(0 0 0 / 0.15);
-    color: var(--color-accent);
-  }
-  .recent-movement-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    align-items: center;
-  }
-  .recent-movement-header strong {
-    font-weight: 600;
-  }
-  .recent-movement-header select,
-  .recent-movement-header input {
-    padding: 6px 10px;
-    font-size: 14px;
-    border-radius: 6px;
-    border: none;
-    outline: none;
-    color: var(--color-accent);
-    font-weight: 600;
-  }
-  .recent-movement-header select {
-    background: var(--color-primary);
-    margin-right: 12px;
-  }
-  .recent-movement-header input {
-    background: var(--color-primary);
-    width: 140px;
-  }
 
   .top-products {
     background: var(--color-primary);
@@ -268,17 +247,20 @@
   }
 
   .sidebar {
-    flex: 1;
+    /* margin-top: 20px; */
+    flex: 0 0 300px; /* Menentukan lebar sidebar tetap, misalnya 300px */
     background: var(--color-secondary);
     border-radius: 12px;
     padding: 20px;
     color: var(--color-text);
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    max-height: 1245px;
-    overflow-y: auto;
+    max-height: 100vh; /* Batasi tinggi maksimum sesuai tinggi layar */
+    overflow-y: auto; /* Scroll jika kontennya melebihi tinggi */
     border: none;
-  }
-
+    position: sticky; /* Biar tetap terlihat saat scroll */
+    top: 20px;
+    margin-bottom: 20px;
+}
   .stock-header {
     font-weight: 600;
     font-size: 20px;
@@ -431,195 +413,214 @@
       font-size: 12px;
     }
   }
+
+
+  /* ini baru */
+
+  .sidebar .stock-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    color: var(--color-text);
+    white-space: normal; /* Allow text to wrap to the next line */
+    word-wrap: break-word; /* Break long words */
+    overflow-wrap: break-word; /* Ensure long words break */
+}
+
+    .sidebar .stock-list li span:first-child {
+    flex: 1; /* Allow product name to take available space */
+    margin-right: 10px; /* Optional, for spacing between name and stock */
+      }
+  
+    .chart-container {
+        background-color: #fff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-top: 24px;
+    }
+
+     .filter-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 16px;
+        gap: 8px;
+        border-radius: 8px;
+    }
+
+    .year-dropdown {
+        padding: 8px 16px;
+        border-radius: 12px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        font-size: 14px;
+    }
+
+    .btn-filter {
+        padding: 8px 16px;
+        border-radius: 12px;
+        background-color: #ccc;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .filter-teks {
+      margin-right: 5px;
+      font-size: 28px;
+    }
+
+    /* .btn-filter:hover {
+        background-color: #f9f9f9;
+        color :#ccc;
+    } */
+    
+
 </style>
 </head>
 <body>
 
+<div class="rumah-utama">
+
 <div class="dashboard-wrapper">
+
   <!-- Dashboard Utama -->
   <div class="dashboard" role="main" aria-label="Analytics Dashboard">
-    <div class="header">
+      <div class="header">
       <h2>Admin Dashboard</h2>
-    </div>
+      </div>
 
     <div class="metrics">
-      <div class="card" tabindex="0" role="region" aria-label="Sales data">
+    <div class="card" tabindex="0" role="region" aria-label="Sales data">
         <div class="title"><span class="icon" aria-hidden="true">💰</span> Sales</div>
-        <div class="value">2,382</div>
+        <div class="value">{{ $totalOrder }}</div>
         <div class="change negative" aria-live="polite">-3.65% Since last week</div>
-      </div>
-      <div class="card" tabindex="0" role="region" aria-label="Earnings data">
+    </div>
+    <div class="card" tabindex="0" role="region" aria-label="Earnings data">
         <div class="title"><span class="icon" aria-hidden="true">💵</span> Earnings</div>
-        <div class="value">$21,300</div>
+        <div class="value">Rp {{ number_format($TotalEarnings) }}</div>
         <div class="change positive" aria-live="polite">6.85% Since last week</div>
-      </div>
-      <div class="card" tabindex="0" role="region" aria-label="Visitors data">
-        <div class="title"><span class="icon" aria-hidden="true">👥</span> Visitors</div>
-        <div class="value">14,212</div>
+    </div>
+    <div class="card" tabindex="0" role="region" aria-label="Visitors data">
+        <div class="title"><span class="icon" aria-hidden="true">👥</span> User</div>
+        <div class="value">{{ $totalActiveUsers }}</div>
         <div class="change positive" aria-live="polite">5.25% Since last week</div>
-      </div>
-      <div class="card" tabindex="0" role="region" aria-label="Orders data">
+    </div>
+    <div class="card" tabindex="0" role="region" aria-label="Orders data">
         <div class="title"><span class="icon" aria-hidden="true">🛒</span> Orders</div>
-        <div class="value">64</div>
+        <div class="value">{{ $totalQtySold }}</div>
         <div class="change negative" aria-live="polite">-2.25% Since last week</div>
-      </div>
+    </div>
+</div>
+
+
+<div class="chart-container">
+  <div><h3>Recent Movement</h1></div>
+    <div class="filter-container">
+        <form method="GET" action="{{ route('dashboard') }}">
+    <label for="year" class="filter-teks">Filter Tahun</label>
+    <select name="year" onchange="this.form.submit()" class="btn-filter">
+        @foreach ($availableYears as $year)
+            <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
+                {{ $year }}
+            </option>
+        @endforeach
+    </select>
+</form>
+
     </div>
 
-    <div class="recent-movement" role="region" aria-label="Recent Movement Chart">
-      <div class="recent-movement-header">
-        <div><strong>Recent Movement</strong></div>
-        <div>
-          <select aria-label="Select Month">
-            <option>Jan</option>
-            <option>Feb</option>
-            <option>Mar</option>
-            <option>Apr</option>
-            <option>May</option>
-            <option>Jun</option>
-            <option>Jul</option>
-            <option>Aug</option>
-            <option>Sep</option>
-            <option>Oct</option>
-            <option>Nov</option>
-            <option>Dec</option>
-          </select>
-          <select aria-label="Search">
-            <option>Sales</option>
-            <option>Revenue</option>
-          </select>
-        </div>
-      </div>
-      <canvas id="movementChart" height="100"></canvas>
-    </div>
+    <canvas id="salesChart" width="400" height="200"></canvas>
+</div>
+
+
+<canvas id="salesChart" height="100"></canvas>
 
     <!-- Top Products Section -->
     <div class="top-products" role="region" aria-label="Top 3 Products">
-      <h3>Top 3 Best-Selling Products</h3>
-      <ul class="product-list">
-        <li>
-          <div class="product-info">
-            <img src="{{ asset('images/products/1/NIKE air force 1 _07 men_s basketball shoes - white,3.webp') }}"
-                 alt="Nike Air Max"
-                 class="product-img clickable"
-                 onclick="showImageModal(this.src)">
-            <span class="product-name">Nike Air Max</span>
-          </div>
-          <span class="product-sales">1,024 sold</span>
-        </li>
-        <li>
-          <div class="product-info">
-            <img src="{{ asset('images/products/1/NIKE air force 1 _07 men_s basketball shoes - white,1.webp') }}"
-                 alt="Adidas Ultraboost"
-                 class="product-img clickable"
-                 onclick="showImageModal(this.src)">
-            <span class="product-name">Adidas Ultraboost</span>
-          </div>
-          <span class="product-sales">967 sold</span>
-        </li>
-        <li>
-          <div class="product-info">
-            <img src="{{ asset('images/products/1/NIKE air force 1 _07 men_s basketball shoes - white,2.webp') }}"
-                 alt="Ventela Public"
-                 class="product-img clickable"
-                 onclick="showImageModal(this.src)">
-            <span class="product-name">Ventela Public</span>
-          </div>
-          <span class="product-sales">882 sold</span>
-        </li>
-      </ul>
-    </div>
-  </div>
+        <h3>Top 3 Best-Selling Products</h3>
+        <ul class="product-list">
+          @foreach($topProducts as $index => $product)
+            <li>
+              <div class="product-info">
+                <img src="{{ asset('images/' . $product->image_url) }}" alt="{{ $product->name }}" class="product-img clickable" onclick="showImageModal(this.src)">
+                <span class="product-name">{{ $product->name }}</span>
+              </div>
+              <span class="product-sales">{{ number_format($product->sold) }} sold</span>
+            </li>
+          @endforeach
+        </ul>
+      </div>
 
-  <!-- Sidebar stok barang -->
-  <aside class="sidebar" role="region" aria-label="Stock Inventory">
-    <div class="stock-header">Stock Inventory</div>
-    <ul class="stock-list" tabindex="0">
-      <li><span class="stock-name">Nike Air Max</span> <span class="stock-qty">154 pcs</span></li>
-      <li><span class="stock-name">Adidas Ultraboost</span> <span class="stock-qty">89 pcs</span></li>
-      <li><span class="stock-name">Ventela Public</span> <span class="stock-qty">67 pcs</span></li>
-      <li><span class="stock-name">Puma Running</span> <span class="stock-qty">43 pcs</span></li>
-      <li><span class="stock-name">Reebok Classic</span> <span class="low_stok">9 pcs</span></li>
-      <li><span class="stock-name">New Balance 574</span> <span class="stock-qty">120 pcs</span></li>
-      <li><span class="stock-name">Converse All Star</span> <span class="stock-qty">98 pcs</span></li>
-      <li><span class="stock-name">Skechers Sport</span> <span class="stock-qty">54 pcs</span></li>
-      <li><span class="stock-name">Asics Gel Kayano</span> <span class="stock-qty">40 pcs</span></li>
-      <li><span class="stock-name">Under Armour Charged</span> <span class="stock-qty">76 pcs</span></li>
-       <li><span class="stock-name">Nike Air Max</span> <span class="stock-qty">154 pcs</span></li>
-      <li><span class="stock-name">Adidas Ultraboost</span> <span class="stock-qty">89 pcs</span></li>
-      <li><span class="stock-name">Ventela Public</span> <span class="low_stok">10 pcs</span></li>
-      <li><span class="stock-name">Puma Running</span> <span class="stock-qty">43 pcs</span></li>
-      <li><span class="stock-name">Reebok Classic</span> <span class="stock-qty">78 pcs</span></li>
-      <li><span class="stock-name">New Balance 574</span> <span class="stock-qty">120 pcs</span></li>
-      <li><span class="stock-name">Converse All Star</span> <span class="stock-qty">98 pcs</span></li>
-      <li><span class="stock-name">Skechers Sport</span> <span class="stock-qty">54 pcs</span></li>
-      <li><span class="stock-name">Asics Gel Kayano</span> <span class="stock-qty">40 pcs</span></li>
-      <li><span class="stock-name">Under Armour Charged</span> <span class="stock-qty">76 pcs</span></li>
-       <li><span class="stock-name">Nike Air Max</span> <span class="stock-qty">154 pcs</span></li>
-      <li><span class="stock-name">Adidas Ultraboost</span> <span class="stock-qty">89 pcs</span></li>
-      <li><span class="stock-name">Ventela Public</span> <span class="stock-qty">67 pcs</span></li>
-      <li><span class="stock-name">Puma Running</span> <span class="stock-qty">43 pcs</span></li>
-      <li><span class="stock-name">Reebok Classic</span> <span class="stock-qty">78 pcs</span></li>
-      <li><span class="stock-name">New Balance 574</span> <span class="stock-qty">120 pcs</span></li>
-      <li><span class="stock-name">Converse All Star</span> <span class="stock-qty">98 pcs</span></li>
-      <li><span class="stock-name">Skechers Sport</span> <span class="stock-qty">54 pcs</span></li>
-      <li><span class="stock-name">Asics Gel Kayano</span> <span class="stock-qty">40 pcs</span></li>
-      <li><span class="stock-name">Under Armour Charged</span> <span class="stock-qty">76 pcs</span></li>
-    </ul>
-  </aside>
 </div>
+
+<div class="dashboard-wrapper-kanan">
+    <!-- Sidebar stok barang -->
+      <aside class="sidebar" role="region" aria-label="Stock Inventory">
+        <div class="stock-header">Stock Inventory</div>
+        <ul class="stock-list" tabindex="0">
+          @foreach($inventory as $item)
+                  <li>
+                    <span>{{ $item->product_name }}</span>
+                    @if($item->total_stock < 10)
+                        <span style="color: white; background-color: red; padding: 2px 8px; border-radius: 10px;">
+                            {{ $item->total_stock }} pcs
+                        </span>
+                    @else
+                        <span>{{ $item->total_stock }} pcs</span>
+                    @endif
+                </li>
+            @endforeach
+        </ul>
+      </aside>
+</div>
+</div>
+
+
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const ctx = document.getElementById('movementChart').getContext('2d');
+    const salesChartCtx = document.getElementById('salesChart').getContext('2d');
 
-  const movementChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      datasets: [{
-        label: 'Movement',
-        data: [2100, 1800, 2000, 2200, 1900, 2500, 2700, 3100, 3400, 3200, 3500, 3300],
-        fill: true,
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
-        borderColor: 'rgba(0, 0, 0, 1)',
-        borderWidth: 2,
-        tension: 0.3,
-        pointRadius: 4,
-        pointBackgroundColor: 'rgba(0, 0, 0, 1)'
-      }]
-    },
-    options: {
-      maintainAspectRatio: true,
-      aspectRatio: 2.5,
-      scales: {
-        y: {
-          beginAtZero: false,
-          min: 1000,
-          max: 4000,
-          ticks: {
-            stepSize: 500,
-            color: '#000000'
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.1)'
-          }
+    const salesChart = new Chart(salesChartCtx, {
+        type: 'line',
+        data: {
+            labels: [
+                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            ],
+            datasets: [
+                {
+                    label: 'Total Revenue',
+                    data: @json($monthlyRevenue),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.3
+                },
+                {
+                    label: 'Total Qty Sold',
+                    data: @json($monthlyQty),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.3
+                }
+            ]
         },
-        x: {
-          ticks: {
-            color: '#000000'
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
-      },
-      plugins: {
-        legend: { display: false }
-      },
-      responsive: true,
-    }
-  });
+    });
 </script>
 
 <!-- Modal for zoom image -->

@@ -187,7 +187,7 @@ Route::middleware(['auth'])->group(function(){
 
     Route::middleware(['role:Admin'])->group(function(){
         //ADMIN
-        Route::get('/admin', [HomeController::class, 'admin'])->name('dashboard_admin');
+        Route::get('/admin', [HomeController::class, 'showDashboard'])->name('dashboard_admin');
         // liat produk semua versi admin (HEADER)
         Route::get('/productadmin', [AdminController::class, 'showadmin'])->name('productadmin.show');
         // details

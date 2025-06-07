@@ -83,12 +83,7 @@
                 </ul>
             </div>
             <div class="footer-column">
-                <h3>POPULAR LINKS</h3>
-                <ul>
-                    <li><a href="#">men</a></li>
-                    <li><a href="#">women</a></li>
-                    <li><a href="#">unisex</a></li>
-                </ul>
+              
             </div>
         
               <div class="footer-column">
