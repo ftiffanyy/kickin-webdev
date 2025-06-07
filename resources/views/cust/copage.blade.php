@@ -412,7 +412,7 @@
                 <div class="order-item">
                     <img src="{{ asset('images/' . $productImage) }}" alt="{{ $item->variant->product->name }}">
                     <div class="order-item-info">
-                        <p>{{ $item->variant->product->name }}</p>
+                        <p>{{ strtoupper($item->variant->product->name) }}</p>
                         <p>Size: <span class="size-display">{{ $item->variant->size }}</span></p>
                         <p>Quantity: <span class="quantity-display">{{ $item->qty }}</span></p>
                     </div>

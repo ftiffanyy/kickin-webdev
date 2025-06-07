@@ -485,7 +485,7 @@
         <a href="{{ route('product.details', ['id' => $productId]) }}" class="product" tabindex="0">
           <img src="{{ asset('images/' . $detail->variant->product->images->firstWhere('main', 1)->url) }}" alt="Product Image">
           <div class="product-info">
-            <p>{{ $detail->variant->product->name }}</p>
+            <p>{{ strtoupper($detail->variant->product->name) }}</p>
             <p class="qty-size">QTY: {{ $detail->qty }}</p>
             <p class="qty-size">Size: {{ $detail->variant->size }}</p>
 

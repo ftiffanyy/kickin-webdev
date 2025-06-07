@@ -68,7 +68,7 @@
                                 @else
                                     <p>Product</p>
                                 @endif
-                                <span>{{ $detail->variant->product->name }}</span>
+                                <span>{{ strtoupper($detail->variant->product->name) }}</span>
                             </div>
                         </div>
                         <div class="col-qty">{{ $detail->qty }}</div>

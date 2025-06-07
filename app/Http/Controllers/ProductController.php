@@ -346,6 +346,16 @@ class ProductController extends Controller
                 $discount = $item->variant->product->product_discount ?? $item->variant->product->discount ?? 0;
                 $priceAtPurchase = $item->variant->product->price * (1 - $discount / 100);
 
+                $variant = Variant::find($item->variant_id);
+
+                if ($variant) {
+                    // Kurangi stok dengan kuantitas yang dibeli
+                    $variant->stock -= $item->qty;
+                    
+                    // Simpan perubahan stok
+                    $variant->save();
+                }
+                
                 OrderDetail::create([
                     'order_id' => $order->id,
                     'variant_id' => $item->variant_id,
@@ -437,6 +447,3 @@ class ProductController extends Controller
 
 
 }
-
-// coba commit
-// coba commit ft
