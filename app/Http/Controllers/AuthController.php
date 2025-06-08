@@ -41,7 +41,7 @@ class AuthController extends Controller
             if ($user->role === 'Admin') {
                 return redirect()->route('dashboard_admin');  // Redirect Admin to the admin dashboard
             } else {
-                return redirect()->route('dashboard');  // Redirect Customer to the customer dashboard
+                return redirect()->intended(route('dashboard'));  // Redirect Customer to the customer dashboard
             }
         }
 

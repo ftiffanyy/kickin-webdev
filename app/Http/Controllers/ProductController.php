@@ -24,7 +24,7 @@ class ProductController extends Controller
 
     public function show()
     {
-        $userId = session('user_id');
+        $userId = session('user_id'); // Cek user_id yang ada di session
 
         // Ambil semua produk
         $products = Product::with('images')->get();
@@ -35,15 +35,20 @@ class ProductController extends Controller
         // Ambil daftar ukuran unik dari variant
         $sizes = Variant::distinct()->pluck('size');
 
-        // Ambil daftar produk yang sudah di wishlist user (jika login)
-        $userWishlistProductIds = collect();
+        // Cek apakah user login atau tidak
         if ($userId) {
+            // Jika login, ambil daftar produk yang ada di wishlist user
             $userWishlistProductIds = Wishlist::where('user_id', $userId)
                 ->pluck('product_id'); // hanya ambil product_id saja
+        } else {
+            // Jika tidak login, wishlist-nya kosong
+            $userWishlistProductIds = collect(); // Wishlist kosong
         }
 
+        // Return view dengan data produk, brand, ukuran, dan wishlist
         return view('cust.product', compact('products', 'brands', 'sizes', 'userWishlistProductIds'));   
     }
+
 
     public function showDetail($id)
     {
@@ -300,31 +305,31 @@ class ProductController extends Controller
 
         $invoiceNumber = strtoupper(Str::random(10));
 
-        // Midtrans Config
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
-
-        $user = User::find($userId);
-
-        $params = [
-            'transaction_details' => [
-                'order_id' => $invoiceNumber,
-                'gross_amount' => $totalPrice,
-            ],
-            'customer_details' => [
-                'first_name' => $user ? $user->name : 'Guest',
-                'email' => $user ? $user->email : 'guest@example.com',
-            ],
-            'callback' => [
-                'finish' => route('order_customer'),
-            ],
-        ];
-
         DB::beginTransaction();
 
         try {
+            // Midtrans Config
+            Config::$serverKey = config('midtrans.server_key');
+            Config::$isProduction = config('midtrans.is_production');
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+
+            $user = User::find($userId);
+
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $invoiceNumber,
+                    'gross_amount' => $totalPrice,
+                ],
+                'customer_details' => [
+                    'first_name' => $user ? $user->name : 'Guest',
+                    'email' => $user ? $user->email : 'guest@example.com',
+                ],
+                'callback' => [
+                    'finish' => route('order_customer'),
+                ],
+            ];
+           
             $snapUrl = Snap::createTransaction($params)->redirect_url;
 
             $shippingAddress = ($request->delivery == 'Shipping') ? $request->address : $request->pickup_location;

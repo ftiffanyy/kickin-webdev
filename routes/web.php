@@ -116,6 +116,12 @@ Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('resend.o
 Route::get('/password/reset/{email}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset.form');
 Route::post('/update-password/{email}', [AuthController::class, 'updatePassword'])->name('password.update');
 
+// liat produk semua (HEADER)
+Route::get('/product', [ProductController::class, 'show'])->name('product.show');
+
+//wishlist
+Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
 // // Routes tambahan untuk reset password (perlu ditambahkan)
 // Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
 // Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
@@ -137,7 +143,7 @@ Route::middleware(['auth'])->group(function(){
 
     Route::post('/logout', function () {
         session()->flush();
-        return redirect('/auth');
+        return redirect('/login');
     })->name('logout');
 
     Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
@@ -156,7 +162,7 @@ Route::middleware(['auth'])->group(function(){
         // ->name('dashboard');
         //products
         // liat produk semua (HEADER)
-        Route::get('/product', [ProductController::class, 'show'])->name('product.show');
+        // Route::get('/product', [ProductController::class, 'show'])->name('product.show');
         // liat detail produk pas diklik
         Route::get('/product/view/{id}', [ProductController::class, 'showDetail'])->name('product.details');
         // fungsi add to cart
@@ -176,8 +182,7 @@ Route::middleware(['auth'])->group(function(){
         Route::get('/wishlist', [WishlistController::class, 'showWishlist'])->name('wishlist');
         Route::post('/wishlist/add', [WishlistController::class, 'addToWishlist'])->name('wishlist.add');
         Route::post('/wishlist/remove', [WishlistController::class, 'removeFromWishlist'])->name('wishlist.remove');
-        // Route::post('/wishlist/toggle', [WishlistController::class, 'toggleWishlist'])->name('wishlist.toggle');
-        Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+        // Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
         Route::post('/wishlist/status', [WishlistController::class, 'getWishlistStatus'])->name('wishlist.status');
         //orders
         Route::get('/orders', [OrderCustController::class, 'show'])->name('order_customer');

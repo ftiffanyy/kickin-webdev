@@ -15,17 +15,8 @@ class HomeController extends Controller
 {
     public function show()
     {
-        //$role = session('user_role', 'Guest');
+        return view('cust.dashboard');
 
-        if (Auth()->user()->role === 'Admin') {
-
-
-            return view('admin.dashboard');
-        } elseif (Auth()->user()->role === 'Customer') {
-            return view('cust.dashboard');
-        } 
-
-        //dd(Auth()->user());
     }
 
     public function admin()
@@ -139,7 +130,7 @@ foreach ($salesTrends as $trend) {
     // Cek jika tidak ada role dalam session
     if (!$userRole) {
         // Menangani jika tidak ada role dalam session (misalnya redirect atau fallback)
-        return redirect()->route('auth'); // Mengarahkan pengguna ke halaman login jika session role tidak ditemukan
+        return redirect()->route('login'); // Mengarahkan pengguna ke halaman login jika session role tidak ditemukan
     }
 
     // Mengarahkan berdasarkan role

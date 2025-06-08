@@ -208,11 +208,12 @@
   @endphp
 
   <div class="nav-links">
-    <a href="{{ route('dashboard') }}">DASHBOARD</a>
     @if ($role !== 'Admin')
+        <a href="{{ route('dashboard') }}">DASHBOARD</a>
         <a href="{{ route('product.show') }}">SHOP HERE</a>
         <a href="{{ route('order_customer') }}">ORDERS</a>
     @else
+        <a href="{{ route('dashboard_admin') }}">DASHBOARD</a>
         <a href="{{ route('productadmin.show') }}">PRODUCT</a>
         <a href="{{ route('orderadmin') }}">ORDERS</a>
     @endif
@@ -240,7 +241,7 @@
       </div>
       <div class="dropdown-menu" id="dropdownMenu">
         <p>Welcome, {{ $username }}</p>
-        <form action="{{ route('logout') }}" method="POST">
+        <form action="{{ route('dashboard') }}" method="POST">
           @csrf
           <button type="submit">Log Out</button>
         </form>

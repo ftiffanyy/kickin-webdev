@@ -17,7 +17,7 @@ class WishlistController extends Controller
         
         // Jika user tidak login, arahkan ke halaman login
         if (!$user) {
-            return redirect()->route('auth')->with('error', 'Please login to view your wishlist');
+            return redirect()->route('login')->with('error', 'Please login to view your wishlist');
         }
 
         // Mengambil data wishlist yang terkait dengan user
@@ -56,7 +56,7 @@ class WishlistController extends Controller
     {
         $userId = session('user_id');
         if (!$userId) {
-            return redirect()->route('auth')->with('error', 'Please login first');
+            return redirect()->route('login')->with('error', 'Please login first');
         }
 
         $productId = $request->input('product_id');
