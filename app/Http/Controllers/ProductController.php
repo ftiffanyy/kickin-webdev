@@ -309,30 +309,6 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            // Midtrans Config
-            Config::$serverKey = config('midtrans.server_key');
-            Config::$isProduction = config('midtrans.is_production');
-            Config::$isSanitized = true;
-            Config::$is3ds = true;
-
-            $user = User::find($userId);
-
-            $params = [
-                'transaction_details' => [
-                    'order_id' => $invoiceNumber,
-                    'gross_amount' => $totalPrice,
-                ],
-                'customer_details' => [
-                    'first_name' => $user ? $user->name : 'Guest',
-                    'email' => $user ? $user->email : 'guest@example.com',
-                ],
-                'callback' => [
-                    'finish' => route('order_customer'),
-                ],
-            ];
-           
-            $snapUrl = Snap::createTransaction($params)->redirect_url;
-
             $shippingAddress = ($request->delivery == 'Shipping') ? $request->address : $request->pickup_location;
 
             $order = Order::create([
@@ -343,7 +319,7 @@ class ProductController extends Controller
                 'shipping_address' => $shippingAddress,
                 'shipping_status' => 'Pending',
                 'invoice_number' => $invoiceNumber,
-                'payment_url' => $snapUrl,
+                'payment_url' => "la",
                 'user_id' => $userId,
             ]);
 
@@ -370,12 +346,38 @@ class ProductController extends Controller
                 ]);
             }
 
+            // Midtrans Config
+            Config::$serverKey = config('midtrans.server_key');
+            Config::$isProduction = config('midtrans.is_production');
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+
+            $user = User::find($userId);
+
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $invoiceNumber,
+                    'gross_amount' => $totalPrice,
+                ],
+                'customer_details' => [
+                    'first_name' => $user ? $user->name : 'Guest',
+                    'email' => $user ? $user->email : 'guest@example.com',
+                ],
+                'callback' => [
+                    'finish' => route('order_customer'),
+                ],
+            ];
+            
+            $snapUrl = Snap::createTransaction($params)->redirect_url;
+            $order->payment_url = $snapUrl;
+            $order->save();
+
             // Kalau checkout dari cart, hapus item dari cart dan session
             if (!empty($checkoutItems)) {
                 CartItem::where('user_id', $userId)->whereIn('id', $checkoutItems)->delete();
                 session()->forget('checkout_items');
             }
-
+            
             DB::commit();
 
             return redirect($snapUrl);
