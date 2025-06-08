@@ -82,10 +82,6 @@
 
                 </ul>
             </div>
-            <div class="footer-column">
-              
-            </div>
-        
               <div class="footer-column">
                 <h3>SOCIAL</h3>
                 <ul>
@@ -100,7 +96,6 @@
                         </a></li>
                 </ul>
             </div>
-
 
             <div class="footer-links">
                 <span>© 2025 Kickin, Inc. All rights reserved</span>
