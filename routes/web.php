@@ -205,6 +205,9 @@ Route::middleware(['auth'])->group(function(){
         // proses edit (hrsnya put dan ada parameter id)
         Route::put('/product/update/{id}', [AdminController::class, 'update_product'])->name('update_product');
 
+        // delete
+        Route::delete('/product/delete/{product:id}', [AdminController::class, 'delete_product'])->name('delete_product');
+
         //order admin
         Route::get('/orderadmin', [AdminController::class, 'orderadmin'])->name('orderadmin');
         //order details admin

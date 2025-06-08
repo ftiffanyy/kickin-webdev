@@ -9,6 +9,7 @@ use App\Models\Variant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -341,5 +342,10 @@ class AdminController extends Controller
             ->with('success', 'Product updated successfully!');
     }
 
+
+    public function delete_product (Product $product){
+        $product->delete();
+        return redirect(route('productadmin.show'))->with('success', 'Product deleted!');
+    }
 
 }

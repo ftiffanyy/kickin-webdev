@@ -84,11 +84,14 @@
                                 <a href="{{ route('edit_product_form', ['id' => $product->id]) }}" class="btn btn-warning btn-sm btn-spacing no-border">Edit</a>
 
                                 <!-- Delete Button -->
-                                <a class="btn btn-black" 
-                                    onclick="return confirm('Are you sure want to delete?')" 
-                                    href="">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                                <form action="{{ route('delete_product', $product->id) }}" method="POST"
+                                    onsubmit="return confirm('Are you sure want to delete this product?');" style="display: inline">
+                                    @csrf
+                                    @method('delete')
+                                    <button type="submit" class="btn btn-black">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach
