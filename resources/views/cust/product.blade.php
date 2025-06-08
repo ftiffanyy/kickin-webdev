@@ -399,16 +399,37 @@
                             </p>
 
                             <p class="card-text">
+                                @php
+                                    // Hitung weighted average dan total reviews
+                                    $reviewsFromTable = \App\Models\Review::where('product_id', $product->id);
+                                    $newReviewsCount = $reviewsFromTable->count();
+                                    $newReviewsAvg = $reviewsFromTable->avg('rating') ?? 0;
+                                    
+                                    // Data existing dari product
+                                    $existingReviewsCount = $product->total_reviews;
+                                    $existingRatingAvg = $product->rating_avg;
+                                    
+                                    // Hitung weighted average
+                                    if ($newReviewsCount > 0) {
+                                        $totalRatingPoints = ($existingRatingAvg * $existingReviewsCount) + ($newReviewsAvg * $newReviewsCount);
+                                        $totalReviewsCount = $existingReviewsCount + $newReviewsCount;
+                                        $weightedRating = $totalRatingPoints / $totalReviewsCount;
+                                    } else {
+                                        $weightedRating = $existingRatingAvg;
+                                        $totalReviewsCount = $existingReviewsCount;
+                                    }
+                                @endphp
+                                
                                 @for ($i = 1; $i <= 5; $i++)
-                                    @if ($i <= floor($product->rating_avg))
+                                    @if ($i <= floor($weightedRating))
                                         <i class="fas fa-star text-warning"></i>
-                                    @elseif ($i - 0.5 <= $product->rating_avg && $product->rating_avg - floor($product->rating_avg) >= 0.25)
+                                    @elseif ($i - 0.5 <= $weightedRating && $weightedRating - floor($weightedRating) >= 0.25)
                                         <i class="fas fa-star-half-alt text-warning"></i>
                                     @else
                                         <i class="fas fa-star text-muted"></i>
                                     @endif
                                 @endfor
-                                ({{ $product->total_reviews }} reviews)
+                                ({{ $totalReviewsCount }} reviews)
                             </p>
                         </div>
                     </div>

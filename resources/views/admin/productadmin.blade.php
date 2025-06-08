@@ -66,9 +66,48 @@
                             <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product->discount }}%</td>
                             <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product->brand }}</td>
                             <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product->gender }}</td>
-                            <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product->rating_avg }} <i class="fas fa-star text-warning"></i></td>
-                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product->total_reviews }}</td>
-                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">{{ $product->sold }}</td>
+                            <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">
+                                @php
+                                    // Hitung data dari table reviews
+                                    $reviewsFromTable = \App\Models\Review::where('product_id', $product->id);
+                                    $newReviewsCount = $reviewsFromTable->count();
+                                    $newReviewsAvg = $reviewsFromTable->avg('rating') ?? 0;
+                                    
+                                    // Data existing dari product
+                                    $existingReviewsCount = $product->total_reviews; // 123 review
+                                    $existingRatingAvg = $product->rating_avg;
+                                    
+                                    // Hitung weighted average
+                                    if ($newReviewsCount > 0) {
+                                        // Total semua rating = (existing_avg * existing_count) + (new_avg * new_count)
+                                        $totalRatingPoints = ($existingRatingAvg * $existingReviewsCount) + ($newReviewsAvg * $newReviewsCount);
+                                        $totalReviewsCount = $existingReviewsCount + $newReviewsCount;
+                                        $finalRating = round($totalRatingPoints / $totalReviewsCount, 2);
+                                    } else {
+                                        $finalRating = $existingRatingAvg;
+                                    }
+                                @endphp
+                                {{ $finalRating }} <i class="fas fa-star text-warning"></i>
+                            </td>
+                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">
+                                @php
+                                    $reviewsCount = \App\Models\Review::where('product_id', $product->id)->count();
+                                    $totalReviews = $product->total_reviews + $reviewsCount;
+                                @endphp
+                                {{ $totalReviews }}
+                            </td>
+                            <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">
+                                @php
+                                    // Hitung total qty dari order_details berdasarkan variant product ini
+                                    $soldFromOrders = \DB::table('order_details')
+                                        ->join('variants', 'order_details.variant_id', '=', 'variants.id')
+                                        ->where('variants.product_id', $product->id)
+                                        ->sum('order_details.qty');
+                                    
+                                    $totalSold = $product->sold + $soldFromOrders;
+                                @endphp
+                                {{ $totalSold }}
+                            </td>
                             {{-- <td class="align-middle">
                                 <!-- Toggle Show Product: On/Off (Just the UI without backend connection) -->
                                 <div class="form-check form-switch">

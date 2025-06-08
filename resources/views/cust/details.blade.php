@@ -66,21 +66,51 @@
                             Rp {{ number_format($products->price, 0, ',', '.') }}
                         @endif
                     </p>
-
+                            
                     <p style="font-family: 'Fredoka', sans-serif; font-size: 16px; color: #5F6266;">
-                        {{ number_format($products->sold, 0, ',', '.') }} sold
+                        @php
+                            // Hitung total qty dari order_details berdasarkan variant product ini
+                            $soldFromOrders = \DB::table('order_details')
+                                ->join('variants', 'order_details.variant_id', '=', 'variants.id')
+                                ->where('variants.product_id', $products->id)
+                                 ->sum('order_details.qty');
+                                    
+                            $totalSold = $products->sold + $soldFromOrders;
+                        @endphp
+                        {{ number_format($totalSold, 0, ',', '.') }} sold
                     </p>
                     <p style="font-family: 'Fredoka', sans-serif; font-size: 16px; color: #5F6266;">
+                        @php
+                            // Hitung weighted average dan total reviews
+                            $reviewsFromTable = \App\Models\Review::where('product_id', $products->id);
+                            $newReviewsCount = $reviewsFromTable->count();
+                            $newReviewsAvg = $reviewsFromTable->avg('rating') ?? 0;
+                            
+                            // Data existing dari product
+                            $existingReviewsCount = $products->total_reviews;
+                            $existingRatingAvg = $products->rating_avg;
+                            
+                            // Hitung weighted average
+                            if ($newReviewsCount > 0) {
+                                $totalRatingPoints = ($existingRatingAvg * $existingReviewsCount) + ($newReviewsAvg * $newReviewsCount);
+                                $totalReviewsCount = $existingReviewsCount + $newReviewsCount;
+                                $weightedRating = $totalRatingPoints / $totalReviewsCount;
+                            } else {
+                                $weightedRating = $existingRatingAvg;
+                                $totalReviewsCount = $existingReviewsCount;
+                            }
+                        @endphp
+
                         @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <= floor($products->rating_avg)) 
+                            @if ($i <= floor($weightedRating)) 
                                 <i class="fas fa-star text-warning"></i> <!-- Full Star -->
-                            @elseif ($i - 0.5 <= $products->rating_avg && $products->rating_avg - floor($products->rating_avg) >= 0.25) 
+                            @elseif ($i - 0.5 <= $weightedRating && $weightedRating - floor($weightedRating) >= 0.25)
                                 <i class="fas fa-star-half-alt text-warning"></i> <!-- Half Star -->
                             @else
                                 <i class="fas fa-star text-muted"></i> <!-- Empty Star -->
                             @endif
                         @endfor
-                        ({{ $products->total_reviews }} reviews)
+                        ({{ $totalReviewsCount }} reviews)
                     </p>
                 </div>
 
