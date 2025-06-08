@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Image;
 use App\Models\Order;
+use App\Models\Review;
 use App\Models\Product;
 use App\Models\Variant;
 use Illuminate\Http\Request;
@@ -346,6 +347,77 @@ class AdminController extends Controller
     public function delete_product (Product $product){
         $product->delete();
         return redirect(route('productadmin.show'))->with('success', 'Product deleted!');
+    }
+
+    // Tambahkan method ini di ProductController Anda
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        
+        $products = Product::with('images')
+            ->where(function($query) use ($searchTerm) {
+                $query->where('name', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('brand', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('gender', 'LIKE', '%' . $searchTerm . '%');
+            })
+            ->get()
+            ->map(function($product) {
+                // Calculate reviews from table
+                $reviewsFromTable = Review::where('product_id', $product->id);
+                $newReviewsCount = $reviewsFromTable->count();
+                $newReviewsAvg = $reviewsFromTable->avg('rating') ?? 0;
+                
+                // Existing data from product
+                $existingReviewsCount = $product->total_reviews;
+                $existingRatingAvg = $product->rating_avg;
+                
+                // Calculate weighted average
+                if ($newReviewsCount > 0) {
+                    $totalRatingPoints = ($existingRatingAvg * $existingReviewsCount) + ($newReviewsAvg * $newReviewsCount);
+                    $totalReviewsCount = $existingReviewsCount + $newReviewsCount;
+                    $finalRating = round($totalRatingPoints / $totalReviewsCount, 2);
+                } else {
+                    $finalRating = $existingRatingAvg;
+                }
+                
+                // Calculate total reviews
+                $reviewsCount = Review::where('product_id', $product->id)->count();
+                $totalReviews = $product->total_reviews + $reviewsCount;
+                
+                // Calculate total sold
+                $soldFromOrders = DB::table('order_details')
+                    ->join('variants', 'order_details.variant_id', '=', 'variants.id')
+                    ->where('variants.product_id', $product->id)
+                    ->sum('order_details.qty');
+                $totalSold = $product->sold + $soldFromOrders;
+                
+                // return [
+                //     'id' => $product->id,
+                //     'name' => $product->name,
+                //     'price' => $product->price,
+                //     'discount' => $product->discount,
+                //     'brand' => $product->brand,
+                //     'gender' => $product->gender,
+                //     'description' => $product->description,
+                //     'rating_avg' => $product->rating_avg,
+                //     'total_reviews' => $product->total_reviews,
+                //     'sold' => $product->sold,
+                //     'final_rating' => $finalRating,
+                //     'total_reviews_count' => $totalReviews,
+                //     'total_sold_count' => $totalSold,
+                //     'image_url' => $product->images->isNotEmpty() ? 
+                //         asset('images/' . $product->images->first()->url) : null,
+                //     'created_at' => $product->created_at,
+                //     'updated_at' => $product->updated_at,
+                // ];
+            });
+        
+        // return response()->json([
+        //     'success' => true,
+        //     'products' => $products
+        // ]);
+        return view('admin.productadmin');
     }
 
 }

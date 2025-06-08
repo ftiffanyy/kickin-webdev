@@ -8,6 +8,7 @@ use Midtrans\Snap;
 use App\Models\User;
 use Midtrans\Config;
 use App\Models\Order;
+use App\Models\Review;
 use App\Models\Product;
 use App\Models\Variant;
 use App\Models\CartItem;
@@ -386,67 +387,61 @@ class ProductController extends Controller
     }
 
 
-    public function filterProducts(Request $request)
+    // Tambahkan method ini di ProductController Anda
+    public function search(Request $request)
     {
-        // Start a query on the Product model
-        $query = Product::query();
-
-        // 1. Filter by gender if selected (case-insensitive)
-        if ($request->has('gender')) {
-            // Convert the selected gender values to lowercase
-            $genders = array_map('strtolower', $request->input('gender'));
-
-            // Apply case-insensitive filtering using the LOWER() function
-            $query->whereIn(DB::raw('LOWER(gender)'), $genders);
-        }
-
-        // 2. Filter by color (case-insensitive, based on product name)
-        if ($request->has('color')) {
-            $colors = $request->input('color');
-            foreach ($colors as $color) {
-                $query->orWhere('name', 'like', '%' . $color . '%');  // Case-insensitive check
-            }
-        }
-
-        // 3. Filter by size (related to variants table)
-        if ($request->has('size')) {
-            $sizes = $request->input('size');
-            $query->whereHas('variants', function ($variantQuery) use ($sizes) {
-                // Filter by size and stock greater than 0
-                $variantQuery->whereIn('size', $sizes)
-                            ->where('stock', '>', 0); // Ensure stock is greater than 0
+        $searchTerm = $request->input('search');
+        
+        $query = Product::with('images')
+            ->where(function($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', '%' . $searchTerm . '%')
+                ->orWhere('brand', 'LIKE', '%' . $searchTerm . '%')
+                ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
+                ->orWhere('gender', 'LIKE', '%' . $searchTerm . '%');
             });
-        }
-        // 4. Filter by brand (case-insensitive)
-        if ($request->has('brand')) {
-            $brands = $request->input('brand');
-            $query->whereIn('brand', $brands);
-        }
-
-        // 5. Sort by price if selected
-        if ($request->has('sort')) {
-            if ($request->input('sort') == 'low_high') {
-                // Sorting by price after discount: price - discount (assuming discount is a percentage)
-                $query->orderByRaw('(price * (1 - discount / 100)) asc');
-            } elseif ($request->input('sort') == 'high_low') {
-                // Sorting by price after discount: price - discount (assuming discount is a percentage)
-                $query->orderByRaw('(price * (1 - discount / 100)) desc');
-            }
-        }
-
-        // 6. Apply hide status filter (if needed, like products that are active)
-        $query->where('hide_status', false);
-
-        // Get the filtered products
-        $products = $query->get();
-
-        // Fetch all distinct sizes from the variants table
-        $sizes = Variant::distinct()->pluck('size');
-
-        // Fetch unique brands from the products table
-        $brands = Product::distinct()->pluck('brand'); // Fetch distinct brands
-
-        return view('cust.product', compact('products', 'sizes', 'brands'));
+        
+        $products = $query->get()
+            ->map(function($product) {
+                // Calculate reviews from table
+                $reviewsFromTable = Review::where('product_id', $product->id);
+                $newReviewsCount = $reviewsFromTable->count();
+                $newReviewsAvg = $reviewsFromTable->avg('rating') ?? 0;
+                
+                // Existing data from product
+                $existingReviewsCount = $product->total_reviews;
+                $existingRatingAvg = $product->rating_avg;
+                
+                // Calculate weighted average
+                if ($newReviewsCount > 0) {
+                    $totalRatingPoints = ($existingRatingAvg * $existingReviewsCount) + ($newReviewsAvg * $newReviewsCount);
+                    $totalReviewsCount = $existingReviewsCount + $newReviewsCount;
+                    $finalRating = round($totalRatingPoints / $totalReviewsCount, 2);
+                } else {
+                    $finalRating = $existingRatingAvg;
+                }
+                
+                // Calculate total reviews
+                $reviewsCount = Review::where('product_id', $product->id)->count();
+                $totalReviews = $product->total_reviews + $reviewsCount;
+                
+                // Calculate total sold
+                $soldFromOrders = DB::table('order_details')
+                    ->join('variants', 'order_details.variant_id', '=', 'variants.id')
+                    ->where('variants.product_id', $product->id)
+                    ->sum('order_details.qty');
+                $totalSold = $product->sold + $soldFromOrders;
+                
+                // Add calculated fields to product
+                $product->final_rating = $finalRating;
+                $product->total_reviews_count = $totalReviews;
+                $product->total_sold_count = $totalSold;
+                $product->image_url = $product->images->isNotEmpty() ? 
+                    asset('images/' . $product->images->first()->url) : null;
+                
+                return $product;
+            });
+        
+        return view('admin.productadmin', compact('products'));
     }
 
 

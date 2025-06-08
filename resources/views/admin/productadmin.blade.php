@@ -8,12 +8,14 @@
             </h2>
             <!-- Create New Product Button & SEARCH BAR -->
             <div class="d-flex justify-content-end">
-                <div class="input-group" style="margin-right : 10px">
-                    <input type="text" class="form-control" id="searchProduct" placeholder="Search" style="width: 250px;">
-                    <button class="btn btn-info" type="button" id="searchButton">
-                        <i class="bi bi-search" style="font-size: 16px; color: white;"></i>
-                    </button>
-                </div>
+                <form id="searchForm" style="margin-right: 10px;">
+                    {{-- <div class="input-group">
+                        <input type="text" class="form-control" id="searchProduct" name="search" placeholder="Search" style="width: 250px;">
+                        <button class="btn btn-info" type="submit" id="searchButton">
+                            <i class="bi bi-search" style="font-size: 16px; color: white;"></i>
+                        </button>
+                    </div> --}}
+                </form>
                 <a href="{{ route('create_product_form') }}" class="btn btn-primary btn-sm custom-btn">Insert New Product</a>
             </div>
         </div>
@@ -407,14 +409,151 @@
 
 @section('scripts')
     <script>
+        // // Live search functionality
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     const searchForm = document.getElementById('searchForm');
+        //     const searchInput = document.getElementById('searchProduct');
+        //     const searchButton = document.getElementById('searchButton');
+        //     const tableBody = document.querySelector('tbody');
+        //     let searchTimeout;
+
+        //     // Function to perform search
+        //     function performSearch(query) {
+        //         fetch(`{{ route('productadmin.search') }}`, {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        //             },
+        //             body: JSON.stringify({
+        //                 search: query
+        //             })
+        //         })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             updateTable(data.products);
+        //         })
+        //         .catch(error => {
+        //             console.error('Search error:', error);
+        //         });
+        //     }
+
+        //     // Function to update table with search results
+        //     function updateTable(products) {
+        //         tableBody.innerHTML = '';
+                
+        //         if (products.length === 0) {
+        //             tableBody.innerHTML = `
+        //                 <tr>
+        //                     <td colspan="11" class="text-center" style="padding: 20px; color: #666;">
+        //                         No products found matching your search criteria.
+        //                     </td>
+        //                 </tr>
+        //             `;
+        //             return;
+        //         }
+
+        //         products.forEach(product => {
+        //             const row = createProductRow(product);
+        //             tableBody.appendChild(row);
+        //         });
+        //     }
+
+        //     // Function to create product row
+        //     function createProductRow(product) {
+        //         const tr = document.createElement('tr');
+                
+        //         // Calculate ratings and reviews
+        //         const finalRating = product.final_rating || product.rating_avg;
+        //         const totalReviews = product.total_reviews_count || product.total_reviews;
+        //         const totalSold = product.total_sold_count || product.sold;
+                
+        //         tr.innerHTML = `
+        //             <th scope="row" class="align-middle text-center">${product.id}</th>
+        //             <td class="align-middle text-center">
+        //                 ${product.image_url ? 
+        //                     `<img src="${product.image_url}" class="card-img-top product-image" alt="${product.name}" style="max-width: 100px; height: auto;">` : 
+        //                     '<p>No image available</p>'
+        //                 }
+        //             </td>
+        //             <td class="align-middle" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266; vertical-align: middle;">${product.name.toUpperCase()}</td>
+        //             <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">Rp ${formatNumber(product.price)}</td>
+        //             <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">${product.discount}%</td>
+        //             <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">${product.brand}</td>
+        //             <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">${product.gender}</td>
+        //             <td class="align-middle text-center" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">
+        //                 ${finalRating} <i class="fas fa-star text-warning"></i>
+        //             </td>
+        //             <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">${totalReviews}</td>
+        //             <td class="align-middle text-end" style="font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: #5F6266;">${totalSold}</td>
+        //             <td class="align-middle">
+        //                 <a href="/admin/products/${product.id}/details" class="btn btn-info btn-sm btn-spacing no-border">Show Details</a>
+        //                 <a href="/admin/products/${product.id}/edit" class="btn btn-warning btn-sm btn-spacing no-border">Edit</a>
+        //                 <form action="/admin/products/${product.id}" method="POST" onsubmit="return confirm('Are you sure want to delete this product?');" style="display: inline">
+        //                     <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+        //                     <input type="hidden" name="_method" value="DELETE">
+        //                     <button type="submit" class="btn btn-black">
+        //                         <i class="fa fa-trash"></i>
+        //                     </button>
+        //                 </form>
+        //             </td>
+        //         `;
+                
+        //         return tr;
+        //     }
+
+        //     // Function to format numbers
+        //     function formatNumber(num) {
+        //         return new Intl.NumberFormat('id-ID').format(num);
+        //     }
+
+        //     // Form submit event
+        //     searchForm.addEventListener('submit', function(e) {
+        //         e.preventDefault(); // Prevent default form submission
+        //         const query = searchInput.value.trim();
+                
+        //         if (query.length === 0) {
+        //             // If search is empty, reload the page to show all products
+        //             window.location.reload();
+        //         } else if (query.length >= 2) {
+        //             performSearch(query);
+        //         } else {
+        //             alert('Please enter at least 2 characters to search');
+        //         }
+        //     });
+
+        //     // Live search on input (optional - bisa dihapus jika hanya ingin search saat submit)
+        //     searchInput.addEventListener('input', function() {
+        //         clearTimeout(searchTimeout);
+        //         const query = this.value.trim();
+                
+        //         if (query.length === 0) {
+        //             // If search is empty, reload the page to show all products
+        //             window.location.reload();
+        //             return;
+        //         }
+                
+        //         if (query.length >= 2) {
+        //             searchTimeout = setTimeout(() => {
+        //                 performSearch(query);
+        //             }, 500); // Increased debounce time for less frequent requests
+        //         }
+        //     });
+
+        //     // Clear search functionality
+        //     searchInput.addEventListener('keyup', function(e) {
+        //         if (e.key === 'Escape') {
+        //             this.value = '';
+        //             window.location.reload();
+        //         }
+        //     });
+        // });
+
         function confirmDelete() {
             if (confirm("Are you sure you want to delete this product?")) {
-                // Simulate a successful delete operation
-                // Using a timeout to simulate the delay and show the success message
                 setTimeout(function() {
-                    // Show success message by redirecting with session data
                     window.location.href = "{{ route('productadmin.show') }}?success=true";
-                }, 500); // Adjust time as needed
+                }, 500);
             }
         }
     </script>

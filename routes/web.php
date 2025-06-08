@@ -198,7 +198,9 @@ Route::middleware(['auth'])->group(function(){
         Route::get('/productadmin', [AdminController::class, 'showadmin'])->name('productadmin.show');
         // details
         Route::get('/product/viewadmin/{id}', [AdminController::class, 'showDetailAdmin'])->name('productadmin.details');
-       
+ 
+        // Tambahkan route ini di routes/web.php
+        Route::post('/admin/products/search', [AdminController::class, 'search'])->name('productadmin.search');
         // liat form create
         Route::get('/product/create-form', [AdminController::class, 'create_product_form'])->name('create_product_form');
         // proses create
