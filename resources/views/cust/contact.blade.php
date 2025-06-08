@@ -359,7 +359,7 @@
                 Terjadi kesalahan dalam pengiriman pesan. Silakan coba lagi.
             </div>
             
-            <form method="POST" action="{{ route('contact.send') }}">
+            <form method="POST" action="">
                 @csrf
                 <div class="input-group">
                     <label for="name">Nama</label>

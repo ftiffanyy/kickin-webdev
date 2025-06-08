@@ -118,27 +118,28 @@ Route::post('/update-password/{email}', [AuthController::class, 'updatePassword'
 
 // liat produk semua (HEADER)
 Route::get('/product', [ProductController::class, 'show'])->name('product.show');
+// filter product
+Route::get('/products/filter', [ProductController::class, 'filterProducts'])->name('products.filter');
+Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
+Route::get('/Privacy', [HomeController::class, 'Privacy'])->name('Privacy');
 
+Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
+Route::get('/about', [HomeController::class, 'about'])->name('about');
 //wishlist
 Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
 Route::middleware(['auth'])->group(function(){
-    Route::get('/about', [HomeController::class, 'about'])->name('about');
+    Route::get('/contact', function () {
+        return view('cust.contact');
+    })->name('contact');
+    
 
     Route::post('/logout', function () {
         session()->flush();
         return redirect('/login');
     })->name('logout');
 
-    Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 
-    Route::get('/Privacy', [HomeController::class, 'Privacy'])->name('Privacy');
-
-    Route::get('/contact', function () {
-        return view('cust.contact');
-    })->name('contact');
-
-    Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 
     Route::middleware(['role:Customer'])->group(function(){
         //dashboard
@@ -155,8 +156,7 @@ Route::middleware(['auth'])->group(function(){
         Route::get('/cart', [ProductController::class, 'cart'])->name('view_cart');
         // fungsi update cart (quantity & remove)
         Route::post('/cart/update', [ProductController::class, 'updateCart'])->name('update_cart');
-        // filter product
-        Route::get('/products/filter', [ProductController::class, 'filterProducts'])->name('products.filter');
+
         //page checkout
         Route::match(['get', 'post'], 'copage', [ProductController::class, 'copage'])->name('copage');
         Route::post('/copage-buynow', [ProductController::class, 'copageBuyNow'])->name('copage_buynow');
