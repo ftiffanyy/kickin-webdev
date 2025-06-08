@@ -17,6 +17,11 @@ use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
+    public function showAuth()
+    {
+        return view('auth.auth');
+    }
+    
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -265,12 +270,6 @@ class AuthController extends Controller
         session(['user_role' => $user->role, 'username' => $user->name]);
         
         return redirect()->route('dashboard'); // Or wherever you want
-    }
-
-
-     public function showAuth()
-    {
-        return view('auth.auth');
     }
 }
 

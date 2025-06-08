@@ -99,8 +99,10 @@ use App\Models\Product;
 // //order details admin
 // Route::get('/orderdadmin/{orderid}', [AdminController::class, 'orderdadmin'])->name('order_details_admin');
 
+Route::get('/', [HomeController::class, 'show'])
+        ->name('dashboard');
 
-Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth');
+Route::get('/login', [AuthController::class, 'showAuth'])->name('auth');
 Route::post('/login', [AuthController::class, 'login'])->name('login'); // dummy handler
 
 Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -130,8 +132,6 @@ Route::post('/update-password/{email}', [AuthController::class, 'updatePassword'
 //     return view('auth.reset', ['email' => $email]);
 // })->name('password.reset.form');
 
-
-
 Route::middleware(['auth'])->group(function(){
     Route::get('/about', [HomeController::class, 'about'])->name('about');
 
@@ -152,8 +152,8 @@ Route::middleware(['auth'])->group(function(){
 
     Route::middleware(['role:Customer'])->group(function(){
         //dashboard
-        Route::get('/', [HomeController::class, 'show'])
-        ->name('dashboard');
+        // Route::get('/', [HomeController::class, 'show'])
+        // ->name('dashboard');
         //products
         // liat produk semua (HEADER)
         Route::get('/product', [ProductController::class, 'show'])->name('product.show');

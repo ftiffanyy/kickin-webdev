@@ -42,6 +42,7 @@
             font-size: 36px;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            color: #ffffff;
         }
         
         .header h1 {
@@ -98,13 +99,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-        
-        .otp-validity {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 15px;
-            font-style: italic;
         }
         
         .security-notice {
@@ -216,11 +210,7 @@
             .header-icon {
                 width: 60px;
                 height: 60px;
-            }
-            
-            .header-icon img {
-                width: 35px;
-                height: 35px;
+                font-size: 28px;
             }
         }
         
@@ -267,9 +257,9 @@
     <div class="email-container">
         <!-- Header Section -->
         <div class="header">
-            <div class="header-icon">
-                <img src="{{ asset('images/Kickin.jpg') }}" alt="Kickin Logo">
-            </div>
+            <!-- <div class="header-icon">
+                🔐
+            </div> -->
             <h1>Password Reset</h1>
             <p>Secure verification code</p>
         </div>
@@ -284,7 +274,6 @@
             <div class="otp-section">
                 <div class="otp-label">Your Verification Code</div>
                 <div class="otp-code">{{ $otp }}</div>
-                <div class="otp-validity">This code will expire in 10 minutes</div>
             </div>
             
             <!-- Instructions -->
@@ -309,7 +298,7 @@
                 </h3>
                 <p>
                     If you did not request a password reset, please ignore this email and ensure your account is secure. 
-                    This verification code will expire automatically and cannot be used after 10 minutes.
+                    This verification code will expire automatically and cannot be used indefinitely.
                 </p>
             </div>
             
