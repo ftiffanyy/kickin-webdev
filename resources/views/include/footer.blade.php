@@ -69,16 +69,16 @@
             <div class="footer-column">
                 <h3>ABOUT</h3>
                 <ul>
-                    <li><a href="{{ route('about') }}">about us</a></li>
-                    <li><a href="{{ route('terms') }}">terms and conditions</a></li>
+                    <li><a href="{{ route('about') }}">About Us</a></li>
+                    <li><a href="{{ route('terms') }}">Terms and Conditions</a></li>
                   </ul>
             </div>
             <div class="footer-column">
                 <h3>CUSTOMER SERVICE</h3>
                 <ul>
-                    <li><a href="{{ route('Privacy') }}">privacy policy</a></li>
-                    <li><a href="{{ route('contact') }}">contact us</a></li>
-                    <li><a href="{{ route('faq') }}">frequently asked question </a></li>
+                    <li><a href="{{ route('Privacy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ route('contact') }}">Contact Us</a></li>
+                    <li><a href="{{ route('faq') }}">Frequently Asked Question </a></li>
 
                 </ul>
             </div>

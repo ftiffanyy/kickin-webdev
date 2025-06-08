@@ -74,7 +74,7 @@ class WishlistController extends Controller
             session()->flash('success', 'Added to wishlist');
         }
 
-        return redirect()->back();
+        return redirect()->route('product.show');
     }
 
 }
