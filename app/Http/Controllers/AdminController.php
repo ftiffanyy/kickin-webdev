@@ -18,7 +18,7 @@ class AdminController extends Controller
 {
     public function orderadmin()
     {
-        $orders = Order::get(); 
+        $orders = Order::orderBy('id', 'desc')->get();
         return view('admin.orderpage', compact('orders'));
     }
 
@@ -32,17 +32,47 @@ class AdminController extends Controller
     {
         $order = Order::findOrFail($id);
 
-        // Validasi input
+        // Define status sequences for both Shipping and Pick Up
+        $shippingStatusSequence = [
+            'pending' => 0,
+            'dispatched' => 1,
+            'in-transit' => 2,
+            'delivered' => 3,
+        ];
+
+        $pickupStatusSequence = [
+            'pending' => 0,
+            'already pick up' => 1,
+        ];
+
+        // Get the current status and the new status
+        $currentStatus = strtolower($order->shipping_status);
+        $newStatus = strtolower($request->shipping_status);
+
+        // Validate the status progression based on the current order type
+        if ($order->status == 'Shipping') {
+            // Ensure that we are not moving backwards in the Shipping flow
+            if ($shippingStatusSequence[$newStatus] < $shippingStatusSequence[$currentStatus]) {
+                return back()->with('error', 'You cannot move the shipping status backwards.');
+            }
+        } elseif ($order->status == 'Pick Up') {
+            // Ensure that we are not moving backwards in the Pick Up flow
+            if ($pickupStatusSequence[$newStatus] < $pickupStatusSequence[$currentStatus]) {
+                return back()->with('error', 'You cannot move the pick-up status backwards.');
+            }
+        }
+
+        // Validate the input
         $request->validate([
             'shipping_status' => 'required|string',
             'comment' => 'nullable|string',
         ]);
 
-        // Update status di orders
+        // Update the order's shipping status
         $order->shipping_status = $request->shipping_status;
         $order->save();
 
-        // Simpan comment ke tabel shippings
+        // If there's a comment, save it to the shippings table
         if ($request->comment) {
             $order->shippings()->create([
                 'status' => $request->shipping_status,
@@ -53,6 +83,45 @@ class AdminController extends Controller
 
         return redirect()->route('orderadmin')->with('success', 'Status updated successfully.');
     }
+
+    public function orderManagement(Request $request)
+    {
+        $query = Order::query();
+
+        // Filter by Order ID
+        if ($request->has('order_id') && $request->order_id != '') {
+            $query->where('invoice_number', 'like', '%' . $request->order_id . '%');
+        }
+
+        // Filter by Customer Name
+        if ($request->has('customer_name') && $request->customer_name != '') {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->customer_name . '%');
+            });
+        }
+
+        // Filter by Address
+        if ($request->has('address') && $request->address != '') {
+            $query->where('shipping_address', 'like', '%' . $request->address . '%');
+        }
+
+        // Filter by Date
+        if ($request->has('date') && $request->date != '') {
+            $query->whereDate('date', $request->date);
+        }
+
+        // Filter by Status
+        if ($request->has('status') && $request->status != '') {
+            $query->where('shipping_status', $request->status);
+        }
+
+        // Fetch the filtered orders
+        $orders = $query->get();
+
+        return view('admin.orderpage', compact('orders'));
+    }
+
+
     
     public function showadmin()
     {

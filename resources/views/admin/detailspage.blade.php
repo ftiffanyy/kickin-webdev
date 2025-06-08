@@ -7,12 +7,19 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div class="alert alert-success alert-danger fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px;">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 @section('content')
 
 @php
     $isShipping = strtolower($order->status) === 'shipping';
     $statusOptions = $isShipping
-        ? ['Pending', 'Dispatched', 'In Transit', 'Delivered']
+        ? ['Pending', 'Dispatched', 'In-transit', 'Delivered']
         : ['Pending', 'Already Pick Up'];
     $currentStatus = strtolower($order->shipping_status);
 @endphp

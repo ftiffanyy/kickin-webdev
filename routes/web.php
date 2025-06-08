@@ -217,6 +217,8 @@ Route::middleware(['auth'])->group(function(){
 
         //order admin
         Route::get('/orderadmin', [AdminController::class, 'orderadmin'])->name('orderadmin');
+        // order filter
+        Route::get('/order-management', [AdminController::class, 'orderManagement'])->name('order_management');
         //order details admin
         Route::get('/orderdadmin/{orderid}', [AdminController::class, 'orderdadmin'])->name('order_details_admin');
         //update status shipping
