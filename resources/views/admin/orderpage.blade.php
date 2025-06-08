@@ -139,8 +139,7 @@
         color: #fff; /* Ensure text is white on hover */
     }
 
-
-    /* The rest of the table styling remains the same */
+    /* Styling for the body */
     body {
         background-color: #F8F9FA;
         font-family: 'Fredoka', sans-serif;
@@ -254,6 +253,77 @@
     .btn:hover {
         background-color: #181B1E;
         color: #fff;
+    }
+
+    /* Responsive Tablet */
+    @media (max-width: 1024px) {
+        .page-title {
+            font-size: 32px;
+        }
+
+        .order-table {
+            width: 95%;
+            padding: 15px;
+        }
+
+        .rounded-table {
+            min-width: 600px;
+        }
+
+        .order-table th, .order-table td {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+
+        .filter-container {
+            flex-direction: column;
+        }
+
+        .filter-item {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+
+    /* Responsive Mobile */
+    @media (max-width: 600px) {
+        .page-title {
+            font-size: 18px;
+            white-space: nowrap;
+        }
+
+        .order-table {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .rounded-table {
+            min-width: 500px;
+        }
+
+        .order-table th, .order-table td {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        .btn {
+            padding: 5px 8px;
+            font-size: 10px;
+        }
+
+        .filter-container {
+            flex-direction: column;
+        }
+
+        .filter-item {
+            width: 100%;
+            margin-bottom: 10px;
+        }
     }
 </style>
 @endsection

@@ -154,7 +154,7 @@
 </div>
 
 <style>
-    /* Style sama seperti sebelumnya */
+    /* Styling untuk halaman Order Detail */
     .page-title {
         font-family: 'Bebas Neue', sans-serif;
         font-size: 36px;
@@ -178,6 +178,7 @@
         padding: 25px;
         border-radius: 16px;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden; /* Make sure content does not overflow */
     }
 
     .order-horizontal-info {
@@ -225,6 +226,7 @@
         margin-bottom: 30px;
         font-size: 15px;
         width: 100%;
+        word-wrap: break-word; /* Ensures content wraps within table cell */
     }
 
     .product-table-header,
@@ -234,6 +236,7 @@
         gap: 10px;
         padding: 12px 16px;
         align-items: center;
+        word-wrap: break-word; /* Ensures content wraps within table cell */
     }
 
     .product-table-header {
@@ -248,6 +251,7 @@
         background-color: #f9f9f9;
         border-bottom: 1px solid #ddd;
         font-size: 15px;
+        word-wrap: break-word; /* Ensures content wraps within table cell */
     }
 
     .product-table-row:last-child {
@@ -286,6 +290,9 @@
         font-weight: 700;
         font-size: 18px;
         color: #222;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Prevent text overflow */
+        white-space: nowrap;
     }
 
     .order-right-container {
@@ -355,6 +362,99 @@
     .status-already-pick-up {
         background-color: #28a745;
     }
+
+    /* Responsive Tablet */
+    @media (max-width: 1024px) {
+        .page-title {
+            font-size: 32px;
+        }
+
+        .order-table {
+            width: 95%;
+            padding: 15px;
+        }
+
+        .rounded-table {
+            min-width: 600px;
+        }
+
+        .order-table th, .order-table td {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+
+        .filter-container {
+            flex-direction: column;
+        }
+
+        .filter-item {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .order-detail-container {
+            flex-wrap: wrap;
+        }
+
+        .order-left-container, .order-right-container {
+            flex: 1 1 100%;
+        }
+
+        .order-left-container {
+            margin-bottom: 20px;
+        }
+    }
+
+    /* Responsive Mobile */
+    @media (max-width: 600px) {
+        .page-title {
+            font-size: 18px;
+            white-space: nowrap;
+        }
+
+        .order-table {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .rounded-table {
+            min-width: 500px;
+        }
+
+        .order-table th, .order-table td {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        .btn {
+            padding: 5px 8px;
+            font-size: 10px;
+        }
+
+        .order-detail-container {
+            flex-direction: column;
+        }
+
+        .order-left-container,
+        .order-right-container {
+            width: 100%;
+        }
+
+        .filter-container {
+            flex-direction: column;
+        }
+
+        .filter-item {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+
 </style>
 
 <script>
