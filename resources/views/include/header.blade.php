@@ -233,17 +233,19 @@
     @endif
   </div>
 
-  <div class="header-right">
-    <div class="cart-icon">
-      <a href="{{ route('view_cart') }}">
-        <i class="fas fa-cart-shopping"></i>
-      </a>
-    </div>
-    <div class="wishlist">
-      <a href="{{ route('wishlist') }}">
-        <i class="fas fa-heart"></i>
-      </a>
-    </div>
+<div class="header-right">
+    @if ($role !== 'Admin') <!-- Hanya tampilkan jika role bukan Admin -->
+      <div class="cart-icon">
+        <a href="{{ route('view_cart') }}">
+          <i class="fas fa-cart-shopping"></i>
+        </a>
+      </div>
+      <div class="wishlist">
+        <a href="{{ route('wishlist') }}">
+          <i class="fas fa-heart"></i>
+        </a>
+      </div>
+    @endif
 
     {{-- Profile Dropdown --}}
     @if ($role !== 'Guest') <!-- Cek apakah role bukan Guest -->
