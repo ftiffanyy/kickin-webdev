@@ -247,6 +247,23 @@
             font-style: italic;
         }
 
+        /* Validation error styles */
+        .form-input.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.2);
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Fredoka', sans-serif;
+            animation: slideDown 0.3s ease-out;
+        }
+
         .submit-btn {
             width: 100%;
             background: linear-gradient(135deg, var(--dark), var(--dim));
@@ -472,14 +489,6 @@
             </div>
         @endif
 
-        <!-- Display error message -->
-        @if(session('error') || (session('status') && (str_contains(strtolower(session('status')), 'not found') || str_contains(strtolower(session('status')), 'invalid'))))
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-triangle"></i>
-                {{ session('error') ?: session('status') }}
-            </div>
-        @endif
-
         <!-- Form Section -->
         <div class="form-section">
             <form action="{{ route('forgot.send') }}" method="POST" id="resetForm">
@@ -494,12 +503,18 @@
                         type="email" 
                         id="email" 
                         name="email" 
-                        class="form-input" 
+                        class="form-input @error('email') is-invalid @enderror" 
                         placeholder="Enter your registered email address"
                         value="{{ old('email') }}"
                         required
                         autocomplete="email"
                     >
+                    @error('email')
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
                 
                 <button type="submit" class="submit-btn" id="submitBtn">
@@ -574,9 +589,9 @@
                 
                 if (Math.abs(newY) > 3) {
                     floatDirection *= -1;
-                }
+                }   
                 
-                logo.style.transform = translateY(${newY}px);
+                logo.style.transform = `translateY(${newY}px)`;
             }, 100);
         });
     </script>

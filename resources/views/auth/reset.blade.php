@@ -206,6 +206,23 @@
             box-shadow: 0 4px 15px rgba(114, 28, 36, 0.1);
         }
 
+        /* Client-side validation alert */
+        .alert-validation {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            padding: 18px 24px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 15px;
+            border: 1px solid #ffeaa7;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: slideDown 0.5s ease-out;
+            box-shadow: 0 4px 15px rgba(133, 100, 4, 0.1);
+        }
+
         .form-section {
             margin: 40px 0;
         }
@@ -248,6 +265,16 @@
             background: white;
         }
 
+        .form-input.error {
+            border-color: #dc3545;
+            box-shadow: 0 0 25px rgba(220, 53, 69, 0.15);
+        }
+
+        .form-input.success {
+            border-color: #28a745;
+            box-shadow: 0 0 25px rgba(40, 167, 69, 0.15);
+        }
+
         .form-input::placeholder {
             color: var(--cadet);
             font-style: italic;
@@ -278,6 +305,13 @@
 
         .submit-btn:active {
             transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            background: linear-gradient(135deg, var(--cadet), var(--silver));
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(165, 169, 174, 0.2);
         }
 
         .submit-btn::before {
@@ -326,22 +360,46 @@
 
         /* Style untuk ikon mata (password toggle) */
         .password-toggle {
-            position: absolute;          /* Posisi absolut terhadap parent (.form-group) */
-            right: 15px;                /* Jarak 15px dari sisi kanan */
-            top: 60px;                   /* Posisi vertikal di tengah */
-            transform: translateY(-50%);/* Offset untuk benar-benar center vertikal */
-            background: none;           /* Hilangkan background button */
-            border: none;               /* Hilangkan border button */
-            color: var(--cadet);        /* Warna default ikon */
-            cursor: pointer;            /* Pointer saat hover */
-            font-size: 20px;           /* Ukuran ikon */
-            transition: color 0.3s ease; /* Animasi perubahan warna */
-            z-index: 10;               /* Pastikan ikon di atas input */
+            position: absolute;
+            right: 15px;
+            top: 60px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--cadet);
+            cursor: pointer;
+            font-size: 20px;
+            transition: color 0.3s ease;
+            z-index: 10;
         }
 
         .password-toggle:hover {
-            color: var(--dark);         /* Warna saat hover */
+            color: var(--dark);
         }
+
+        /* Password strength indicator */
+        .password-strength {
+            margin-top: 8px;
+            font-size: 12px;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .strength-weak { color: #dc3545; }
+        .strength-medium { color: #ffc107; }
+        .strength-strong { color: #28a745; }
+
+        /* Match indicator */
+        .password-match {
+            position: absolute;
+            right: 60px;
+            top: 60px;
+            transform: translateY(-50%);
+            font-size: 16px;
+            z-index: 9;
+        }
+
+        .match-success { color: #28a745; }
+        .match-error { color: #dc3545; }
 
         /* Animations */
         @keyframes slideUp {
@@ -385,6 +443,16 @@
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-10px); }
             60% { transform: translateY(-5px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
         }
 
         /* Responsive design */
@@ -497,6 +565,12 @@
             </div>
         @endif
 
+        <!-- Client-side validation alert -->
+        <div class="alert alert-validation" id="validationAlert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="validationMessage"></span>
+        </div>
+
         <!-- Form Section -->
         <div class="form-section">
             <form action="{{ route('password.update', ['email' => $email]) }}" method="POST" id="resetForm">
@@ -515,10 +589,12 @@
                         placeholder="Enter your new password"
                         required
                         autocomplete="new-password"
+                        minlength="6"
                     >
                     <button type="button" class="password-toggle" id="toggleNewPassword">
                         <i class="fas fa-eye"></i>
                     </button>
+                    <div class="password-strength" id="passwordStrength"></div>
                 </div>
                 
                 <div class="form-group">
@@ -538,9 +614,10 @@
                     <button type="button" class="password-toggle" id="toggleConfirmPassword">
                         <i class="fas fa-eye"></i>
                     </button>
+                    <div class="password-match" id="passwordMatch"></div>
                 </div>
                 
-                <button type="submit" class="submit-btn" id="submitBtn">
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>
                     <i class="fas fa-lock" style="margin-right: 10px;"></i>
                     UPDATE PASSWORD
                 </button>
@@ -563,6 +640,10 @@
             const newPasswordInput = document.getElementById('new_password');
             const confirmPasswordInput = document.getElementById('confirm_password');
             const container = document.querySelector('.reset-container');
+            const validationAlert = document.getElementById('validationAlert');
+            const validationMessage = document.getElementById('validationMessage');
+            const passwordStrength = document.getElementById('passwordStrength');
+            const passwordMatch = document.getElementById('passwordMatch');
             
             // Password toggle functionality
             const toggleNewPassword = document.getElementById('toggleNewPassword');
@@ -582,17 +663,172 @@
                 this.querySelector('i').classList.toggle('fa-eye-slash');
             });
 
-            // Form submission with loading state
+            // Show validation alert
+            function showValidationAlert(message) {
+                validationMessage.textContent = message;
+                validationAlert.style.display = 'flex';
+                
+                // Add shake animation to the container
+                container.classList.add('shake');
+                setTimeout(() => {
+                    container.classList.remove('shake');
+                }, 500);
+                
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    hideValidationAlert();
+                }, 5000);
+            }
+
+            // Hide validation alert
+            function hideValidationAlert() {
+                validationAlert.style.display = 'none';
+            }
+
+            // Check password strength
+            function checkPasswordStrength(password) {
+                let strength = 0;
+                let text = '';
+                let className = '';
+
+                if (password.length >= 8) strength++;
+                if (/[a-z]/.test(password)) strength++;
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+                switch (strength) {
+                    case 0:
+                    case 1:
+                    case 2:
+                        text = 'Weak - Use at least 8 characters with mixed case, numbers, and symbols';
+                        className = 'strength-weak';
+                        break;
+                    case 3:
+                    case 4:
+                        text = 'Medium - Consider adding more variety';
+                        className = 'strength-medium';
+                        break;
+                    case 5:
+                        text = 'Strong - Great password!';
+                        className = 'strength-strong';
+                        break;
+                }
+
+                passwordStrength.textContent = text;
+                passwordStrength.className = `password-strength ${className}`;
+                return strength;
+            }
+
+            // Check password match
+            function checkPasswordMatch() {
+                const newPassword = newPasswordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                if (confirmPassword === '') {
+                    passwordMatch.innerHTML = '';
+                    confirmPasswordInput.classList.remove('success', 'error');
+                    return false;
+                }
+                
+                if (newPassword === confirmPassword) {
+                    passwordMatch.innerHTML = '<i class="fas fa-check match-success"></i>';
+                    confirmPasswordInput.classList.remove('error');
+                    confirmPasswordInput.classList.add('success');
+                    return true;
+                } else {
+                    passwordMatch.innerHTML = '<i class="fas fa-times match-error"></i>';
+                    confirmPasswordInput.classList.remove('success');
+                    confirmPasswordInput.classList.add('error');
+                    return false;
+                }
+            }
+
+            // Enable/disable submit button
+            function updateSubmitButton() {
+                const newPassword = newPasswordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const passwordsMatch = newPassword === confirmPassword;
+                const minLength = newPassword.length >= 6;
+                
+                if (passwordsMatch && minLength && newPassword !== '' && confirmPassword !== '') {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+            }
+
+            // Event listeners
+            newPasswordInput.addEventListener('input', function() {
+                const password = this.value;
+                checkPasswordStrength(password);
+                checkPasswordMatch();
+                updateSubmitButton();
+                hideValidationAlert();
+                
+                // Remove error styling when user starts typing
+                this.classList.remove('error');
+            });
+
+            confirmPasswordInput.addEventListener('input', function() {
+                checkPasswordMatch();
+                updateSubmitButton();
+                hideValidationAlert();
+                
+                // Remove error styling when user starts typing
+                this.classList.remove('error');
+            });
+
+            // Form submission validation
             form.addEventListener('submit', function(e) {
+                const newPassword = newPasswordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                // Hide any existing validation alerts
+                hideValidationAlert();
+                
+                // Check if passwords match
+                if (newPassword !== confirmPassword) {
+                    e.preventDefault();
+                    showValidationAlert('Password confirmation does not match. Please check both password fields.');
+                    
+                    // Add error styling
+                    newPasswordInput.classList.add('error');
+                    confirmPasswordInput.classList.add('error');
+                    
+                    // Focus on confirm password field
+                    confirmPasswordInput.focus();
+                    return false;
+                }
+                
+                // Check minimum length
+                if (newPassword.length < 6) {
+                    e.preventDefault();
+                    showValidationAlert('Password must be at least 6 characters long.');
+                    newPasswordInput.classList.add('error');
+                    newPasswordInput.focus();
+                    return false;
+                }
+                
+                // If validation passes, show loading state
                 container.classList.add('loading');
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i>UPDATING...';
                 submitBtn.disabled = true;
+                
+                return true;
             });
 
             // Auto-focus first input with delay for better UX
             setTimeout(() => {
                 newPasswordInput.focus();
             }, 300);
+
+            // Clear validation alert when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!validationAlert.contains(e.target)) {
+                    hideValidationAlert();
+                }
+            });
         });
     </script>
 </body>
