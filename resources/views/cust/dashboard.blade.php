@@ -2,6 +2,39 @@
 
 @section('content')
     <style>
+.video-container {
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    padding-bottom: 56.25%; /* Aspect ratio 16:9 */
+    height: 0;
+    overflow: hidden;
+    background: #000;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 8px;
+}
+
+/* Hide any potential control elements */
+.video-container iframe::-webkit-media-controls {
+    display: none !important;
+}
+
+.video-container iframe::-webkit-media-controls-enclosure {
+    display: none !important;
+}
+
+
     * {
         margin: 0;
         padding: 0;
@@ -318,10 +351,17 @@
     </head>
     <body>
         
-        <video width=100% autoplay loop muted>
-            <source src="{{ asset('images/dashboard.mp4') }}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+<div class="video-container">
+    <iframe 
+        width="100%" 
+        height="auto" 
+        src="https://drive.google.com/file/d/1194G5Lv7n-e2krHBEWbBS8HAJh6GZmYX/preview" 
+        frameborder="0" 
+        allow="autoplay; encrypted-media; fullscreen" 
+        allowfullscreen
+        style="border:none;">
+    </iframe>
+</div>
 
         <div class="container">
             <h1>WHY KICKIN ?!?!</h1>
