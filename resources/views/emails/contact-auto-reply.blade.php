@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terima Kasih - Pesan Anda Telah Diterima</title>
+    <title>Thank You - Your Message Has Been Received</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -72,28 +72,28 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>✅ Terima Kasih!</h1>
-            <p>Pesan Anda telah diterima</p>
+            <h1>✅ Thank You!</h1>
+            <p>Your message has been received</p>
         </div>
         
         <div class="content">
-            <p>Halo <strong>{{ $contactName }}</strong>,</p>
+            <p>Hello <strong>{{ $contactName }}</strong>,</p>
             
-            <p>Terima kasih telah menghubungi kami! Pesan Anda dengan subjek "<strong>{{ $contactSubject }}</strong>" telah kami terima pada {{ $contactDate }}.</p>
+            <p>Thank you for contacting us! Your message with subject "<strong>{{ $contactSubject }}</strong>" we have received on {{ $contactDate }}.</p>
             
             <div class="highlight-box">
-                <p><strong>🎯 Apa yang terjadi selanjutnya?</strong></p>
+                <p><strong>🎯 What happens next?</strong></p>
                 <ul>
-                    <li>Tim kami akan meninjau pesan Anda dalam 1-2 hari kerja</li>
-                    <li>Kami akan merespons melalui email ini</li>
-                    <li>Untuk pertanyaan mendesak, silakan hubungi kami langsung</li>
+                    <li>Our team will review your message within 1-2 business days.</li>
+                    <li>We will respond via this email</li>
+                    <li>For urgent questions, please contact us directly</li>
                 </ul>
             </div>
             
-            <p>Sementara itu, jangan ragu untuk mengunjungi website kami atau menghubungi kami melalui:</p>
+            <p>In the meantime, please feel free to visit our website or contact us via:</p>
             
             <div class="contact-info">
-                <h3>📞 Informasi Kontak</h3>
+                <h3>📞 Contact Information</h3>
                 <div class="contact-item">
                     <span class="contact-icon">📞</span>
                     <span>+66 972 729 666</span>
@@ -108,19 +108,19 @@
                 </div>
                 <div class="contact-item">
                     <span class="contact-icon">⏰</span>
-                    <span>Senin - Jumat: 08.00 - 17.00</span>
+                    <span>Monday - Friday: 08.00 - 17.00</span>
                 </div>
             </div>
             
-            <p>Sekali lagi, terima kasih atas kepercayaan Anda kepada kami!</p>
+            <p>Once again, thank you for your trust in us!</p>
             
-            <p>Salam hangat,<br>
-            <strong>Tim {{ config('app.name') }}</strong></p>
+            <p>Warm regards,<br>
+            <strong>Tim Kickin</strong></p>
         </div>
         
         <div class="footer">
-            <p>Email ini dikirim otomatis sebagai konfirmasi bahwa pesan Anda telah diterima.</p>
-            <p>Jika Anda tidak mengirim pesan ini, abaikan email ini.</p>
+            <p>This email is sent automatically as confirmation that your message has been received.</p>
+            <p>If you did not send this message, please ignore this email.</p>
         </div>
     </div>
 </body>

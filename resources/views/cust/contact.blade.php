@@ -468,8 +468,8 @@
     <!-- Hero Section -->
     <div class="hero">
         <div class="hero-content">
-            <h1>Hubungi Kami</h1>
-            <p>Kami siap membantu Anda kapan saja. Jangan ragu untuk menghubungi kami dan dapatkan solusi terbaik untuk kebutuhan Anda.</p>
+            <h1>Contact Us</h1>
+            <p>We are ready to assist you anytime. Do not hesitate to contact us and get the best solution for your needs.</p>
         </div>
     </div>
 
@@ -477,52 +477,52 @@
     <div class="content">
         <!-- Contact Form -->
         <div class="form-section">
-            <h2 class="section-title">Kirim Pesan</h2>
+            <h2 class="section-title">Send Message</h2>
             
             <div class="success-message message" id="success-message">
-                ✅ Pesan Anda berhasil terkirim! Kami akan segera menghubungi Anda.
+                ✅ Your message has been sent successfully! We will contact you soon.
             </div>
             
             <div class="error-message message" id="error-message">
-                ❌ Terjadi kesalahan dalam pengiriman pesan. Silakan coba lagi.
+                ❌ There was an error in sending the message. Please try again.
             </div>
             
             <form id="contact-form" action="{{ route('contact.send') }}" method="POST">
                 @csrf
                 <div class="input-group">
-                    <label for="name">Nama Lengkap</label>
-                    <input type="text" id="name" name="name" placeholder="Masukkan nama lengkap Anda" required value="{{ old('name') }}" />
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required value="{{ old('name') }}" />
                     @error('name')
                         <span class="error-text">{{ $message }}</span>
                     @enderror
                 </div>
                 
                 <div class="input-group">
-                    <label for="email">Alamat Email</label>
-                    <input type="email" id="email" name="email" placeholder="Masukkan alamat email Anda" required value="{{ old('email') }}" />
+                    <label for="email">Email Adress</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" required value="{{ old('email') }}" />
                     @error('email')
                         <span class="error-text">{{ $message }}</span>
                     @enderror
                 </div>
                 
                 <div class="input-group">
-                    <label for="subject">Subjek</label>
-                    <input type="text" id="subject" name="subject" placeholder="Masukkan subjek pesan" required value="{{ old('subject') }}" />
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" placeholder="Enter the message subject" required value="{{ old('subject') }}" />
                     @error('subject')
                         <span class="error-text">{{ $message }}</span>
                     @enderror
                 </div>
                 
                 <div class="input-group">
-                    <label for="message">Pesan</label>
-                    <textarea id="message" name="message" placeholder="Tulis pesan Anda di sini..." required>{{ old('message') }}</textarea>
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Write your message here..." required>{{ old('message') }}</textarea>
                     @error('message')
                         <span class="error-text">{{ $message }}</span>
                     @enderror
                 </div>
                 
                 <button type="submit" class="submit-btn">
-                    <span>Kirim Pesan</span>
+                    <span>Send Message</span>
                 </button>
             </form>
         </div>
@@ -531,7 +531,7 @@
         <div class="contact-info-section">
             <!-- Map Section -->
             <div class="map-container-wrapper">
-                <h2 class="section-title">Lokasi Kami</h2>
+                <h2 class="section-title">Our Location</h2>
                 <div class="map-container">
                     <iframe 
                         src="https://www.google.com/maps/embed/v1/place?q=universitas+ciputra+surabaya&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8" 
@@ -541,18 +541,18 @@
                     </iframe>
                 </div>
                 <p style="text-align: center; color: #cccccc; font-style: italic;">
-                    📍 Kunjungi kami di Universitas Ciputra, Surabaya. Lokasi yang mudah diakses dan strategis.
+                    📍 Visit us at Ciputra University, Surabaya. Easily accessible and strategic location.
                 </p>
             </div>
 
             <!-- Contact Info -->
             <div class="contact-info">
-                <h2 class="section-title">Informasi Kontak</h2>
+                <h2 class="section-title">Contact Information</h2>
                 
                 <div class="contact-item">
                     <div class="contact-icon">📞</div>
                     <div class="contact-details">
-                        <h3>Telepon</h3>
+                        <h3>Phone</h3>
                         <p>+66 972 729 666</p>
                     </div>
                 </div>
@@ -568,7 +568,7 @@
                 <div class="contact-item">
                     <div class="contact-icon">📍</div>
                     <div class="contact-details">
-                        <h3>Alamat</h3>
+                        <h3>Adress</h3>
                         <p>Universitas Ciputra, Surabaya</p>
                     </div>
                 </div>
@@ -576,8 +576,8 @@
                 <div class="contact-item">
                     <div class="contact-icon">⏰</div>
                     <div class="contact-details">
-                        <h3>Jam Operasional</h3>
-                        <p>Senin - Jumat: 08.00 - 17.00</p>
+                        <h3>Operating Hours</h3>
+                        <p>Monday - Friday: 08.00 - 17.00</p>
                     </div>
                 </div>
             </div>
@@ -591,7 +591,7 @@
         const submitBtn = document.querySelector('.submit-btn');
         const originalText = submitBtn.innerHTML;
         
-        submitBtn.innerHTML = '<span>Mengirim...</span>';
+        submitBtn.innerHTML = '<span>Sending...</span>';
         submitBtn.disabled = true;
         
         // Form akan disubmit secara normal ke Laravel

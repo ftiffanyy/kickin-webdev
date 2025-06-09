@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pesan Baru dari Website</title>
+    <title>New Message from Customer</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,7 +21,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .header {
-            background: linear-gradient(550deg, #F8F9FA, #181B1E);
+            background: grey;
             color: white;
             padding: 30px;
             text-align: center;
@@ -77,14 +77,14 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📧 Pesan Baru dari Website</h1>
+            <h1>📧 New Message from Customer</h1>
             <p>{{ $contactDate }}</p>
         </div>
         
         <div class="content">
             <div class="info-box">
                 <div class="info-row">
-                    <div class="info-label">Nama:</div>
+                    <div class="info-label">Name:</div>
                     <div class="info-value">{{ $contactName }}</div>
                 </div>
                 <div class="info-row">
@@ -92,20 +92,20 @@
                     <div class="info-value">{{ $contactEmail }}</div>
                 </div>
                 <div class="info-row">
-                    <div class="info-label">Subjek:</div>
+                    <div class="info-label">Subject:</div>
                     <div class="info-value">{{ $contactSubject }}</div>
                 </div>
             </div>
             
             <div class="message-box">
-                <div class="message-title">Pesan:</div>
+                <div class="message-title">Message:</div>
                 <div>{!! nl2br(e($contactMessage)) !!}</div>
             </div>
         </div>
         
         <div class="footer">
-            <p>Email ini dikirim otomatis dari sistem contact form website Anda.</p>
-            <p>Silakan balas langsung ke email pengirim: {{ $contactEmail }}</p>
+            <p>This email is sent automatically from your website's contact form system.</p>
+            <p>Please reply directly to the sender's email: {{ $contactEmail }}</p>
         </div>
     </div>
 </body>
