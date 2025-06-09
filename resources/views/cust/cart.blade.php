@@ -12,6 +12,13 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div class="alert alert-success alert-danger fade show position-fixed top-0 end-0 m-3 shadow-lg z-3" role="alert" style="min-width: 300px;">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 @if(count($cart) > 0)
     <form action="{{ route('update_cart') }}" method="POST">
         <div style="overflow-x: auto;">
@@ -48,7 +55,7 @@
                             
                             <!-- checkbox column -->
                             <td style="vertical-align: middle;">
-                                <input type="checkbox" name="selected_items[]" value="{{ $item->id }}" class="item-checkbox" style="cursor: pointer; width: 20px; height: 20px; border: 2px solid #CFD1D4; background-color: #FFF; accent-color: #181B1E; border-radius: 5px; transition: all 0.3s ease;">
+                                <input type="checkbox" name="selected_items[]" value="{{ $item->id }}" class="item-checkbox" onchange="updateButtonStates()" style="cursor: pointer; width: 20px; height: 20px; border: 2px solid #CFD1D4; background-color: #FFF; accent-color: #181B1E; border-radius: 5px; transition: all 0.3s ease;">
                             </td>
                             
                             <!-- image column -->
@@ -105,8 +112,8 @@
             </span>
         </h5>
 
-        <button type="submit" name="action" value="remove" class="btn" style="font-family: 'Fredoka', sans-serif; background-color: #5F6266; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-transform: uppercase;">Remove</button>
-        <button type="submit" name="action" value="checkout" class="btn" style="font-family: 'Fredoka', sans-serif; background-color: #181B1E; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-transform: uppercase; margin-left: 10px;">Checkout</button>
+        <button type="submit" name="action" value="remove" id="remove-btn" class="btn" disabled style="font-family: 'Fredoka', sans-serif; background-color: #5F6266; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-transform: uppercase; opacity: 0.5; cursor: not-allowed;">Remove</button>
+        <button type="submit" name="action" value="checkout" id="checkout-btn" class="btn" disabled style="font-family: 'Fredoka', sans-serif; background-color: #181B1E; color: white; border: none; padding: 10px 20px; border-radius: 5px; text-transform: uppercase; margin-left: 10px; opacity: 0.5; cursor: not-allowed;">Checkout</button>
     </form>
 
 @else
@@ -126,6 +133,20 @@
         input[type="number"] {
             -moz-appearance: textfield;
         }
+
+        /* Button disabled styles */
+        .btn:disabled {
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            pointer-events: none;
+        }
+
+        .btn:not(:disabled) {
+            opacity: 1 !important;
+            cursor: pointer !important;
+            pointer-events: auto;
+        }
+
         @media (max-width: 992px) {
             .table th, .table td {
                 font-size: 10px;
@@ -210,6 +231,49 @@
         checkboxes.forEach(function(checkbox) {
             checkbox.checked = isChecked;
         });
+        updateButtonStates();
+    }
+
+    function updateButtonStates() {
+        var checkboxes = document.querySelectorAll('.item-checkbox');
+        var hasChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        
+        var removeBtn = document.getElementById('remove-btn');
+        var checkoutBtn = document.getElementById('checkout-btn');
+        
+        if (hasChecked) {
+            // Enable buttons
+            removeBtn.disabled = false;
+            checkoutBtn.disabled = false;
+            removeBtn.style.opacity = '1';
+            removeBtn.style.cursor = 'pointer';
+            checkoutBtn.style.opacity = '1';
+            checkoutBtn.style.cursor = 'pointer';
+        } else {
+            // Disable buttons
+            removeBtn.disabled = true;
+            checkoutBtn.disabled = true;
+            removeBtn.style.opacity = '0.5';
+            removeBtn.style.cursor = 'not-allowed';
+            checkoutBtn.style.opacity = '0.5';
+            checkoutBtn.style.cursor = 'not-allowed';
+        }
+        
+        // Update select-all checkbox state
+        var selectAllCheckbox = document.getElementById('select-all');
+        var totalCheckboxes = checkboxes.length;
+        var checkedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+        
+        if (checkedCheckboxes === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedCheckboxes === totalCheckboxes) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        }
     }
 
     function changeQuantity(id, delta) {
@@ -305,6 +369,9 @@
     
     // Event listener untuk perubahan manual quantity input
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize button states on page load
+        updateButtonStates();
+        
         var quantityInputs = document.querySelectorAll('.quantity-input');
         quantityInputs.forEach(function(input) {
             input.addEventListener('input', function() {
