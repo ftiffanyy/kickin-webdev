@@ -2,6 +2,11 @@
 
 @section('content')
         <style>
+            .logox img {
+                width: 300px; /* sesuaikan dengan ukuran yang diinginkan */
+                height: auto; /* untuk menjaga rasio gambar */
+            }
+
             body {
                 font-family: Arial, sans-serif;
                 background-color: #f9f9f9;
@@ -82,10 +87,9 @@
     </head>
     <body>
         <div class="about-container">
-            <video width=150PX autoplay loop muted>
-                <source src="{{ asset('images/vidlogo.mp4') }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
+            <div class="logox">
+                <img src="{{ asset('images/Kickin.jpg') }}" alt="Logo" />
+            </div>
 
             <h1>KICKIN</h1>
             <p>

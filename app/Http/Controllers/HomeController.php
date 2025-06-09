@@ -36,7 +36,7 @@ class HomeController extends Controller
 
     public function Privacy()
     {
-        return view('cust.Privacy');
+        return view('cust.privacy');
     }
 
     public function faq()
