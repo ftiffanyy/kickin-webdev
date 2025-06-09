@@ -389,6 +389,11 @@
       grid-template-columns: 1fr;
     }
 
+    .dashboard, .sidebar {
+      width: 98%;
+      margin: 0 0 30px 0;
+    }
+
     .card {
       padding: 15px;
     }
