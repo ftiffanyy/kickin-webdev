@@ -90,7 +90,7 @@ class AdminController extends Controller
 
         // Filter by Order ID
         if ($request->has('order_id') && $request->order_id != '') {
-            $query->where('invoice_number', 'like', '%' . $request->order_id . '%');
+            $query->where('id', 'like', '%' . $request->order_id . '%');
         }
 
         // Filter by Customer Name

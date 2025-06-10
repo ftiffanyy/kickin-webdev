@@ -54,73 +54,42 @@ class AuthController extends Controller
         return view('auth.forget');
     }
 
-    // public function forgotPassword(Request $request)
-    // {
-    //     // $request->validate([
-    //     //     'email' => 'required|email|exists:users,email',
-    //     // ]);
-
-    //     $request->validate([
-    //         'email' => 'required|email|exists:users,email',
-    //     ], [
-    //         'email.exists' => 'Email not found. Please try again.',
-    //     ]);
-
-    //     // Generate 6-digit OTP
-    //     $otp = rand(100000, 999999);
-
-    //     // Save OTP to database
-    //     DB::table('password_resets')->updateOrInsert(
-    //         ['email' => $request->email],
-    //         ['token' => $otp, 'created_at' => now()]
-    //     );
-
-    //     // Send OTP to user's email
-    //     Mail::to($request->email)->send(new VerificationCodeMail($otp));
-
-    //     // Store email in session to use later for password reset
-    //     session(['email' => $request->email]);
-
-    //     // Redirect to OTP page with a success message
-    //     return redirect()->route('otp.form')->with('status', 'OTP has been sent to your email.');
-    // }
-
     public function forgotPassword(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email|exists:users,email',
-    ], [
-        'email.required' => 'Email address is required.',
-        'email.email' => 'Please enter a valid email address.',
-        'email.exists' => 'The email address you entered is not registered in our system. Please check your email or create a new account.',
-    ]);
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.required' => 'Email address is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.exists' => 'The email address you entered is not registered in our system. Please check your email or create a new account.',
+        ]);
 
-    $email = $request->email;
+        $email = $request->email;
 
-    try {
-        // Generate 6-digit OTP
-        $otp = rand(100000, 999999);
+        try {
+            // Generate 6-digit OTP
+            $otp = rand(100000, 999999);
 
-        // Save OTP to database
-        DB::table('password_resets')->updateOrInsert(
-            ['email' => $email],
-            ['token' => $otp, 'created_at' => now()]
-        );
+            // Save OTP to database
+            DB::table('password_resets')->updateOrInsert(
+                ['email' => $email],
+                ['token' => $otp, 'created_at' => now()]
+            );
 
-        // Send OTP to user's email
-        Mail::to($email)->send(new VerificationCodeMail($otp));
+            // Send OTP to user's email
+            Mail::to($email)->send(new VerificationCodeMail($otp));
 
-        // Store email in session to use later for password reset
-        session(['email' => $email]);
+            // Store email in session to use later for password reset
+            session(['email' => $email]);
 
-        // Redirect to OTP page with a success message
-        return redirect()->route('otp.form')->with('status', 'OTP code has been sent to your email address. Please check your inbox and enter the code to proceed.');
+            // Redirect to OTP page with a success message
+            return redirect()->route('otp.form')->with('status', 'OTP code has been sent to your email address. Please check your inbox and enter the code to proceed.');
 
-    } catch (\Exception $e) {
-        // Handle any errors during OTP generation or email sending
-        return back()->with('error', 'Failed to send OTP. Please try again later.')->withInput();
+        } catch (\Exception $e) {
+            // Handle any errors during OTP generation or email sending
+            return back()->with('error', 'Failed to send OTP. Please try again later.')->withInput();
+        }
     }
-}
 
 
     // Show OTP form
@@ -254,7 +223,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         // Store role and username in session after registration
-        session(['user_role' => $user->role, 'username' => $user->name]);
+        session(['user_role' => $user->role, 'username' => $user->name, 'user_id' => $user->id]);
         
         return redirect()->route('dashboard'); // Or wherever you want
     }

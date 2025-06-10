@@ -389,7 +389,7 @@ class ProductController extends Controller
     }
 
 
-public function filterProducts(Request $request)
+    public function filterProducts(Request $request)
     {
         // Start a query on the Product model
         $query = Product::query();

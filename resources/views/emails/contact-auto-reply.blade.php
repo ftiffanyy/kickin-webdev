@@ -100,7 +100,7 @@
                 </div>
                 <div class="contact-item">
                     <span class="contact-icon">✉️</span>
-                    <span>jevonyes@ivander.com</span>
+                    <span>keenanchan01@student.ciputra.ac.id</span>
                 </div>
                 <div class="contact-item">
                     <span class="contact-icon">📍</span>

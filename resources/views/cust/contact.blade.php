@@ -95,7 +95,6 @@
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         opacity: 0.9;
         animation: slideInUp 1s ease-out 0.3s both;
-        /* text-transform: uppercase; */
         font-weight: 600;
         letter-spacing: 0.5px;
     }
@@ -186,7 +185,6 @@
         width: 100%;
         height: 100%;
         border: 0;
-        /* filter: grayscale(1) invert(1) contrast(1.2); */
     }
 
     .contact-info {
@@ -214,7 +212,6 @@
         color: #ffffff;
         font-size: 2.2rem;
         text-align: center;
-        /* text-transform: lowercase; */
     }
 
     .section-title::after {
@@ -267,14 +264,12 @@
         font-size: 1.3rem;
         color: #cccccc;
         margin-bottom: 0.25rem;
-        /* text-transform: lowercase; */
     }
 
     .contact-details p {
         font-size: 1.1rem;
         font-weight: 500;
         color: #ffffff;
-        /* text-transform: uppercase; */
         letter-spacing: 0.5px;
     }
 
@@ -290,7 +285,6 @@
         color: #cccccc;
         font-family: 'Bebas Neue', cursive;
         font-size: 1.2rem;
-        /* text-transform: lowercase; */
     }
 
     .contact-page input, .contact-page textarea {
@@ -303,14 +297,12 @@
         transition: all 0.3s ease;
         background: rgba(45, 45, 45, 0.8);
         color: #ffffff;
-        /* text-transform: uppercase; */
         font-weight: 500;
         letter-spacing: 0.5px;
     }
 
     .contact-page input::placeholder, .contact-page textarea::placeholder {
         color: #888888;
-        /* text-transform: lowercase; */
         font-weight: 400;
     }
 
@@ -338,7 +330,6 @@
         font-size: 1.1rem;
         transition: all 0.3s ease;
         width: 100%;
-        /* text-transform: lowercase; */
         letter-spacing: 1px;
         font-family: 'Bebas Neue', cursive;
         position: relative;
